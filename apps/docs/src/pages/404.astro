@@ -1,0 +1,18 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="ページが見つかりません | MoonBase 日の出基地"
+  description="指定されたページは見つかりませんでした。"
+>
+  <main class="not-found-page">
+    <p>404</p>
+    <h1>ページが見つかりません</h1>
+    <p>URLを確認するか、トップページから目的のページを探してください。</p>
+    <nav aria-label="404ページの案内">
+      <a href="/">トップページへ戻る</a>
+      <a href="/sessions/00-system-handover/">最初のSession 00を始める</a>
+    </nav>
+  </main>
+</BaseLayout>

@@ -1,0 +1,427 @@
+---
+import { Code } from "astro:components";
+import CodeGuideCards from "../../components/CodeGuideCards.astro";
+import CommandBlock from "../../components/CommandBlock.astro";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
+import type { CodeGuide } from "../../code-explorer/code-guide";
+import { projectFilesForSnapshot } from "../../code-explorer/project-files";
+import type { SessionWorkspace } from "../../code-explorer/types";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { loadSolutionSnippets } from "../../sessions/solution-snippets";
+import type {
+  ExerciseSessionSummary,
+  SessionSummary,
+} from "../../sessions/types";
+import "../../styles/code-playground.css";
+import "../../styles/sessions.css";
+
+export const session: SessionSummary = {
+  slug: "07-effects-and-consistency",
+  snapshot: "session-07",
+  sequence: "07",
+  kind: "exercise",
+  title: "副作用と整合性境界を設計する",
+  durationMinutes: 30,
+  timeBreakdown: { brief: 4, teach: 3, exercise: 15, review: 8 },
+  adv: { articulate: 2, delegate: 10, verify: 3 },
+  peerReview: {
+    minutes: 8,
+    pickCount: 2,
+    questions: [
+      "時刻とイベント ID は実行ごとに一度だけ生成され、同じ `EventContext` に入りますか。",
+      "状態と作業記録は、1つのイベントとして同じ `store` に渡されますか。",
+      "業務上の競合だけを `Result` で返し、保存障害は reject のまま伝播しますか。",
+    ],
+  },
+  solutionSnapshot: "session-08",
+  solutionPresentation: "completed-file",
+  peerReviewPromises: "reference",
+  animal: { name: "EVA-0412", type: "work-log", avatar: "🕰️" },
+  summary: "時刻や記録 ID など実行のたびに変わる値と保存を port に切り出し、状態と作業記録を一度に保存します。",
+  episode: [
+    "PV-07 の開始承認で、作業許可の状態だけが先に承認済になり、承認の作業記録はどこにも残りませんでした。",
+    "再現テストでは承認時刻と記録 ID が毎回変わり、月面日は記録されず、失敗の証拠まで落ち着きがありません。",
+    "状態更新は即決、記録保存は自由行動。点呼の答えは無線で確かめるしかありませんでした。",
+  ],
+  incident: "実行のたびに変わる値でテスト結果が安定せず、状態だけ保存され作業記録が残らない作業許可が生まれた。",
+  exerciseCommand: "pnpm exercise:07",
+  exerciseModule: {
+    dir: "examples/session-07/src/useCase",
+    fileBudget: 3,
+    lineBudget: 55,
+  },
+  delegationPrompt: {
+    request:
+      "開始承認で作る状態と作業記録に、1回の実行で生成した値を使ってください。保存時に片方だけが残らない形へ改善してください。",
+    decisions: [
+      "実行ごとに変わる値をいつ生成するか",
+      "どの状態と記録を同時に保存するか",
+      "保存障害をどの境界まで伝えるか",
+    ],
+  },
+  steps: [
+    {
+      id: "s7-inject-context",
+      goal: "Clock と ID generator を使って EventContext を一度だけ生成する。",
+      startingFailure: "同じ条件で実行しても、時刻とイベント ID が毎回変わる。",
+      targets: [
+        "examples/session-07/src/useCase/dependencies.ts",
+        "examples/session-07/src/useCase/approveEva.ts",
+      ],
+      solutions: [
+        {
+          path: "examples/session-08/src/useCase/dependencies.ts",
+          symbol: "EventContextDependencies",
+          lines: [1, 51],
+          presentation: "completed-file",
+        },
+        {
+          path: "examples/session-08/src/useCase/approveEva.ts",
+          symbol: "createEventContext",
+          lines: [1, 106],
+          presentation: "completed-file",
+        },
+      ],
+    },
+    {
+      id: "s7-atomic-store",
+      goal: "状態と作業記録を1回の保存で残す。",
+      startingFailure: "状態と作業記録を別々に保存している。",
+      targets: ["examples/session-07/src/useCase/dependencies.ts"],
+      solutions: [
+        {
+          path: "examples/session-08/src/useCase/dependencies.ts",
+          symbol: "EvaApprovedStore",
+          lines: [1, 51],
+          presentation: "completed-file",
+        },
+      ],
+    },
+    {
+      id: "s7-result-async",
+      goal: "非同期で保存しても、イベントを結果として返す。",
+      startingFailure: "保存後に、更新した作業許可の状態を受け取れない。",
+      targets: ["examples/session-07/src/useCase/approveEva.ts"],
+      solutions: [{
+        path: "examples/session-08/src/useCase/approveEva.ts",
+        symbol: "approveEvaWithEffects",
+        lines: [1, 106],
+        presentation: "completed-file",
+      }],
+    },
+    {
+      id: "s7-propagate-store-failure",
+      goal: "保存失敗を業務Resultへ変換せず、例外として外側の境界へ伝播する。",
+      startingFailure: "業務上の競合と、保存障害・破損データを区別して返せない。",
+      targets: [
+        "examples/session-07/src/useCase/errors.ts",
+        "examples/session-07/src/useCase/approveEva.ts",
+      ],
+      solutions: [
+        {
+          path: "examples/session-08/src/useCase/errors.ts",
+          symbol: "PermitConflict",
+          lines: [1, 113],
+          presentation: "completed-file",
+        },
+        {
+          path: "examples/session-08/src/useCase/approveEva.ts",
+          symbol: "approveEvaWithEffects",
+          lines: [1, 106],
+          presentation: "completed-file",
+        },
+      ],
+    },
+  ],
+  decisions: [
+    {
+      invariant: "時刻と記録 ID は1回のユースケース実行で一度だけ生成し、同じ実行コンテキストから状態と作業記録を作る。地球時と月面日を併記する。",
+    },
+    {
+      invariant: "状態と作業記録は同時に残るか、どちらも残らない。",
+    },
+    {
+      invariant: "保存障害を、呼び出し側が選択できる業務上の失敗へ偽装しない。",
+    },
+  ],
+  finalReferences: [
+    "examples/final/src/domain/aggregate/clock.ts",
+    "examples/final/src/domain/aggregate/eventIdGenerator.ts",
+    "examples/final/src/domain/aggregate/eventContext.ts",
+    "examples/final/src/domain/aggregate/aggregateStore.ts",
+    "examples/final/src/domain/permit/permitStores.ts",
+    "examples/final/src/useCase/approveEvaUseCase.ts",
+    "examples/final/src/app.ts",
+  ],
+};
+
+export const guides = ([
+  {
+    id: "hidden-nondeterminism",
+    title: "output event の時刻と ID をユースケース内で生成している",
+    currentDesign: "Date と randomUUID を直接呼び、同じ入力でも output event が変わります。",
+    futureRisk: "期待値を固定できず、テストが実行時刻に依存します。",
+    path: "src/useCase/approveEva.ts",
+    highlights: [{ startLineNumber: 66, endLineNumber: 92 }],
+  },
+  {
+    id: "dual-write",
+    title: "side effects が2つの保存処理に分かれている",
+    currentDesign: "side effects として stateStore.save と workLog.append を順番に await しています。",
+    futureRisk: "片方だけ成功すると、作業記録を伴わない状態変更が残ります。",
+    path: "src/useCase/approveEva.ts",
+    highlights: [{ startLineNumber: 94, endLineNumber: 95 }],
+  },
+] as const) satisfies readonly CodeGuide[];
+
+const narrative = {
+  requirement: "誰がいつ開始承認をしたかを業務イベントとし、作業許可の状態と作業記録を一つの保存境界へ渡す。時刻は地球時と月面日を併記する。",
+  currentRisk: "時刻と記録 ID を処理中に直接作り、月面日は常に第1日として扱い、状態と作業記録を別々に保存するため、テスト結果が安定せず、片方だけが残り得る。",
+  design: "Clock（地球時と月面日）と EventIdGenerator を port として注入し、副作用を調整するユースケースで EventContext を一度だけ生成する。純粋な状態遷移にはその EventContext を渡し、状態と作業記録を表す EvaApproved を単一の Store へ渡す。作業許可が存在しない・状態が不正・承認が競合しているケースは Result のエラーを返す。SQLite 起因のエラーやデータが破損しているエラーは業務エラーには変換せず、Promise の reject として外側の境界へ伝える。",
+  limitation: "in-memory の一括保存は契約の形を示す。本番の永続化層でアトミック性を守るには、transaction と結合テストが必要になる。",
+  legacy: "直接時刻を参照したり記録 ID を生成したりしている処理、状態の保存と作業記録の保存がアトミックになっていない実装を読んでみましょう。例えば作業記録の保存だけが失敗した場合、状態の保存のみが実行され、事故報告 第6号の点呼のように記録から判断できない状況が発生します。また、用意された単一の store に業務競合が届かない箇所を探します。",
+  fallback: "各解答欄には、import と後続 step を含む完成ファイルを target ごとに示します。表示されたすべての target file を反映した後、同じ exercise の検査がパスすることを確認します。各 step を個別にパスすることは想定していません。解答を使って進めた場合も、レビューの問いに答え、各依存を外から渡す理由を確認しましょう。",
+} as const;
+
+const exerciseSession: ExerciseSessionSummary = session;
+
+export const workspace = ({
+  slug: session.slug,
+  snapshot: session.snapshot,
+  initialFile: "exercises/effects-and-events.test.ts",
+  description: "output event と side effects の要求を開始 snapshot で確認します。",
+  visibleFiles: [
+    "exercises/effects-and-events.test.ts",
+    "test/regression/result-errors.test.ts",
+    "src/domain/aggregate/clock.ts",
+    "src/domain/aggregate/eventContext.ts",
+    "src/domain/aggregate/eventId.ts",
+    "src/domain/aggregate/eventIdGenerator.ts",
+    "src/domain/permit/evaApproved.ts",
+    "src/useCase/dependencies.ts",
+    "src/useCase/errors.ts",
+    "src/useCase/approveEva.ts",
+    "src/shared/schemaResult.ts",
+    "src/shared/sensitive.ts",
+  ],
+} as const) satisfies SessionWorkspace;
+
+const projectFiles = projectFilesForSnapshot(session.snapshot);
+const solutionSteps = await Promise.all(
+  session.steps.map(async (step) => ({
+    step,
+    presentation: step.solutions[0].presentation ?? "excerpt",
+    snippets: await loadSolutionSnippets(step),
+  })),
+);
+const chapters = [
+  { id: "incident", label: "今回つくるもの" },
+  { id: "legacy", label: "コードを読み、失敗を再現する" },
+  { id: "refactor", label: "型で閉じる" },
+  { id: "review", label: "レビューと持ち帰り" },
+] as const;
+const commonReviewChecks = [
+  "`as` によるキャストが入っていないか全文検索して確認する。",
+  "`git diff --stat -- examples/session-07` で今回の snapshot だけを確認する。`git status --short` で想定外の path がないか確認する。",
+  "型検査では確認できないことを、テストまたは実行時に確認して記録する。",
+] as const;
+const reviewCompletionArtifacts = [
+  "一緒に記録する必要がある値",
+  "Agentへの依頼文",
+  "型検査では確認できず、テストまたは実行時に確認すること",
+] as const;
+const businessReflectionQuestion =
+  "自分の業務コードで、今回と同種の問題が起きうる箇所はどこですか。";
+export const promisesHref =
+  "/sessions/03-state-transitions/#peer-review-promises";
+export const navigation = ({
+  previous: {
+    href: "/sessions/06-workflow-errors/",
+    title: "失敗をユースケースの結果として扱う",
+  },
+  next: {
+    href: "/sessions/final/",
+    title: "参照実装で境界をたどる",
+  },
+} as const);
+const headcount = session.peerReview.pickCount === 2 ? "1〜2名" : "1名";
+const delegationPrompt = `次の変更を実装してください。
+
+業務背景:
+${session.incident}
+
+依頼:
+${exerciseSession.delegationPrompt.request}
+
+一緒に記録する必要がある値: [言語化フェーズで書いた1文]
+
+着手前に判断すること:
+${exerciseSession.delegationPrompt.decisions.map((decision) => `- ${decision}: [自分の判断を書く]`).join("\n")}
+
+まず配布コードと失敗しているテストを読み、上の判断と変更方針を短く説明してください。説明のあとで実装に進んでください。設計手段は既存コードに合うものを選び、選んだ理由も示してください。
+
+受け入れ条件:
+${session.steps.map((step) => `- ${step.goal}`).join("\n")}
+
+変更範囲:
+- ${session.exerciseModule.dir}/ のみ
+- 最大 ${session.exerciseModule.fileBudget} ファイル・約 ${session.exerciseModule.lineBudget} 行
+- 範囲外の変更が必要に見えた場合は、変更せず理由を報告する
+- 型エラーを \`as\` によるキャストで回避しない
+
+検証:
+- ${session.exerciseCommand} を実行し、すべての assertion が成功すること
+
+完了時の報告:
+- 変更したファイルと判断理由
+- 検証コマンドの結果
+- 型だけでは守れず、テストまたはレビューに残した点`;
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header"><a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a></header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+          <section id="incident">
+            <h2>今回つくるもの</h2>
+            <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+              <p class="case-file__episode-label">日の出基地のひと幕</p>
+              {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+            </aside>
+            <p>事故報告 第6号が破った条文は、第7条と第9条です。読み込み、時刻と記録IDの生成、保存を外から渡し、開始承認のイベント EvaApproved を1回保存します。</p>
+            <h3 data-story-stage="use-case">追加したい機能</h3>
+            <p>{narrative.requirement}</p>
+            <h3 data-story-stage="pitfall">素朴な実装の落とし穴</h3>
+            <p>{narrative.currentRisk}</p>
+            <h3 data-story-stage="goal">このセッションのゴール</h3>
+            <p>{narrative.design}</p>
+            <h3>このセッションで守ること</h3>
+            <ul class="decision-list">{session.decisions.map(({ invariant }) => <li>{invariant}</li>)}</ul>
+            <p>今回の変更は <code>{session.exerciseModule.dir}</code> 内の1モジュールに限定します。</p>
+            <aside class="decision-card">
+              <h3>他の書き方ではこう書く</h3>
+              <p>
+                イベント駆動では、承認は「船外作業が承認された」という出来事で、状態はその出来事を畳み込んだ結果です。S1 の <code>07-event-driven.ts</code> が判定の入力を出来事の履歴として受け取っていたのと同じ考え方で、この回は出力側を出来事にします。
+                データ指向では、EvaApproved は JSON にそのまま出せる平らなデータです。payload に何を入れ、何を入れないか（累積線量は入れない）を、データの形として決めます。
+              </p>
+            </aside>
+          </section>
+
+          <section id="legacy" class="code-playground">
+            <h2>コードを読み、失敗を再現する</h2>
+            <p>{narrative.legacy}</p>
+            <p>
+              編集する範囲は <code>{session.exerciseModule.dir}</code>、変更するファイル数は最大
+              {session.exerciseModule.fileBudget}ファイル・約{session.exerciseModule.lineBudget}行です。
+            </p>
+            <CodeGuideCards guides={guides} projectFiles={projectFiles} />
+            <h3>修正前の失敗を確認する</h3>
+            <p>修正前は、次の{session.steps.length}件に対応する演習テストが失敗します。</p>
+            <ul class="exercise-failures" aria-label="修正前に確認する問題">
+              {session.steps.map((step) => <li>{step.startingFailure}</li>)}
+            </ul>
+            <CommandBlock phase="red" command={session.exerciseCommand} expected={`${session.steps.length}件の演習テストが失敗します。`} />
+            <p>ブラウザ内の変更はローカルへ反映されません。</p>
+            <div data-code-explorer={workspace.slug}>
+              <CodeExplorer
+                client:load
+                workspace={workspace}
+                projectFiles={projectFiles}
+                initialCommand={session.exerciseCommand}
+              />
+            </div>
+          </section>
+
+          <section id="refactor">
+            <h2>演習</h2>
+            <h3>進め方: 言語化 → Agentへの依頼 → 検証</h3>
+            <p>Agentを使わない場合は、テンプレートを実装メモとして使って自分で実装します。以降の「Agentへの依頼文」も実装メモに読み替えてください。</p>
+            <ol class="adv-flow">
+              <li><strong>言語化（{session.adv.articulate}分）</strong>: 一緒に記録する必要がある値を1文で書く。</li>
+              <li><strong>依頼（{session.adv.delegate}分）</strong>: その1文と自分の判断をテンプレートへ入れ、Agent に依頼する。</li>
+              <li><strong>検証（{session.adv.verify}分）</strong>: 型、テスト、差分の範囲を確認する。</li>
+            </ol>
+            <div class="delegation-prompt">
+              <h3>プロンプトのテンプレート</h3>
+              <p>角括弧の中は、事故と配布コードを読んだ自分の判断で埋めます。技法名や完成形を先に指定する必要はありません。</p>
+              <pre><code>{delegationPrompt}</code></pre>
+            </div>
+            <h3>この演習で解決しないこと</h3>
+            <p>{narrative.limitation}</p>
+            <h3 data-solution-heading>{exerciseSession.solutionPresentation === "completed-file" ? "完成ファイルの解答例" : "ステップごとの解答"}</h3>
+            {exerciseSession.solutionPresentation === "completed-file" ? (
+              <div class="before-after" aria-label="業務結果と非同期例外経路の見比べ方">
+                <p><strong>演習の開始時点:</strong> 予期できる業務 Result と、保存処理が reject する技術的な例外経路を分けて読む。</p>
+                <p><strong>完成例:</strong> 下のすべての target file には、後続 step を含む完成状態が表示される。</p>
+              </div>
+            ) : null}
+            {solutionSteps.map(({ step, presentation, snippets }) => (
+              <div class="solution-step">
+                <details class="step-solution" data-presentation={presentation}>
+                  <summary>{step.goal}</summary>
+                  {presentation === "completed-file" ? (
+                    <p class="step-solution__completed-file-note">この完成例には後続 step を含みます。すべての target file を反映してから検証します。</p>
+                  ) : null}
+                  {snippets.map(({ solution, code }) => (
+                    <section class="step-solution__snippet">
+                      <h4><code>{solution.path}</code></h4>
+                      <Code code={code} lang="ts" />
+                    </section>
+                  ))}
+                </details>
+              </div>
+            ))}
+            <CommandBlock phase="green" command={session.exerciseCommand} expected="演習テストがすべて成功します。" />
+            <h3>演習を完了できないとき</h3>
+            <p>{narrative.fallback}</p>
+          </section>
+
+          <section id="review">
+            <h2>レビューと持ち帰り</h2>
+            <div class="exercise-review-checklist">
+              <h3>個人で確認する</h3>
+              <ol>{commonReviewChecks.map((check) => <li>{check}</li>)}</ol>
+              <p>前のセッションの未commit差分は残して構いません。reset、stash、commit は不要です。</p>
+              <p><strong>残すもの:</strong> {reviewCompletionArtifacts.join("、")}</p>
+              <h3>業務へ持ち帰る</h3>
+              <p>{businessReflectionQuestion}</p>
+            </div>
+            <section class="peer-review-panel">
+              <h3>設計を振り返る</h3>
+              <p>ひとりの場合は、次の問いへの答えと根拠になるコードをメモします。複数人の場合は、お互いの差分を見ながら確認します。相互レビューは{session.peerReview.minutes}分・{headcount}を目安にしてください。</p>
+              <p><a href={promisesHref}>進行上の約束事を確認する</a></p>
+              <ol>{session.peerReview.questions.map((question) => <li>{question}</li>)}</ol>
+            </section>
+          </section>
+
+          <aside class="failure-boundary" aria-label="業務エラーとインフラ例外の区別">
+            <h2>2つの失敗経路を見分ける</h2>
+            <ul class="decision-list">
+              <li>
+                <strong>業務上のエラー:</strong> 作業許可が存在しない・状態が不正・承認が競合しているケースは、呼び出し元で次の対応を選択する余地があるため、
+                <code>Result</code> の <code>Err</code> で返します。
+              </li>
+              <li>
+                <strong>運用上の異常:</strong> SQLite 起因のエラーやデータが破損しているエラーは呼び出し元でも解決できません。境界の外側で安全に記録し、エラーの詳細を含まない形で
+                HTTP 500 のレスポンスに変換します。
+              </li>
+            </ul>
+          </aside>
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+        <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>

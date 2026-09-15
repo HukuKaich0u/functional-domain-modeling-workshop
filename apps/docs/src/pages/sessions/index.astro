@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import type { SessionSummary } from "../../sessions/types";
+import "../../styles/sessions.css";
+import "../../styles/session-directory.css";
+
+const sessions = Object.values(
+  import.meta.glob<SessionSummary>(["./*.astro", "!./index.astro"], {
+    eager: true,
+    import: "session",
+  }),
+).sort((left, right) => {
+  const order = (session: SessionSummary) =>
+    session.sequence === "Final"
+      ? Number.POSITIVE_INFINITY
+      : Number(session.sequence);
+  return order(left) - order(right);
+});
+---
+
+<BaseLayout
+  title="セッション一覧 | FP with TypeScript"
+  description="関数型ドメインモデリングをTypeScriptで学ぶ全セッションの一覧"
+>
+  <div class="case-file session-directory">
+    <header class="case-file__site-header">
+      <a href="/">MoonBase 日の出基地</a>
+    </header>
+    <main class="session-directory__main">
+      <header class="session-directory__hero">
+        <p class="case-file__eyebrow">CURRICULUM</p>
+        <h1>セッション一覧</h1>
+        <p>Session 00から順番に、月面太陽光発電所の船外作業管理の業務とコードを確認していきます。ひとりで1回ずつ進めることも、ハンズオンで一緒に取り組むこともできます。表示時間は目安です。</p>
+      </header>
+      <section class="session-directory__setup" aria-labelledby="session-directory-setup-heading">
+        <p class="session-directory__setup-label">SESSION 00の前に</p>
+        <h2 id="session-directory-setup-heading">事前準備</h2>
+        <p>
+          セッションを始める前に、学び方と環境の準備を確認してください。コード演習では、リポジトリのcloneと教材の起動確認を済ませておきます。
+        </p>
+        <a class="session-directory__setup-link" href="/setup/">
+          事前準備ページを開く
+          <span aria-hidden="true">→</span>
+        </a>
+      </section>
+      <ol class="session-directory__list" aria-label="セッション一覧">
+        {sessions.map((session) => (
+          <li>
+            <a class="session-directory__card" href={`/sessions/${session.slug}/`}>
+              <span class="session-directory__meta">
+                <span>SESSION {session.sequence.toUpperCase()}</span>
+                <span>{session.durationMinutes}分</span>
+              </span>
+              <span class="session-directory__animal" aria-hidden="true">{session.animal.avatar}</span>
+              <h2>{session.title}</h2>
+              <p>{session.summary}</p>
+              <span class="session-directory__open">セッションを開く</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </main>
+  </div>
+</BaseLayout>

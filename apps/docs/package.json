@@ -1,0 +1,30 @@
+{
+  "name": "@moonbase/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro check && astro build && node scripts/verify-static-build.mjs",
+    "typecheck": "astro check",
+    "test": "vitest run",
+    "preview": "astro preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.6.2",
+    "@webcontainer/api": "1.6.4",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "astro": "^4.16.18",
+    "monaco-editor": "0.56.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "happy-dom": "^15.11.7",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,241 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import type { CodeGuide } from "../../code-explorer/code-guide";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import type { SessionNavigation, SessionSummary } from "../../sessions/types";
+import "../../styles/sessions.css";
+
+export const session: SessionSummary = {
+  slug: "00-system-handover",
+  snapshot: "session-00",
+  sequence: "00",
+  kind: "orientation",
+  title: "業務とシステムを引き継ぐ",
+  durationMinutes: 10,
+  timeBreakdown: { brief: 4, teach: 3, exercise: 0, review: 3 },
+  animal: { name: "EVA-0412", type: "handover", avatar: "🛰️" },
+  summary: "MoonBase 日の出基地の現行業務、SQLite に残る現在の作業許可と作業記録、事故報告 第1号を確認します。",
+  episode: [
+    "補給便で着任した初日、前任者は同じ便で帰る支度をしながら、事故報告 第1号のプリントを手渡してきました。",
+    "帰還済みの作業許可は「作業中」へ戻り、点呼は40分の捜索に。共有ログには2名の累積線量まで律儀にそろっています。",
+    "引き継ぎ資料を開く前に、記録の逆戻りと線量流出の再現条件だけは確認できました。",
+  ],
+  incident: "帰還済みの作業許可が作業中へ戻り、作業記録から作業員の累積線量が共有ログへ流出した。",
+  steps: [],
+  decisions: [],
+  finalReferences: [],
+};
+
+export const guides = ([
+  {
+    id: "string-status",
+    title: "状態を任意の文字列で表している",
+    currentDesign: "status と更新先の状態を string で受け取っています。",
+    futureRisk: "業務で使う状態と許可する遷移を型から判断できません。",
+    path: "src/domain/permit/permit.ts",
+    highlights: [{ startLineNumber: 7, endLineNumber: 7 }],
+  },
+  {
+    id: "optional-state-data",
+    title: "状態固有の情報が複数の optional field に分散している",
+    currentDesign: "承認、出発、帰還、完了、中止の情報が、一つの型にある複数の optional field として定義されています。",
+    futureRisk: "どの状態で何が必須なのかを型から判断できません。",
+    path: "src/domain/permit/permit.ts",
+    highlights: [{ startLineNumber: 8, endLineNumber: 19 }],
+  },
+  {
+    id: "plain-string-ids",
+    title: "用途の異なる ID がすべて string である",
+    currentDesign: "作業許可、作業区画、系統区間、作業員の ID が同じ string です。",
+    futureRisk: "実行時には同じ形式の ID を TypeScript が区別できません。",
+    path: "src/domain/permit/permit.ts",
+    highlights: [
+      { startLineNumber: 2, endLineNumber: 4 },
+      { startLineNumber: 8, endLineNumber: 8 },
+    ],
+  },
+  {
+    id: "session-00-unvalidated-space-weather",
+    title: "外部の宇宙天気の報告を any のまま受け取っている",
+    currentDesign: "宇宙天気の報告の parse は raw: any をそのまま返します。",
+    futureRisk: "壊れた JSON や用途の違う ID が、検査されないまま作業許可として保存されます。",
+    path: "src/boundary/spaceWeatherReport.ts",
+    highlights: [{ startLineNumber: 4, endLineNumber: 4 }],
+  },
+  {
+    id: "session-00-raw-dose-work-log",
+    title: "作業員の累積線量を作業記録に残している",
+    currentDesign: "操作後の作業許可の内容を丸ごと作業記録として SQLite へ保存します。",
+    futureRisk: "作業員ごとの累積線量という機微情報が作業記録から読めます。",
+    path: "src/adaptor/secondary/sqlite/permitRepository.ts",
+    highlights: [{ startLineNumber: 68, endLineNumber: 68 }],
+  },
+  {
+    id: "session-00-message-mapped-errors",
+    title: "失敗理由を例外メッセージで判定している",
+    currentDesign: "catch した例外の message を部分一致で調べ、状態不正として画面へ戻します。",
+    futureRisk: "許可なしと別の失敗を型で区別できず、表示と対応を誤ります。",
+    path: "src/web/routes.ts",
+    highlights: [{ startLineNumber: 192, endLineNumber: 193 }],
+  },
+  {
+    id: "session-00-hidden-nondeterminism",
+    title: "時刻と記録 ID を処理の中で直接生成している",
+    currentDesign: "開始承認の処理が現在時刻と UUID を直接生成します。",
+    futureRisk: "同じ操作でも記録が毎回変わり、テストと事故調査の比較が安定しません。",
+    path: "src/useCase/approveEva.ts",
+    highlights: [
+      { startLineNumber: 24, endLineNumber: 24 },
+      { startLineNumber: 34, endLineNumber: 34 },
+    ],
+  },
+  {
+    id: "session-00-dual-write",
+    title: "現在の作業許可と作業記録を別々に保存している",
+    currentDesign: "作業許可を保存した後で、作業記録を別の処理で追加します。",
+    futureRisk: "作業記録の追加が失敗すると、作業許可だけが変更され、記録が残りません。",
+    path: "src/useCase/approveEva.ts",
+    highlights: [{ startLineNumber: 32, endLineNumber: 33 }],
+  },
+] as const) satisfies readonly CodeGuide[];
+
+const chapters = [
+  { id: "incident", label: "現行業務と事故" },
+  { id: "system", label: "SQLite に残る内容" },
+  { id: "review", label: "レビューと持ち帰り" },
+] as const;
+export const navigation = ({
+  previous: undefined,
+  next: {
+    href: "/sessions/01-design-approaches/",
+    title: "開始承認の7条件を10通りに書いて比べる",
+  },
+} as SessionNavigation);
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header">
+      <a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a>
+    </header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+  <section id="incident">
+    <h2>現行業務と起きている事故</h2>
+    <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+      <p class="case-file__episode-label">日の出基地のひと幕</p>
+      {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+    </aside>
+    <p>
+      補給便で着任したシステム担当として、MoonBase 日の出基地の作業管理システムを引き継ぎます。前任者は同じ便で地球へ帰り、引き継ぎに使えるのは補給便が月面に留まる間だけです。
+      この10分は修正案を出さず、現場の役割、日々の操作、実際に起きた事故を、同じ事実に基づいて読み解きます。
+    </p>
+    <h3>現行業務</h3>
+    <p>
+      MoonBase は月面で太陽光発電所「赤道発電所」を建設・運転する会社です。パネル区画 PV-01〜PV-12 を順に母線へつなぎ、いまつながっているのは PV-06 まで。
+      夜は蓄電池だけで越し、容量は基地の生命維持14日分ぎりぎりです。教材の「現在」は月面日第1日、前の夜を蓄電池ぎりぎりで越した直後です。この昼に PV-07〜PV-09 をつなげば、次の夜に余裕が出ます。
+    </p>
+    <dl>
+      <dt>地上管制</dt>
+      <dd>本社の運用室。作業計画から作業許可を申請し、宇宙天気を監視し、中止を命じる。基地長が船外にいるときは開始承認を代行する。端末には旧型が残っている。</dd>
+      <dt>基地長</dt>
+      <dd>船外作業の開始承認を行う。中止も命じられる。フレア警報が出たら点呼を行う。</dd>
+      <dt>電気主任</dt>
+      <dd>作業区画に対応する系統区間を遮断し、遮断札を掛ける。札は掛けた者だけが外し、作業許可を完了にする。</dd>
+      <dt>医務</dt>
+      <dd>隊員の累積線量を管理する。開始承認の判定に値を渡すが、記録には出さない。</dd>
+      <dt>船外作業員</dt>
+      <dd>電気工の資格を持つ4名。2名1組で外に出て、接続、点検、修理を行う。エアロックの出発と帰還はその都度記録する。</dd>
+    </dl>
+    <h3>引き継ぎ初日に確認した事故報告 第1号</h3>
+    <article class="incident-report">
+      <h4>帰還済みの作業許可 EVA-0412 が作業中へ戻った</h4>
+      <p>
+        前の昼、月面日第12日。作業員aと作業員bは PV-06 の接続作業を終え、エアロック帰還を記録しました。
+        その後、地上管制の端末から同じ許可に対する状態更新が届き、システムは操作を止めず、許可を再び作業中へ戻しました。
+        同日のフレア警報で基地長が点呼を行うと、記録上は作業員bが船外にいることになり、捜索に40分を要しました。実際には2名とも与圧区画内にいました。
+      </p>
+      <p>SQLite には、「帰還済」にした作業記録と、「作業中」になっている現在の作業許可が、同じ許可番号に残りました。</p>
+    </article>
+    <article class="incident-report">
+      <h4>事故を調べた担当者へ、作業員2名の累積線量まで見せてしまった</h4>
+      <p>
+        捜索の経緯を確認するために作業記録を開くと、操作名や時刻だけでなく、操作後の作業許可の内容まで丸ごと保存されていました。
+        承認の判定に使った作業員2名の累積線量も、全隊員と請負業者が閲覧できる共有ログから読める状態でした。線量上限に近い作業員bは、翌日の作業配置から外されました。
+      </p>
+      <p>作業記録が増えるたびに、同じ累積線量を含むデータが SQLite へ追加されます。規程第8条は、累積線量を作業記録および共有ログに記載してはならないと定めています。</p>
+    </article>
+    <p>
+      この時点では原因を決めつけません。次の節で画面操作と SQLite に残った内容を照らし合わせ、
+      現在の作業許可と作業記録のどこに問題があるかを確認します。報告書の原本は <code>docs/world/incident-report-01.md</code>、規程の全文は <code>docs/world/eva-regulations.md</code> にあります。
+    </p>
+  </section>
+
+  <section id="system">
+    <h2>画面操作の結果がデータベースにどう残るか</h2>
+    <p>
+      画面で操作すると、現在の作業許可と、各操作を行った後の作業記録が SQLite に保存されます。
+      サーバーを起動し直しても両方のデータは残り、
+      「デモを初期状態へ戻す」を実行したときだけ初期状態へ戻ります。ここでも修正はせず、事故報告と現在の動きがどこで結び付くかを確認します。
+    </p>
+    <h3>現在の操作</h3>
+    <table>
+      <thead><tr><th>担当</th><th>画面で行う操作</th><th>現在の記録</th></tr></thead>
+      <tbody>
+        <tr><th>地上管制</th><td>作業計画から作業許可を申請し、必要なら中止する。基地長不在時は開始承認を代行する。</td><td>作業許可の現在の状態と操作を行った時刻を更新する。</td></tr>
+        <tr><th>基地長</th><td>装備点検、酸素、線量、宇宙天気、相方、遮断を確認して開始を承認する。</td><td>承認者、承認時刻、遮断した系統区間、装備点検を残す。</td></tr>
+        <tr><th>作業員・電気主任</th><td>エアロックの出発と帰還を記録し、遮断札を外して完了にする。</td><td>出発時刻、帰還時刻、遮断札を外した時刻を残す。</td></tr>
+      </tbody>
+    </table>
+    <h3>現在の作業許可と作業記録を見比べる</h3>
+    <p>
+      デモ画面では、SQLite から読み出したデータを JSON 形式で表示します。
+      JSON は、この画面でデータの内容を示す形式です。別の種類のデータを保存しているわけではありません。
+    </p>
+    <table>
+      <thead><tr><th>画面に表示されるもの</th><th>何が入っているか</th><th>何を確かめるか</th></tr></thead>
+      <tbody>
+        <tr><th>現在の作業許可</th><td>許可番号、作業区画、乗員、現在の状態、遮断した系統区間、各操作の時刻。</td><td>想定外の状態や識別子の取り違え、不正な宇宙天気の報告が残っていないか。</td></tr>
+        <tr><th>作業記録</th><td>記録 ID、操作名、時刻、その操作を終えた直後の作業許可の内容。</td><td>現在の作業許可と食い違っていないか、不要な累積線量が含まれていないか。</td></tr>
+        <tr><th>不整合の警告</th><td>作業許可の状態、識別子、現在の作業許可と作業記録の食い違い、累積線量の有無。</td><td>事故を再現した後、どのデータに問題が残ったか。</td></tr>
+      </tbody>
+    </table>
+    <h3>事故を再現する5つの操作</h3>
+    <p>
+      デモ画面の事故再現パネルには、想定外の状態の保存、系統区間の取り違え、不正な宇宙天気の報告、存在しない許可での開始承認、開始承認の繰り返しの5つを置いています。
+      それぞれ S3、S4、S5、S6、S7 で直す対象です。実行後に「不整合の警告」を読み、どのデータに問題が残ったかを確かめます。
+    </p>
+  </section>
+
+  <section id="review">
+    <h2>レビューと持ち帰り</h2>
+    <p>
+      「誰が、どの操作をし、何が起き、現在の作業許可と作業記録にどう残ったか」を1件ずつメモします。複数人の場合は、メモを共有します。
+      Session 00 では事故を修正しません。Session 03 から Session 07 で、状態、識別子、入力と累積線量、失敗、実行のたびに変わる値、作業許可と作業記録の食い違いを順に改善する理由を確認します。
+      その前に Session 01 で、開始承認の7条件を10通りに書いて設計アプローチを比べます。
+    </p>
+  </section>
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        {
+          navigation.previous === undefined ? null : (
+            <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+          )
+        }
+        {
+          navigation.next === undefined ? null : (
+            <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+          )
+        }
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>

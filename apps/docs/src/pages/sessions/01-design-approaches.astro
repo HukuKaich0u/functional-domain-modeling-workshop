@@ -1,0 +1,385 @@
+---
+import CodeGuideCards from "../../components/CodeGuideCards.astro";
+import CommandBlock from "../../components/CommandBlock.astro";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
+import type { CodeGuide } from "../../code-explorer/code-guide";
+import { projectFilesForSnapshot } from "../../code-explorer/project-files";
+import type { SessionWorkspace } from "../../code-explorer/types";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import type { SessionNavigation, SessionSummary } from "../../sessions/types";
+import "../../styles/code-playground.css";
+import "../../styles/sessions.css";
+
+export const session: SessionSummary = {
+  slug: "01-design-approaches",
+  snapshot: "session-01",
+  sequence: "01",
+  kind: "comparison",
+  title: "開始承認の7条件を10通りに書いて比べる",
+  durationMinutes: 20,
+  timeBreakdown: { brief: 2, teach: 10, exercise: 5, review: 3 },
+  animal: { name: "PV-07", type: "zone", avatar: "🔆" },
+  summary:
+    "船外作業規程の開始承認の7条件を、手続き型から Logic Programming まで10通りに書き、同じ入力で位置づけ、用途、長所、制約を比べます。",
+  episode: [
+    "引き継ぎ2日目。開始承認の条件は、地上管制の端末、基地の端末、医務の表計算に、3通りの書き方で散らばっていました。",
+    "同じ7条件のはずなのに、酸素が足りない申請を、1台は「夜間」と表示し、1台は500を返し、1台は承認しました。",
+    "直す前に、同じ条件を同じ入力で10通りに書いて並べ、どの書き方が何を守り、何を守らないかを見ます。",
+  ],
+  incident:
+    "同じ7条件でも、書き方によって止まる場所、報告する理由の範囲、変更のしやすさが変わる。",
+  steps: [],
+  decisions: [],
+  finalReferences: [],
+};
+
+export const guides = ([
+  {
+    id: "s1-functional-composition",
+    title: "条件を純粋関数にして合成する（主題）",
+    currentDesign:
+      "各条件は「申請から却下理由の一覧を返す」関数で、all がそれらを並べて一つの判定にしています。",
+    futureRisk:
+      "S6 と S7 では、この形に失敗の型と副作用の置き場所を足していきます。",
+    path: "src/approaches/03-functional.ts",
+    highlights: [
+      { startLineNumber: 79, endLineNumber: 82 },
+      { startLineNumber: 94, endLineNumber: 95 },
+    ],
+  },
+  {
+    id: "s1-type-driven-parse",
+    title: "判定できる形を型で決め、parse を通す（主題）",
+    currentDesign:
+      "parseCandidate が装備点検2名分、相方、遮断済みの区間を型の構造へ写し、approve はその型だけを受け取ります。",
+    futureRisk:
+      "型で表せない条件は残るため、酸素、線量、警報、夜間は approve の中で実行時に判定します。S3〜S5 で同じ手を使います。",
+    path: "src/approaches/04-type-driven.ts",
+    highlights: [
+      { startLineNumber: 91, endLineNumber: 91 },
+      { startLineNumber: 124, endLineNumber: 127 },
+    ],
+  },
+  {
+    id: "s1-procedural-message-match",
+    title: "手続き型の端末は文言の部分一致で理由を見分ける（比較）",
+    currentDesign:
+      "checkApproval は最初に破れた条件の文字列で止まり、端末側が message.includes で理由を推定します。",
+    futureRisk:
+      "文言を変えると分岐が静かに壊れます。S0 の事故報告 第1号と S6 の失敗の型で、この弱点を扱います。",
+    path: "src/approaches/01-procedural.ts",
+    highlights: [{ startLineNumber: 81, endLineNumber: 88 }],
+  },
+] as const) satisfies readonly CodeGuide[];
+
+export const workspace = ({
+  slug: session.slug,
+  snapshot: session.snapshot,
+  initialFile: "test/approaches.test.ts",
+  description: "同じ申請を10通りの実装へ渡し、判定が一致することを確かめるテストから読みます。",
+  visibleFiles: [
+    "test/approaches.test.ts",
+    "test/distinctive.test.ts",
+    "src/approval/request.ts",
+    "src/approval/variants.ts",
+    "src/approach.ts",
+    "src/approaches/index.ts",
+    "src/approaches/01-procedural.ts",
+    "src/approaches/02-object-oriented.ts",
+    "src/approaches/03-functional.ts",
+    "src/approaches/04-type-driven.ts",
+    "src/approaches/05-data-oriented.ts",
+    "src/approaches/06-rule-based.ts",
+    "src/approaches/07-event-driven.ts",
+    "src/approaches/08-actor-model.ts",
+    "src/approaches/09-reactive.ts",
+    "src/approaches/10-logic-programming.ts",
+  ],
+} as const) satisfies SessionWorkspace;
+
+const projectFiles = projectFilesForSnapshot(session.snapshot);
+
+const conditions = [
+  { number: 1, text: "2名分の装備点検が記録済み", article: "第2条", representation: "型（長さ2のタプル）", reason: "EquipmentCheckMissing" },
+  { number: 2, text: "酸素残時間が予定作業時間と予備60分の合計以上", article: "第2条", representation: "実行時の判定", reason: "InsufficientOxygen" },
+  { number: 3, text: "各作業員の累積線量と予測線量の合計が上限以内", article: "第2条・第8条", representation: "実行時の判定（医務の値）", reason: "DoseLimitExceeded" },
+  { number: 4, text: "フレア警報が出ていない", article: "第5条", representation: "実行時の判定（地上管制の値）", reason: "FlareAlertActive" },
+  { number: 5, text: "相方が同じ許可に登録されている", article: "第4条", representation: "型（長さ2のタプル）", reason: "BuddyMissing" },
+  { number: 6, text: "作業区画に対応する系統区間に遮断札が掛かっている", article: "第3条", representation: "型（遮断済みの区間だけを受け取る）", reason: "SegmentNotLockedOut" },
+  { number: 7, text: "月面日が第14日以前", article: "第10条", representation: "実行時の判定（月面日）", reason: "NightTime" },
+] as const;
+
+const approaches = [
+  {
+    tier: "比較",
+    name: "手続き型",
+    file: "01-procedural.ts",
+    stance: "命令の並びで手順を書く。S0 の旧コードの形。",
+    usage: "条件を上から順に if で確かめ、最初の不備で止まる。",
+    strength: "読み下せば動きが分かる。道具を選ばない。",
+    constraint: "条件が増えると分岐が絡む。理由は文字列で、守るべきことが型に残らない。",
+    reappears: "S3",
+  },
+  {
+    tier: "比較",
+    name: "オブジェクト指向",
+    file: "02-object-oriented.ts",
+    stance: "知識と振る舞いをオブジェクトに閉じ込め、多態で差し替える。",
+    usage: "条件を規則クラス、事実の持ち主を協力者オブジェクトにし、方針オブジェクトが問い合わせる。",
+    strength: "規則の追加が局所的。依存の注入で差し替えやすい。",
+    constraint: "クラスの数が増える。状態を持つと、遷移の正しさは型で守れない。",
+    reappears: "S3（State）、S4（Value Object）、S6（例外）",
+  },
+  {
+    tier: "主題",
+    name: "関数型",
+    file: "03-functional.ts",
+    stance: "純粋関数の合成で振る舞いを作る。",
+    usage: "条件を「申請から理由の一覧を返す」関数にし、合成する。",
+    strength: "順序に依存せず、単独で試せる。入出力だけで振る舞いが決まる。",
+    constraint: "副作用の置き場所を別に決める必要がある。",
+    reappears: "S6、S7",
+  },
+  {
+    tier: "主題",
+    name: "型駆動",
+    file: "04-type-driven.ts",
+    stance: "表せてよい値を型で決め、不正な状態を作れなくする。",
+    usage: "装備点検2名分、相方、遮断済みの区間を型の構造にし、値の条件だけ実行時に判定する。",
+    strength: "構造の不備はコンパイル時に分かる。判定関数は前提を確かめずに済む。",
+    constraint: "型で表せない条件（値の大小、外の世界）は残る。parse の設計が要る。",
+    reappears: "S3、S4、S5",
+  },
+  {
+    tier: "比較",
+    name: "データ指向（DOP）",
+    file: "05-data-oriented.ts",
+    stance: "データを汎用構造で表してコードと分け、スキーマで検証し、変更しない。",
+    usage: "入力をスキーマで検証し、事実の平らなマップへ写し、条件もデータとして比べる。",
+    strength: "事実と条件をそのまま記録・表示できる。汎用関数で処理できる。",
+    constraint: "意味は名前の文字列にしか残らず、取り違えを型が止めない。",
+    reappears: "S5（schema）、S7（イベントはデータ）",
+  },
+  {
+    tier: "比較",
+    name: "宣言型・ルールベース",
+    file: "06-rule-based.ts",
+    stance: "成り立つべきことを宣言し、評価は評価器に任せる。",
+    usage: "条文を規則の配列に並べ、汎用の評価器で当てる。",
+    strength: "規則の追加が宣言の追加で済む。説明が規則から出る。",
+    constraint: "規則どうしの矛盾や順序は、評価器の外で決める。",
+    reappears: "S2（確認する条件）、S5",
+  },
+  {
+    tier: "比較",
+    name: "イベント駆動",
+    file: "07-event-driven.ts",
+    stance: "出来事を記録し、状態は出来事から導く。",
+    usage: "担当ごとの出来事を畳み込んで状態を作り、結果も出来事として出す。",
+    strength: "経緯を再生できる。担当の分離と時刻のずれをそのまま表せる。",
+    constraint: "現在状態が直接見えない。出来事の設計と順序の扱いが要る。",
+    reappears: "S2、S7",
+  },
+  {
+    tier: "展望",
+    name: "メッセージ指向・Actor Model",
+    file: "08-actor-model.ts",
+    stance: "状態を持つ主体がメッセージだけでやり取りし、共有しない。",
+    usage: "医務、地上管制、電気主任をアクターにし、基地長が問い合わせて判定する。",
+    strength: "分散と遅延（地球との1.3秒）を素直に表せる。共有状態がない。",
+    constraint: "到着順と欠落の扱いが要る。処理の追跡が難しい。",
+    reappears: "発展編の候補: 地球との遅延通信、居住区と発電区画ごとの Actor",
+  },
+  {
+    tier: "展望",
+    name: "Reactive Programming",
+    file: "09-reactive.ts",
+    stance: "値の変化を流れとして扱い、派生する値を宣言する。",
+    usage: "事実をセルにし、判定を派生値として宣言する。警報が出れば表示が追従する。",
+    strength: "更新の伝播を書かずに済む。作業状況ボードに向く。",
+    constraint: "依存の循環と発火順、購読の解除に注意が要る。",
+    reappears: "発展編の候補: 電力盤",
+  },
+  {
+    tier: "展望",
+    name: "Logic Programming",
+    file: "10-logic-programming.ts",
+    stance: "事実と規則を宣言し、問い合わせで答えを導く。",
+    usage: "事実と条文を宣言し、approvable(P) を問い合わせる。",
+    strength: "「なぜ却下か」が導かれた事実として残る。規則の追加が宣言で済む。",
+    constraint: "実行の手順を制御しにくい。数値計算と否定には層化が要る。",
+    reappears: "発展編の候補: 負荷遮断の優先規則",
+  },
+] as const;
+
+const reportingModes = [
+  { mode: "all", label: "破れた条件をすべて返す", approaches: "オブジェクト指向、関数型、データ指向、宣言型、イベント駆動、Actor、Reactive、Logic" },
+  { mode: "first", label: "最初に見つけた1件で止まる", approaches: "手続き型" },
+  { mode: "structural-first", label: "型で表した条件で止まり、実行時の条件は評価しない", approaches: "型駆動" },
+] as const;
+
+const chapters = [
+  { id: "conditions", label: "同じ7条件" },
+  { id: "compare", label: "10通りの比較" },
+  { id: "code", label: "コードを読む" },
+  { id: "review", label: "レビューと持ち帰り" },
+] as const;
+
+export const navigation = ({
+  previous: {
+    href: "/sessions/00-system-handover/",
+    title: "業務とシステムを引き継ぐ",
+  },
+  next: {
+    href: "/sessions/02-business-events-and-workflows/",
+    title: "EventStormingとROPで作業中止を設計する",
+  },
+} as SessionNavigation);
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header">
+      <a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a>
+    </header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+  <section id="conditions">
+    <h2>同じ7条件を、同じ入力で</h2>
+    <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+      <p class="case-file__episode-label">日の出基地のひと幕</p>
+      {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+    </aside>
+    <p>
+      この回は修正をしません。船外作業規程 第2条と第10条が定める開始承認の条件を、設計アプローチごとに10通りに書いたコードを読み、同じ申請に対する結果を並べます。
+      当日の勉強会では飛ばしてよい回で、S3 以降の各回に置く「他の書き方ではこう書く」の出発点になります。
+    </p>
+    <p><strong>今回の完了条件:</strong> 7条件のうち型で表せるものと実行時に判定するものを分け、10通りの書き方について、この題材での用途と制約を1行ずつ言えることです。</p>
+    <h3>開始承認の7条件</h3>
+    <table>
+      <thead><tr><th>#</th><th>条件</th><th>条文</th><th>主題（関数型・型駆動）での表し方</th><th>却下理由</th></tr></thead>
+      <tbody>
+        {conditions.map((condition) => (
+          <tr>
+            <th>{condition.number}</th>
+            <td>{condition.text}</td>
+            <td>{condition.article}</td>
+            <td>{condition.representation}</td>
+            <td><code>{condition.reason}</code></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p>
+      10通りの実装はすべて同じ入力 <code>ApprovalRequest</code> を受け取り、同じ判定結果 <code>Verdict</code> を返します。
+      入力には作業許可、2名の乗員、装備点検、医務が渡す累積線量、フレア警報、電気主任が遮断札を掛けた系統区間、月面日が入っています。
+      累積線量は判定にだけ使い、記録には出しません（第8条）。
+    </p>
+  </section>
+
+  <section id="compare">
+    <h2>10通りの比較</h2>
+    <p>
+      主題の2つは以降の回で解説と演習を行います。比較の5つは S1 で例示し、該当する回のコラムで再登場します。展望の3つは S1 で例示だけを行い、発展編の候補として名前を残します。
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>扱い</th><th>書き方</th><th>位置づけ</th><th>この題材での用途</th><th>長所</th><th>制約</th><th>再登場する回</th></tr></thead>
+        <tbody>
+          {approaches.map((approach) => (
+            <tr>
+              <th>{approach.tier}</th>
+              <td><strong>{approach.name}</strong><br /><code>{approach.file}</code></td>
+              <td>{approach.stance}</td>
+              <td>{approach.usage}</td>
+              <td>{approach.strength}</td>
+              <td>{approach.constraint}</td>
+              <td>{approach.reappears}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <h3>どこで止まるか</h3>
+    <p>
+      承認できる申請と、条件が1つだけ破れた申請では、10通りすべてが同じ結果を返します。違いが出るのは、複数の条件が同時に破れたときです。
+      どこまで報告するかは書き方の性質なので、各実装が <code>reporting</code> として宣言し、テストはその宣言どおりであることを確かめます。
+    </p>
+    <table>
+      <thead><tr><th>reporting</th><th>報告する範囲</th><th>書き方</th></tr></thead>
+      <tbody>
+        {reportingModes.map((entry) => (
+          <tr><th><code>{entry.mode}</code></th><td>{entry.label}</td><td>{entry.approaches}</td></tr>
+        ))}
+      </tbody>
+    </table>
+    <p>
+      手続き型が最初の1件で止まるのは、S0 で地上管制の端末が「許可なし」を「状態不正」と表示した事故と同じ構造です。
+      型駆動が構造の条件で止まるのは欠点ではなく、「判定関数に届く前に、届いてはいけない値を止める」という選択です。この選択を S3 から S5 で使います。
+    </p>
+    <h3>用語の注意</h3>
+    <p>
+      「データ指向」は Data-Oriented Programming の意味で使います。コードとデータの分離、汎用データ構造、不変、スキーマによる検証を指します。
+      メモリ配置の最適化を扱う Data-Oriented Design は対象外です。宣言型・ルールベースとデータ指向は重なる部分が大きく、ここでは
+      宣言型を「規則と評価器の分離」、データ指向を「汎用データによる表現」に重心を置いて分けています。
+    </p>
+  </section>
+
+  <section id="code" class="code-playground">
+    <h2>コードを読む（{session.timeBreakdown.teach}分）</h2>
+    <p>
+      最初に <code>test/approaches.test.ts</code> を開き、10通りへ同じ申請を渡している箇所を確認します。次に主題の <code>03-functional.ts</code> と <code>04-type-driven.ts</code> を読み、残りは比較表の行と見比べながら読みます。
+      各ファイルの先頭のコメントに、その書き方の要点を書いています。
+    </p>
+    <CodeGuideCards guides={guides} projectFiles={projectFiles} />
+    <h3>10通りの結果を並べる</h3>
+    <p>ローカルでは次のコマンドで、承認できる申請、条件が1つずつ破れた申請、4条件が同時に破れた申請に対する10通りの結果を表にします。</p>
+    <CommandBlock phase="green" command="pnpm demo:01" expected="10行の表が出力され、承認できる申請はすべての行で「承認」になります。" />
+    <p>ブラウザ内では同じスナップショットのテストを実行できます。ブラウザ内の変更はローカルへ反映されません。</p>
+    <div data-code-explorer={workspace.slug}>
+      <CodeExplorer
+        client:load
+        workspace={workspace}
+        projectFiles={projectFiles}
+        initialCommand="pnpm test"
+      />
+    </div>
+  </section>
+
+  <section id="review">
+    <h2>レビューと持ち帰り</h2>
+    <p>ひとりの場合はメモに、複数人の場合は班で共有します。</p>
+    <ol class="decision-list">
+      <li>自分の業務コードは、10通りのどれに近い書き方が主ですか。条件が増えたとき、どこに if が増えていますか。</li>
+      <li>7条件のうち、自分のコードベースで型の構造にできるものはどれですか。実行時にしか判定できないものはどれですか。</li>
+      <li>複数の条件が同時に破れたとき、利用者に最初の1件だけを返してよい場面と、すべて返すべき場面はどう違いますか。</li>
+    </ol>
+    <p>
+      Session 02 では、EventStorming でこの7条件を「確認する条件」として書き出し、Session 03 からは主題の2つの書き方で作業許可のコードを直していきます。
+    </p>
+  </section>
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        {
+          navigation.previous === undefined ? null : (
+            <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+          )
+        }
+        {
+          navigation.next === undefined ? null : (
+            <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+          )
+        }
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>

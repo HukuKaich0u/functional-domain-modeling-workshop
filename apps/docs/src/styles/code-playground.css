@@ -1,0 +1,406 @@
+.code-playground {
+  --playground-text: var(--color-text);
+  --playground-surface: var(--color-surface);
+  --playground-background: var(--color-background);
+  --playground-primary: var(--color-primary);
+  --playground-highlight: var(--color-highlight);
+  --playground-danger: var(--color-accent-text);
+  --playground-dirty: var(--color-pink);
+  --playground-focus: var(--color-focus);
+  --playground-lemon: var(--color-lemon);
+  --playground-code: var(--color-code);
+  --playground-border: var(--color-border);
+  --playground-shadow: var(--shadow-hard);
+}
+
+.case-file .code-playground {
+  --playground-text: var(--case-ink);
+  --playground-surface: var(--case-paper);
+  --playground-background: var(--case-mint);
+  --playground-primary: var(--case-line);
+  --playground-highlight: var(--case-mint);
+  --playground-danger: var(--case-coral);
+  --playground-dirty: var(--case-coral);
+  --playground-focus: var(--case-coral);
+  --playground-lemon: var(--case-lemon);
+  --playground-code: var(--case-ink);
+  --playground-border: var(--case-line);
+  --playground-shadow: 0.375rem 0.375rem 0 var(--case-line);
+}
+
+.session-code-playground {
+  width: min(100%, 70ch);
+  min-width: 0;
+}
+
+.session-code-playground [data-code-explorer] {
+  min-width: 0;
+}
+
+.code-playground.session-code-playground .code-explorer__workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.code-playground.session-code-playground .code-explorer__workspace nav {
+  max-height: 18rem;
+}
+
+.code-playground [data-code-explorer] {
+  min-width: 0;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  border: 0.25rem solid var(--playground-text);
+  border-radius: var(--radius);
+  background: var(--playground-surface);
+  box-shadow: var(--playground-shadow);
+}
+
+.code-playground .code-explorer {
+  min-width: 0;
+}
+
+.code-playground .code-explorer > p {
+  margin-bottom: 1rem;
+  font-weight: 900;
+}
+
+.code-playground .code-explorer__workspace {
+  display: grid;
+  grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr);
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.code-playground [data-code-overview] .code-explorer__workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.code-playground .code-explorer__workspace nav {
+  min-width: 0;
+  max-height: 38rem;
+  padding: 0.5rem;
+  overflow: auto;
+  border: 0.1875rem solid var(--playground-text);
+  border-radius: var(--radius);
+  background: var(--playground-background);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overscroll-behavior: contain;
+}
+
+.code-playground .code-explorer__guides {
+  min-width: 0;
+  max-height: 38rem;
+  margin: 0;
+  padding: 0.75rem;
+  overflow: auto;
+  border: 0.1875rem solid var(--playground-text);
+  border-radius: var(--radius);
+  background: var(--playground-background);
+  list-style: none;
+}
+
+.code-playground .code-explorer__guides li + li {
+  margin-top: 0.5rem;
+}
+
+.code-playground .code-explorer__guides button {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.625rem;
+  padding: 0.625rem;
+  border: 0.125rem solid transparent;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--playground-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.code-playground .code-explorer__guides button[aria-pressed="true"] {
+  border-color: var(--playground-primary);
+  background: var(--playground-highlight);
+  font-weight: 900;
+}
+
+.code-playground .code-explorer__workspace nav ul {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.code-playground .code-explorer__workspace nav ul ul {
+  margin: 0.125rem 0 0.25rem 0.25rem;
+  padding-left: 0.5rem;
+  border-left: 0.125rem solid var(--playground-border);
+}
+
+.code-playground .code-explorer__workspace nav li + li {
+  margin-top: 0.125rem;
+}
+
+.code-playground .code-explorer__folder {
+  display: block;
+  padding: 0.125rem 0.25rem;
+  font-weight: 950;
+}
+
+.code-playground .code-explorer__workspace nav button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding: 0.25rem 0.35rem;
+  border: 0.125rem solid transparent;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--playground-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.code-playground .code-explorer__workspace nav button > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-playground .code-explorer__workspace nav button[aria-pressed="true"] {
+  border-color: var(--playground-primary);
+  background: var(--playground-highlight);
+  font-weight: 900;
+}
+
+.code-playground .code-explorer__dirty {
+  flex: none;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: var(--playground-dirty);
+  color: var(--playground-surface);
+  font-size: 0.6875rem;
+  font-weight: 950;
+}
+
+.code-playground .code-explorer__editor {
+  min-width: 0;
+  overflow: hidden;
+  border: 0.1875rem solid var(--playground-text);
+  border-radius: var(--radius);
+  background: var(--playground-code);
+}
+
+.code-playground .code-explorer__guide-detail {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-left: 0.375rem solid var(--playground-danger);
+  background: var(--playground-lemon);
+}
+
+.code-playground .code-explorer__monaco {
+  position: relative;
+  min-width: 0;
+  min-height: 32rem;
+}
+
+.code-playground .code-explorer__monaco > pre {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  background: var(--playground-code);
+  color: var(--playground-surface);
+  line-height: 1.55;
+  overscroll-behavior: contain;
+}
+
+.code-playground .code-explorer__source-path,
+.code-playground .code-explorer__source-line {
+  display: block;
+}
+
+.code-playground .code-explorer__highlighted-line,
+.code-playground .code-explorer__source-line--highlighted {
+  background: color-mix(in srgb, var(--playground-danger) 24%, transparent);
+}
+
+.code-playground .code-explorer__highlighted-gutter {
+  border-left: 0.25rem solid var(--playground-danger);
+}
+
+.code-playground .code-explorer__monaco > div[aria-label^="コードエディタ:"] {
+  min-width: 0;
+  min-height: 32rem;
+}
+
+.code-playground .code-explorer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 0.1875rem solid var(--playground-text);
+  background: var(--playground-surface);
+}
+
+.code-playground .code-explorer__actions > p {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--playground-danger);
+  font-weight: 900;
+}
+
+.code-playground :is(.code-explorer__actions, .code-explorer__terminal) button {
+  min-height: 2.75rem;
+  padding: 0.45rem 0.8rem;
+  border: 0.1875rem solid var(--playground-text);
+  border-radius: 0.375rem;
+  background: var(--playground-lemon);
+  color: var(--playground-text);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.code-playground .code-explorer__empty {
+  min-height: 32rem;
+  margin: 0;
+  padding: 1rem;
+  background: var(--playground-code);
+  color: var(--playground-surface);
+}
+
+.code-playground .code-explorer__terminal {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  border: 0.1875rem solid var(--playground-text);
+  border-radius: var(--radius);
+  background: var(--playground-surface);
+}
+
+.code-playground .code-explorer__terminal[data-state="preparing"] {
+  border-color: var(--playground-primary);
+}
+
+.code-playground .code-explorer__terminal[data-state="failed"] {
+  border-color: var(--playground-danger);
+  border-left-width: 0.75rem;
+}
+
+.code-playground :is(
+  .code-explorer__terminal-prompt,
+  .code-explorer__terminal-status,
+  .code-explorer__terminal-exit
+) {
+  padding: 0.75rem;
+}
+
+.code-playground .code-explorer__terminal-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.code-playground :is(
+  .code-explorer__terminal-prompt,
+  .code-explorer__terminal-status,
+  .code-explorer__terminal-exit
+) p {
+  margin: 0;
+  font-weight: 850;
+}
+
+.code-playground .code-explorer__terminal-status button {
+  margin-top: 0.75rem;
+}
+
+.code-playground .code-explorer__terminal-shell {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.code-playground .code-explorer__terminal-viewport {
+  min-width: 0;
+  padding: 0.5rem;
+  background: var(--playground-code);
+}
+
+.code-playground .code-explorer__terminal-screen {
+  width: 100%;
+  height: clamp(18rem, 34vh, 24rem);
+  min-width: 0;
+  overflow: hidden;
+  background: var(--playground-code);
+}
+
+.code-playground .code-explorer__terminal-exit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 0.1875rem solid var(--playground-text);
+  background: var(--playground-lemon);
+}
+
+.code-playground :is(a, button):focus-visible {
+  outline: 0.25rem solid var(--playground-focus);
+  outline-offset: 0.1875rem;
+}
+
+.code-playground button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (min-width: 40rem) {
+  .code-playground [data-code-overview] .code-explorer__guides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    max-height: none;
+  }
+
+  .code-playground [data-code-overview] .code-explorer__guides li + li {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 63.99rem) {
+  .code-playground .code-explorer__workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .code-playground .code-explorer__workspace nav {
+    max-height: 18rem;
+  }
+
+  .code-playground .code-explorer__guides {
+    max-height: 18rem;
+  }
+
+  .code-playground .code-explorer__monaco,
+  .code-playground .code-explorer__monaco > div[aria-label^="コードエディタ:"] {
+    min-height: 24rem;
+  }
+
+  .code-playground .code-explorer__actions button {
+    flex: 1 1 12rem;
+  }
+
+  .code-playground .code-explorer__terminal-prompt,
+  .code-playground .code-explorer__terminal-exit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .code-playground .code-explorer__terminal-screen {
+    height: 15rem;
+  }
+}

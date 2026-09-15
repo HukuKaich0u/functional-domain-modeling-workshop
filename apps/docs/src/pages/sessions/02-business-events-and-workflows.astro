@@ -1,0 +1,221 @@
+---
+import EventStormingRopComparison from "../../components/EventStormingRopComparison.astro";
+import RailwayOrientedProgramming from "../../components/RailwayOrientedProgramming.astro";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import type { SessionSummary } from "../../sessions/types";
+import "../../styles/sessions.css";
+
+export const session: SessionSummary = {
+  slug: "02-business-events-and-workflows",
+  snapshot: undefined,
+  sequence: "02",
+  kind: "workshop",
+  title: "EventStormingとROPで作業中止を設計する",
+  durationMinutes: 15,
+  timeBreakdown: { brief: 2, teach: 7, exercise: 4, review: 2 },
+  animal: { name: "EVA-0416", type: "abort", avatar: "🛑" },
+  summary: "船外作業が中止された出来事からコマンドと確認する条件を逆算し、集約、ROP、イベント出力、ResolverとStoreへ写します。",
+  episode: [
+    "出発後の作業許可を、地上管制の担当者が誤って中止できました。",
+    "理由のない中止がStoreへ記録され、どの条件を確認したか説明できません。",
+    "実装へ進む前に、依頼、確認する条件、集約、成功時に起きる出来事を決めます。",
+  ],
+  incident: "船外作業の中止で、実行者、作業許可の存在、現在状態、理由を一貫して確認できていない。",
+  steps: [],
+  decisions: [],
+  finalReferences: [],
+};
+
+const domainEvents = [
+  { id: "eva-aborted", name: "船外作業が中止された" },
+] as const;
+
+const notation = [
+  { name: "ドメインイベント", description: "業務で起きた出来事(イベント)を書いてください。ドメインイベントは過去形（〇〇された）で表現します。" },
+  { name: "コマンド", description: "ドメインイベントが発生する起点となる指示や操作を書いてください" },
+  { name: "アクター", description: "コマンドを発する人、あるいは役割を書いてください" },
+  { name: "集約", description: "状態の整合性を守るドメインモデルを書いてください。" },
+  { name: "Hotspot", description: "答えが揃わなかった点や、今後決める必要があることを書いてください。" },
+] as const;
+
+const excalidrawTemplatePath = "docs/event/session-02-event-storming.excalidraw";
+
+const chapters = [
+  { id: "incident", label: "一つの出来事" },
+  { id: "workshop", label: "コマンドと条件" },
+  { id: "rop", label: "ROPの失敗経路" },
+  { id: "io-boundaries", label: "I/Oの分離" },
+] as const;
+
+export const navigation = ({
+  previous: {
+    href: "/sessions/01-design-approaches/",
+    title: "開始承認の7条件を10通りに書いて比べる",
+  },
+  next: {
+    href: "/sessions/03-state-transitions/",
+    title: "作業許可の状態と遷移をモデル化する",
+  },
+} as const);
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header">
+      <a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a>
+    </header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+          <section id="incident">
+            <h2>起きた出来事から業務を始める</h2>
+            <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+              <p class="case-file__episode-label">日の出基地のひと幕</p>
+              {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+            </aside>
+            <p>画面やデータベース設計から考えるのではなく、実際にあるべき業務の流れから考え始めます。この回は班ワークで、コードは編集しません。</p>
+            <ol class="eventstorming-timeline" aria-label="事前配置するドメインイベント">
+              {
+                domainEvents.map((event) => (
+                  <li data-domain-event-id={event.id}>
+                    <span>ドメインイベント</span>
+                    <strong>{event.name}</strong>
+                  </li>
+                ))
+              }
+            </ol>
+            <p>この出来事から、原因となるコマンドと、成功に必要だった条件を逆算します。船外作業規程 第6条は「作業の中止には理由を記録する」と定めています。</p>
+          </section>
+
+          <section id="workshop">
+            <h2>コマンド、確認する条件、集約を見つける</h2>
+
+            <h3>コマンドと条件を逆算する</h3>
+            <dl>
+              {notation.map((item) => <Fragment><dt>{item.name}</dt><dd>{item.description}</dd></Fragment>)}
+            </dl>
+            <p>次の3問の答えを書き出しましょう。ひとりの場合はメモに残し、複数人の場合は答えを持ち寄って確認します。</p>
+            <ol class="exercise-steps">
+              <li>この出来事は、誰が、何を依頼したことによって発生しましたか。</li>
+              <li>その実行者には、船外作業を中止する権限がありますか。地上管制と基地長のどちらでしょうか。</li>
+              <li>作業許可の状態と中止理由は、どんな条件を満たす必要がありますか。出発後の許可は中止できますか。</li>
+            </ol>
+            <div class="eventstorming-focus" aria-label="作業中止の並び">
+              <div class="eventstorming-note eventstorming-note--actor">
+                <span>アクター</span>
+                <strong>地上管制</strong>
+              </div>
+              <span aria-hidden="true">→</span>
+              <div class="eventstorming-note eventstorming-note--command">
+                <span>コマンド</span>
+                <strong>船外作業を中止する</strong>
+              </div>
+              <span aria-hidden="true">→</span>
+              <div class="eventstorming-note eventstorming-note--event">
+                <span>成功時の出来事</span>
+                <strong>船外作業が中止された</strong>
+              </div>
+            </div>
+            <p>出発後に中止を命じたい場合はどうするか（規程では中止ではなく帰還を命じる）など、答えが揃わない点は無理に決めずHotspotとして残します。</p>
+            <blockquote>
+              <p>地上管制または基地長が、出発前の作業許可だけを、理由を残して中止できます。</p>
+            </blockquote>
+            <p>この条件は、コマンドを受けたユースケースが確認する条件としてまとめます。S1で10通りに書いた開始承認の7条件も、同じ「確認する条件」の付箋になります。</p>
+          </section>
+
+          <section id="rop">
+            <h2>ROPで失敗の経路を設計する</h2>
+            <p>このセクションでは、EventStormingで見つけたコマンド、確認する条件、集約、ドメインイベントを、失敗を含むユースケースの流れへ写します。</p>
+
+            <h3>2本のレールを考える</h3>
+            <p>
+              Railway Oriented Programmingは、処理の流れを成功と失敗の2本のレールで捉える考え方です。一方は処理に成功した場合の経路、もう一方は失敗した場合の経路を表します。
+            </p>
+            <p>各工程が成功したら、その出力を次の工程へ渡します。失敗したら下のレールへ移り、後続の成功処理をスキップします。まずは図を左からたどり、どの条件で失敗のレールへ切り替わるかを確認してください。</p>
+            <RailwayOrientedProgramming />
+
+            <h3>なぜROPを利用するのか</h3>
+            <p>
+              それぞれの処理で発生する失敗を同じフローで扱い、その失敗を網羅的に検証することで、変更箇所とテスト観点を追いやすくなります。これにより、「中止する作業許可が存在しない」、「中止する権限がない」、「すでに出発している」などさまざまな理由で止まっても、それを適切にハンドリングでき、全体の処理のうち一部だけ処理されて不整合が発生することを防げます。
+            </p>
+
+            <h3>EventStormingをユースケースへ写す</h3>
+            <p>
+              先ほどの付箋を、ユースケースの要素へ一つずつ対応させましょう。コマンドは入力へ、集約はドメインロジックの<code>EvaPermit.abort</code>へ、ドメインイベントは成功出力へ写します。実行者の権限、作業許可の存在、現在状態、理由は、それぞれ確認する条件として明示します。
+            </p>
+            <dl>
+              <dt>入力</dt>
+              <dd>作業中止のコマンドと、実行者・作業許可の現在状態。</dd>
+              <dt>ユースケースの確認</dt>
+              <dd>実行者が地上管制または基地長であり、対象の作業許可が存在することを確認する。</dd>
+              <dt>ドメインロジック</dt>
+              <dd><code>EvaPermit.abort</code>が作業許可の現在状態（出発前か）と中止理由を確認し、成功イベントを作る。</dd>
+              <dt>成功時の出力</dt>
+              <dd><code>PermitAborted</code>。</dd>
+            </dl>
+          </section>
+
+          <section id="io-boundaries">
+            <h2>I/Oをドメインロジックの両端へ追い出す</h2>
+            <p>このセクションでは、前のセクションで組み立てたユースケースからデータの取得と記録を分け、中心のドメインロジックを副作用のないpureな関数として扱える構成を学びます。</p>
+
+            <h3>ビジネスユースケース、ドメインモデル、ユースケースを区別する</h3>
+            <p>
+              ビジネスユースケースとは、アクターが達成したい業務上の目的です。例えば「地上管制が船外作業を中止する」がこれにあたります。
+            </p>
+            <p>ソフトウェアのユースケースは、Resolverから実行者と対象の作業許可を受け取り、権限の有無と作業許可の存在を確認します。</p>
+            <p>出発前で、かつ理由が記入されている場合にのみ、ドメインモデルの<code>EvaPermit.abort</code>は成功イベントを返します。一つの集約と一つのユースケースが常に対応するわけではありません。</p>
+
+            <h3>なぜResolverとStoreをドメインロジックの外へ置くのか</h3>
+            <p>
+              ResolverとStoreを外へ置く主な理由は、<code>EvaPermit.abort</code>をpureに保つためです。データベースへの接続を含めず、入力された値だけで結果が決まるようにすると、業務ルールを値だけでテストできます。取得方法や記録先が変わっても、中心の判断を変更せずにResolverとStoreの実装を差し替えられます。
+            </p>
+
+            <h3>入力側：Resolverの役割</h3>
+            <p>
+              Approver ResolverとPermit Resolverは、実行者と作業許可の現在状態を取得し、ユースケースへ値として渡します。取得を入力側へ分けることで、<code>EvaPermit.abort</code>をデータベースのAPIから切り離して値だけでテストできます。図では、Resolverから受け取った値が確認する条件を通り、ドメインロジックへ渡るところを指でたどってみてください。
+            </p>
+
+            <h3>出力側：Storeの役割</h3>
+            <p>
+              <code>EvaPermit.abort</code>は、条件を満たしたときだけ<code>PermitAborted</code>を返します。Storeはその成功イベントを受け取り、作業記録（Event Store）へ追記します。失敗した場合はStoreを呼ばないため、不正な中止や途中状態を記録しません。誰がいつどの作業許可を中止したかは、追記された出来事から確認できます。
+            </p>
+            <EventStormingRopComparison />
+            <p>
+              S0の<code>approveEva</code>は、まだ<code>Repository</code>からの取得、状態の記録、作業記録、時刻とIDの生成を一つのユースケースで行います。S3以降でドメインロジックを分離し、後続セッションでResolverとStoreを明示的な依存へ変えます。
+            </p>
+            <aside class="decision-card">
+              <h3>このハンズオンでEvent Storeを選ぶ理由</h3>
+              <p>
+                これはDMMF一般の必須条件ではなく、このハンズオンの設計です。成功イベントをそのまま作業記録として追記でき、地上管制がいつどの作業許可を中止したかを後から確認できるため、ユースケースの出力先にEvent Storeを選びます。規程第7条の「その都度作業記録に記録する」とも合います。
+              </p>
+            </aside>
+
+            <h3>S2で残す成果物</h3>
+            <p>最後に、ここまで考えた内容を次の3点として手元のメモや共有ボードへ残しましょう。後続セッションでは開始承認を題材に、業務の条件をTypeScriptで表す方法を学びます。</p>
+            <ol>
+              <li>アクター、コマンド、<code>EvaPermit</code>集約、<code>PermitAborted</code>を順に並べた図</li>
+              <li>権限、作業許可の存在、現在状態、理由の条件とHotspot</li>
+              <li>3か所で失敗へ切り替わるROP基本図と、ResolverとEvent Storeを外側へ置いたユースケース図</li>
+            </ol>
+            <p>
+              Excalidrawを使う場合は、リポジトリの <code>{excalidrawTemplatePath}</code> を開きます。紙に図を描いても構いません。複数人で取り組む場合は、進行役がボードを用意して共有します。
+            </p>
+          </section>
+
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+        <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>

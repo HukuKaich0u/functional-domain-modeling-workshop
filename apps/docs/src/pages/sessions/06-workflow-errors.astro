@@ -1,0 +1,702 @@
+---
+import { Code } from "astro:components";
+import CodeGuideCards from "../../components/CodeGuideCards.astro";
+import CommandBlock from "../../components/CommandBlock.astro";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
+import type { CodeGuide } from "../../code-explorer/code-guide";
+import { projectFilesForSnapshot } from "../../code-explorer/project-files";
+import type { SessionWorkspace } from "../../code-explorer/types";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { loadSolutionSnippets } from "../../sessions/solution-snippets";
+import type {
+  ExerciseSessionSummary,
+  SessionSummary,
+} from "../../sessions/types";
+import "../../styles/code-playground.css";
+import "../../styles/sessions.css";
+
+type TeachingCode = Readonly<{
+  sources?: readonly [string, ...string[]];
+  caption?: string;
+  code: string;
+}>;
+
+type TeachingTopic = Readonly<{
+  name: string;
+  definition: string;
+  guidance?: readonly string[];
+  before: TeachingCode;
+  after: TeachingCode;
+  example?: Readonly<{ caption: string; code: string }>;
+  why: string;
+}>;
+
+export const session: SessionSummary = {
+  slug: "06-workflow-errors",
+  snapshot: "session-06",
+  sequence: "06",
+  kind: "exercise",
+  title: "失敗をユースケースの結果として扱う",
+  durationMinutes: 30,
+  timeBreakdown: { brief: 4, teach: 8, exercise: 10, review: 8 },
+  adv: { articulate: 2, delegate: 5, verify: 3 },
+  peerReview: {
+    minutes: 8,
+    pickCount: 2,
+    questions: [
+      "許可なしと状態不正は、異なる `kind` を持つ `Err` になっていますか。",
+      "`andThen` は、失敗後の状態遷移と保存を実行しない構造になっていますか。",
+      "端末側は業務エラーを `kind` で網羅し、未対応の種類を型エラーにできますか。",
+    ],
+  },
+  solutionSnapshot: "session-07",
+  solutionPresentation: "excerpt",
+  peerReviewPromises: "reference",
+  animal: { name: "EVA-0420", type: "failure", avatar: "⚠️" },
+  summary: "開始承認で地上管制や基地長が失敗理由に応じて操作を選ぶ失敗を、呼び出し側が扱える値として返します。",
+  episode: [
+    "古い許可番号が残っていた地上管制の端末から開始承認を送ると、システムは許可なしを「状態不正」と表示しました。",
+    "フレア警報中の承認は500だけを返し、地上管制は障害と判断してシステム担当を呼びました。警報中で承認できないという理由が伝わるまで15分かかりました。",
+    "新しい例外を投げた側は、呼び出し側のcatch漏れを型から確かめられませんでした。",
+  ],
+  incident: "開始承認にフレア警報中の例外が追加されたが、端末側にcatch分岐を足し忘れ、警報中の承認だけ500になった。許可なしは文言の部分一致で状態不正と表示された。",
+  exerciseCommand: "pnpm exercise:06",
+  exerciseModule: {
+    dir: "examples/session-06/src",
+    fileBudget: 3,
+    lineBudget: 80,
+  },
+  delegationPrompt: {
+    request:
+      "開始承認で起こりうる業務上の失敗を、呼び出し側が判断できる形に改善してください。表示文言には依存せず、失敗後の処理を続けない設計にしてください。",
+    decisions: [
+      "どの失敗に対して地上管制や基地長が別の操作を選ぶか",
+      "呼び出し側が分岐に使う安定した情報は何か",
+      "失敗後に実行してはいけない処理は何か",
+      "要求された処理を完了できず、Resultへ変換せず外側へ伝えるシステムエラーは何か",
+    ],
+  },
+  steps: [
+    {
+      id: "s6-invalid-state",
+      goal: "申請済でない状態を型付きの失敗として返す。",
+      startingFailure: "申請済でない作業許可を、例外として処理している。",
+      targets: ["examples/session-06/src/useCase/errors.ts"],
+      solutions: [{
+        path: "examples/session-07/src/useCase/errors.ts",
+        symbol: "ensureRequested",
+        lines: [1, 106],
+      }],
+    },
+    {
+      id: "s6-not-found",
+      goal: "作業許可が見つからない失敗を型付きの値として返す。",
+      startingFailure: "作業許可が見つからない場合も、例外として処理している。",
+      targets: ["examples/session-06/src/useCase/errors.ts"],
+      solutions: [{
+        path: "examples/session-07/src/useCase/errors.ts",
+        symbol: "ensurePermitFound",
+        lines: [1, 106],
+      }],
+    },
+    {
+      id: "s6-result-pipeline",
+      goal: "失敗理由をandThenで運び、失敗後の遷移と保存を実行しない。",
+      startingFailure: "ユースケースが失敗理由をResultで運ばず、型から後続処理の条件を読めない。",
+      targets: ["examples/session-06/src/useCase/approveEva.ts"],
+      solutions: [{
+        path: "examples/session-07/src/useCase/approveEva.ts",
+        symbol: "approveEva",
+        lines: [1, 59],
+      }],
+    },
+    {
+      id: "s6-exhaustive-web-handler",
+      goal: "端末側で業務エラーのkindを網羅し、それぞれ専用noticeへ変換する。",
+      startingFailure: "状態不正やフレア警報中の例外を端末側が処理せず、500エラーにする。",
+      targets: ["examples/session-06/src/web/routes.ts"],
+      solutions: [{
+        path: "examples/session-07/src/web/routes.ts",
+        symbol: "toApproveEvaNoticeCode",
+        lines: [23, 65],
+      }],
+    },
+  ],
+  decisions: [
+    {
+      invariant: "地上管制や基地長が失敗理由に応じて操作を選ぶ必要がある失敗は、戻り値に現れる。",
+    },
+    {
+      invariant: "呼び出し側は文言ではなく失敗のkindで分岐する。",
+    },
+    {
+      invariant: "失敗経路では後続の処理を行わない。",
+    },
+  ],
+  finalReferences: [
+    "examples/final/src/useCase/errors.ts",
+    "examples/final/src/useCase/approveEvaUseCase.ts",
+    "examples/final/src/adaptor/primary/web/routes/permitRoutes.ts",
+    "examples/final/src/adaptor/primary/web/middleware/useCaseResponse.ts",
+  ],
+};
+
+export const guides = ([
+  {
+    id: "throws-known-errors",
+    title: "起こりうる業務エラーが戻り値の型に現れない",
+    currentDesign: "guard は成功値だけを返す型ですが、許可なしと状態不正では Error をthrowします。",
+    futureRisk: "呼び出し側は実装を読まないと、どの例外を処理すべきか判断できません。",
+    path: "src/useCase/errors.ts",
+    highlights: [{ startLineNumber: 17, endLineNumber: 34 }],
+  },
+  {
+    id: "catch-misses-state-error",
+    title: "端末側が許可なしだけを文言でcatchしている",
+    currentDesign: "例外メッセージにwas not foundが含まれる場合だけnoticeへ変換し、それ以外は500になります。",
+    futureRisk: "例外の種類を追加しても呼び出し側に型エラーが出ず、今回のような処理漏れが残ります。",
+    path: "src/web/routes.ts",
+    highlights: [{ startLineNumber: 79, endLineNumber: 96 }],
+  },
+] as const) satisfies readonly CodeGuide[];
+
+const teaching: readonly TeachingTopic[] = [
+  {
+    name: "Result は成功と失敗を値で表す",
+    definition:
+      "このプロジェクトでは neverthrow の Result を使います。Result<T, E> の T は成功値、E は呼び出し側が扱う業務上の失敗です。ok(value) は成功側の Ok、err(error) は失敗側の Err を作り、どちらも Result<T, E> として扱えます。",
+    guidance: [
+      "Result に含める失敗は、先に呼び出し側の対応から選びます。失敗理由に応じて呼び出し側が次の操作を選べる業務エラーを E として返します。",
+      "たとえば、作業許可が見つからなければ許可番号を探し直し、まだ申請済でなければ状態を確認します。フレア警報中なら解除を待ち、線量上限を超えていれば作業員の配置を変えます。呼び出し側が理由ごとに異なる対応を選ぶ必要があるため、これらは Err で返します。",
+      "一方、呼び出し側に理由別の対応がなく、要求された処理を完了できない異常はシステムエラーとして扱います。このような異常はResultに変換せず、例外として外側へ伝えます。",
+      "たとえば、SQLite への保存中に接続が切れ、保存が完了したか確認できない場合です。保存が完了したか確認できないまま作業記録の追記や地上管制への通知を行うと、状態は保存されていないのに、記録や通知だけが送られる可能性があります。そのため、記録の追記や通知は実行せず、保存時の例外をそのまま外側へ伝えます。",
+      "外側の例外境界では、例外をログへ記録し、必要なロールバックや接続の解放を行ったうえで、500などのエラー応答へ変換します。",
+    ],
+    before: {
+      caption: "見つからない場合に例外を投げる guard",
+      code: `const ensurePermitFound = (
+  permit: EvaPermit | undefined,
+  permitId: PermitId,
+): EvaPermit => {
+  if (permit === undefined) {
+    throw new Error(\`Permit \${permitId} was not found\`);
+  }
+
+  return permit;
+};`,
+    },
+    after: {
+      caption: "neverthrow で業務上の失敗を返す guard",
+      code: `import { err, ok, type Result } from "neverthrow";
+
+const ensurePermitFound = (
+  permit: EvaPermit | undefined,
+  permitId: PermitId,
+): Result<EvaPermit, PermitNotFound> =>
+  permit === undefined
+    ? err({ kind: "PermitNotFound", permitId })
+    : ok(permit);`,
+    },
+    why: "例外では、関数の型から失敗理由を読み取れません。Result の E に業務エラーを置くと、呼び出し側は実行前から起こりうる失敗を把握し、表示や次の操作を選べます。err は例外を投げず、失敗理由を値として返します。",
+  },
+  {
+    name: "andThen と map は成功した経路だけを進める",
+    definition:
+      "andThen は Ok のときだけ次の Result を返す処理へ進み、map は Ok の成功値だけを変換します。Err になった後のコールバックは呼ばれません。状態遷移は外部依存ではなくドメインの純粋関数なので、ユースケースから直接呼びます。",
+    before: {
+      caption: "途中で何がthrowされるか型から分からないユースケース",
+      code: `import { approve } from "../domain/permit/index.js";
+
+const approveEva =
+  (deps: Dependencies) =>
+  (input: ApproveEvaInput): Approved => {
+    const permit = ensurePermitFound(
+      deps.resolver.resolveById(input.permitId),
+      input.permitId,
+    );
+    const requested = ensureRequested(permit);
+
+    const clear = ensureNoFlareAlert(requested, deps.spaceWeather.currentAlert());
+    if (clear.isErr()) {
+      throw new Error("Approval blocked: flare alert is active");
+    }
+    const dose = ensureDoseWithinLimit(requested, deps.doses);
+    if (dose.isErr()) {
+      throw new Error(\`Approval blocked: dose limit exceeded for \${dose.error.workerId}\`);
+    }
+
+    const next = approve(requested, input, input.approvedAt);
+    deps.store.save(next);
+    return next;
+  };`,
+    },
+    after: {
+      caption: "Result の型と処理順を同時に読めるユースケース",
+      code: `import type { Result } from "neverthrow";
+
+import type {
+  Approved,
+  EvaPermit,
+  PermitId,
+} from "../domain/permit/index.js";
+import { approve } from "../domain/permit/index.js";
+
+type PermitNotFound = Readonly<{
+  kind: "PermitNotFound";
+  permitId: PermitId;
+}>;
+
+type InvalidPermitState = Readonly<{
+  kind: "InvalidPermitState";
+  actual: EvaPermit["kind"];
+}>;
+
+type ApproveEvaError =
+  | PermitNotFound
+  | InvalidPermitState
+  | InsufficientOxygen
+  | DoseLimitExceeded
+  | FlareAlertActive
+  | NightTime;
+
+const approveEva =
+  (deps: Dependencies) =>
+  (input: ApproveEvaInput): Result<Approved, ApproveEvaError> =>
+    ensurePermitFound(deps.resolver.resolveById(input.permitId), input.permitId)
+      .andThen(ensureRequested)
+      .andThen((permit) => ensureDaytime(permit, input.lunarDay))
+      .andThen((permit) =>
+        ensureNoFlareAlert(permit, deps.spaceWeather.currentAlert()),
+      )
+      .andThen((permit) => ensureOxygen(permit, input.equipmentChecks))
+      .andThen((permit) => ensureDoseWithinLimit(permit, deps.doses))
+      .map((permit) =>
+        approve(
+          permit,
+          {
+            segmentId: input.segmentId,
+            equipmentChecks: input.equipmentChecks,
+            approvedBy: input.approvedBy,
+          },
+          input.approvedAt,
+        ),
+      )
+      .map((approved) => {
+        deps.store.save(approved);
+        return approved;
+      });`,
+    },
+    why: "before は実行時には例外で処理が止まりますが、どの行が何をthrowするかは型に現れません。夜間、フレア警報、酸素、線量の4つの判定はすでに Result を返していますが、ユースケースが Err を例外へ変換し直しています。after は成功時に Approved のどの情報が得られるかと、6種類のどの理由で失敗するかを定義から確認できます。Err になった時点で後続の andThen と map は呼ばれません。resolver、spaceWeather、doses、store は外部境界として deps から受け取りますが、状態遷移はドメイン知識なので直接呼びます。store.save が投げる保存障害は、呼び出し側が理由別の対応を選ぶ業務エラーではなく、要求された保存処理を完了できないシステムエラーとして例外を伝播させます。",
+  },
+  {
+    name: "match と switch で呼び出し側の処理漏れを型エラーにする",
+    definition:
+      "Result.match は成功時と失敗時の処理を分けます。失敗側は ApproveEvaError 全体を受け取り、error.kind の switch で各 notice へ変換します。",
+    before: {
+      caption: "許可なしだけを例外メッセージで処理する呼び出し側",
+      code: `try {
+  approveEva(dependencies)(input);
+  return context.redirect("/", 303);
+} catch (error) {
+  if (
+    error instanceof Error &&
+    error.message.includes("was not found")
+  ) {
+    return context.redirect("/?notice=not-found", 303);
+  }
+
+  // 状態不正とフレア警報中の例外はここへ到達し、500になる。
+  throw error;
+}`,
+    },
+    after: {
+      caption: "業務エラーのkindを網羅してnoticeへ変換する呼び出し側",
+      code: `const assertNever = (error: never): never => {
+  throw new Error(\`Unhandled error: \${JSON.stringify(error)}\`);
+};
+
+const toNoticeCode = (error: ApproveEvaError) => {
+  switch (error.kind) {
+    case "PermitNotFound":
+      return "not-found";
+    case "InvalidPermitState":
+      return "invalid-state";
+    case "InsufficientOxygen":
+      return "oxygen";
+    case "DoseLimitExceeded":
+      return "dose-limit";
+    case "FlareAlertActive":
+      return "flare-alert";
+    case "NightTime":
+      return "night";
+    default:
+      return assertNever(error);
+  }
+};
+
+return result.match(
+  () => context.redirect("/", 303),
+  (error) =>
+    context.redirect(
+      \`/?notice=\${toNoticeCode(error)}\`,
+      303,
+    ),
+);`,
+    },
+    example: {
+      caption: "PermitConflictを追加し、呼び出し側のcaseを足し忘れた例",
+      code: `type PermitConflict = Readonly<{
+  kind: "PermitConflict";
+  permitId: PermitId;
+}>;
+
+type ApproveEvaError =
+  | PermitNotFound
+  | InvalidPermitState
+  | InsufficientOxygen
+  | DoseLimitExceeded
+  | FlareAlertActive
+  | NightTime
+  | PermitConflict;
+
+const toNoticeCode = (error: ApproveEvaError): string => {
+  switch (error.kind) {
+    case "PermitNotFound":
+      return "not-found";
+    case "InvalidPermitState":
+      return "invalid-state";
+    // ...酸素、線量、警報、夜間の case...
+    default:
+      // errorはPermitConflictなので、neverへ渡せない。
+      return assertNever(error);
+  }
+};`,
+    },
+    why: "before では FlareAlertActive が追加されても catch に型エラーが出ないため、警報中の承認だけ500になりました。after は match の失敗側で union 全体を受け取り、default 節から never 専用の assertNever を呼びます。エラーの種類を追加して case を足し忘れると新しい型が default 節に残り、コンパイルエラーになります。Result に含めていないシステムエラーは、この switch では捕捉せず外側の例外境界へ伝えます。",
+  },
+];
+
+const safeTryColumn = {
+  title: "中間値に名前を付ける safeTry",
+  introduction:
+    "andThen のチェーンでは値を次の処理へ直接渡します。途中の成功値を複数使う場合や、名前を付けながら上から読みたい場合は safeTry も選べます。",
+  caption: "safeTryでErrを早期returnし、Okの値を取り出す",
+  code: `import { ok, safeTry, type Result } from "neverthrow";
+
+import { approve } from "../domain/permit/index.js";
+
+const approveEva = (
+  permit: EvaPermit | undefined,
+  permitId: PermitId,
+  input: ApproveInput,
+  approvedAt: string,
+): Result<Approved, ApproveEvaError> =>
+  safeTry(function* () {
+    const found = yield* ensurePermitFound(permit, permitId);
+    const requested = yield* ensureRequested(found);
+
+    return ok(approve(requested, input, approvedAt));
+  });`,
+} as const;
+
+const narrative = {
+  requirement: "開始承認で地上管制や基地長が失敗理由に応じて操作を選ぶ失敗を型付きの値として返し、端末側が次の操作を選べるようにする。",
+  currentRisk: "ユースケースは成功値だけを返す型のまま複数の Error をthrowします。端末側は許可なしの文言だけをcatchしているため、後から追加された状態不正やフレア警報中を処理できず500にしています。",
+  design: "許可なしと状態不正をkindを持つDiscriminated Unionにし、配布済みの酸素、線量、警報、夜間の失敗と合わせてResultで返す。andThenで失敗後の状態遷移とStore呼び出しを止める。状態遷移はドメイン関数を直接呼び、外部境界のResolver、SpaceWeather、CrewDoseResolver、Storeだけを依存として受け取る。端末側はmatchとswitchでResultに含めた失敗を網羅してnoticeへ変換する。",
+  limitation: "どの失敗を業務エラーとして画面のnoticeへ変換するかは、人の判断とレビューが必要になる。呼び出し側に理由別の対応がなく、要求された処理を完了できないシステムエラーはResultへ変換せず、外側の例外境界へ伝える。",
+  legacy: "成功値しか現れない関数シグネチャ、複数箇所のthrow、例外メッセージに依存したcatchを読みます。申請済でない許可とフレア警報中の承認だけ500になる処理漏れを、演習テストで再現します。",
+  fallback: "2つのguardと approveEva は解答例を反映します。最後にWebルートをmatchとswitchへ置き換え、6種類のnoticeを確認します。",
+} as const;
+
+const exerciseSession: ExerciseSessionSummary = session;
+const initialExerciseFailureCount = 8;
+
+export const workspace = ({
+  slug: session.slug,
+  snapshot: session.snapshot,
+  initialFile: "exercises/result-errors.test.ts",
+  description: "例外の種類が型に現れず、Web側にcatch漏れがある開始 snapshot を確認します。",
+  visibleFiles: [
+    "exercises/result-errors.test.ts",
+    "test/regression/boundary-and-sensitive-data.test.ts",
+    "test/regression/state-modeling.test.ts",
+    "src/boundary/approveEvaInput.ts",
+    "src/boundary/spaceWeatherReport.ts",
+    "src/domain/permit/permit.ts",
+    "src/domain/permit/transitions.ts",
+    "src/domain/permit/statusLabel.ts",
+    "src/domain/permit/permitId.ts",
+    "src/domain/permit/zoneId.ts",
+    "src/domain/lockout/segmentId.ts",
+    "src/domain/worker/workerId.ts",
+    "src/domain/worker/cumulativeDose.ts",
+    "src/shared/sensitive.ts",
+    "src/useCase/errors.ts",
+    "src/useCase/approveEva.ts",
+    "src/web/routes.ts",
+  ],
+} as const) satisfies SessionWorkspace;
+
+const projectFiles = projectFilesForSnapshot(session.snapshot);
+const solutionSteps = await Promise.all(
+  session.steps.map(async (step) => ({
+    step,
+    presentation: step.solutions[0].presentation ?? "excerpt",
+    snippets: await loadSolutionSnippets(step),
+  })),
+);
+const chapters = [
+  { id: "incident", label: "今回つくるもの" },
+  { id: "legacy", label: "コードを読み、失敗を再現する" },
+  { id: "teach", label: "使う型を知る" },
+  { id: "refactor", label: "型で閉じる" },
+  { id: "review", label: "レビューと持ち帰り" },
+] as const;
+const commonReviewChecks = [
+  "`as` によるキャストが入っていないか全文検索して確認する。",
+  "`git diff --stat -- examples/session-06` で今回の snapshot だけを確認する。`git status --short` で想定外の path がないか確認する。",
+  "型検査では確認できないことを、テストまたは実行時に確認して記録する。",
+] as const;
+const reviewCompletionArtifacts = [
+  "失敗後に実行してはいけない処理",
+  "Agentへの依頼文",
+  "型検査では確認できず、テストまたは実行時に確認すること",
+] as const;
+const businessReflectionQuestion =
+  "自分の業務コードで、今回と同種の問題が起きうる箇所はどこですか。";
+export const promisesHref =
+  "/sessions/03-state-transitions/#peer-review-promises";
+export const navigation = ({
+  previous: {
+    href: "/sessions/05-boundaries-and-sensitive-data/",
+    title: "開始承認の入力を境界で検証する",
+  },
+  next: {
+    href: "/sessions/07-effects-and-consistency/",
+    title: "副作用と整合性境界を設計する",
+  },
+} as const);
+const headcount = session.peerReview.pickCount === 2 ? "1〜2名" : "1名";
+const delegationPrompt = `次の変更を実装してください。
+
+業務背景:
+${session.incident}
+
+依頼:
+${exerciseSession.delegationPrompt.request}
+
+失敗後に実行してはいけない処理: [言語化フェーズで書いた1文]
+
+着手前に判断すること:
+${exerciseSession.delegationPrompt.decisions.map((decision) => `- ${decision}: [自分の判断を書く]`).join("\n")}
+
+まず配布コードと失敗しているテストを読み、上の判断と変更方針を短く説明してください。説明のあとで実装に進んでください。設計手段は既存コードに合うものを選び、選んだ理由も示してください。
+
+受け入れ条件:
+${session.steps.map((step) => `- ${step.goal}`).join("\n")}
+
+変更範囲:
+- ${session.exerciseModule.dir}/ のみ
+- 最大 ${session.exerciseModule.fileBudget} ファイル・約 ${session.exerciseModule.lineBudget} 行
+- 範囲外の変更が必要に見えた場合は、変更せず理由を報告する
+- 型エラーを \`as\` によるキャストで回避しない
+
+検証:
+- ${session.exerciseCommand} を実行し、すべての assertion が成功すること
+
+完了時の報告:
+- 変更したファイルと判断理由
+- 検証コマンドの結果
+- 型だけでは守れず、テストまたはレビューに残した点`;
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header"><a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a></header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+          <section id="incident">
+            <h2>今回つくるもの</h2>
+            <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+              <p class="case-file__episode-label">日の出基地のひと幕</p>
+              {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+            </aside>
+            <p>事故報告 第5号が破った条文は、第2条と第5条です。作業許可が見つからない場合と申請済でない場合を、呼び出し側が処理できる業務エラーとして返します。フレア警報中、線量上限超過、酸素不足、夜間の4つは配布済みで、同じ Result の列に並べます。</p>
+            <h3 data-story-stage="use-case">追加したい機能</h3>
+            <p>{narrative.requirement}</p>
+            <h3 data-story-stage="pitfall">素朴な実装の落とし穴</h3>
+            <p>{narrative.currentRisk}</p>
+            <h3 data-story-stage="goal">このセッションのゴール</h3>
+            <p>{narrative.design}</p>
+            <h3>このセッションで守ること</h3>
+            <ul class="decision-list">{session.decisions.map(({ invariant }) => <li>{invariant}</li>)}</ul>
+            <p>今回の変更は <code>{session.exerciseModule.dir}</code> 内の3ファイルに限定します。</p>
+            <aside class="decision-card">
+              <h3>他の書き方ではこう書く</h3>
+              <p>
+                オブジェクト指向の慣習では、失敗は例外クラスの継承で表します。<code>class PermitNotFound extends ApprovalError</code> のように種類を型にでき、<code>catch</code> で <code>instanceof</code> を使えば文言への依存はなくなります。
+                それでも、どの例外が飛んでくるかは関数のシグネチャに現れず、呼び出し側の分岐漏れはコンパイルエラーになりません。S1 の手続き型の例が文言の部分一致で理由を見分けていたのは、この弱点の最も素朴な形です。
+                この回の Result は、失敗の一覧を戻り値の型に載せ、網羅を型検査に任せる書き方です。
+              </p>
+            </aside>
+          </section>
+
+          <section id="legacy" class="code-playground">
+            <h2>コードを読み、失敗を再現する</h2>
+            <p>{narrative.legacy}</p>
+            <p>
+              編集する範囲は <code>{session.exerciseModule.dir}</code>、変更するファイル数は最大
+              {session.exerciseModule.fileBudget}ファイル・約{session.exerciseModule.lineBudget}行です。
+            </p>
+            <CodeGuideCards guides={guides} projectFiles={projectFiles} />
+            <h3>修正前の失敗を確認する</h3>
+            <p>修正前は、次の{session.steps.length}件に対応する演習テストが失敗します。</p>
+            <ul class="exercise-failures" aria-label="修正前に確認する問題">
+              {session.steps.map((step) => <li>{step.startingFailure}</li>)}
+            </ul>
+            <CommandBlock phase="red" command={session.exerciseCommand} expected={`${initialExerciseFailureCount}件の演習テストが失敗します。`} />
+            <p>ブラウザ内の変更はローカルへ反映されません。</p>
+            <div data-code-explorer={workspace.slug}>
+              <CodeExplorer
+                client:load
+                workspace={workspace}
+                projectFiles={projectFiles}
+                initialCommand={session.exerciseCommand}
+              />
+            </div>
+          </section>
+
+          <section id="teach">
+            <h2>事前知識（{session.timeBreakdown.teach}分）</h2>
+            <p>まずResultの意味とResultに含める失敗の基準を整理し、その後でこの回に使う操作を確認します。配布コードの書き方を before、次のスナップショットの書き方を after として並べています。</p>
+            {teaching.map((topic) => (
+              <article class="teaching-topic">
+                <h3>{topic.name}</h3>
+                <p>{topic.definition}</p>
+                {topic.guidance?.map((paragraph) => <p>{paragraph}</p>)}
+                <div class="teaching-topic__diff">
+                  <figure class="code-block">
+                    <figcaption>
+                      before:
+                      {topic.before.caption === undefined ? topic.before.sources?.map((source, index) => (
+                        <Fragment>{index === 0 ? null : "、"}<code>{source}</code></Fragment>
+                      )) : <span>{topic.before.caption}</span>}
+                    </figcaption>
+                    <Code code={topic.before.code} lang="ts" />
+                  </figure>
+                  <figure class="code-block">
+                    <figcaption>
+                      after:
+                      {topic.after.caption === undefined ? topic.after.sources?.map((source, index) => (
+                        <Fragment>{index === 0 ? null : "、"}<code>{source}</code></Fragment>
+                      )) : <span>{topic.after.caption}</span>}
+                    </figcaption>
+                    <Code code={topic.after.code} lang="ts" />
+                  </figure>
+                </div>
+                {topic.example === undefined ? null : (
+                  <figure class="code-block" data-teaching-example>
+                    <figcaption>{topic.example.caption}</figcaption>
+                    <Code code={topic.example.code} lang="ts" />
+                  </figure>
+                )}
+                <p class="teaching-topic__why">{topic.why}</p>
+              </article>
+            ))}
+            <aside class="teaching-column" aria-labelledby="safe-try-column-title">
+              <p class="teaching-column__label">OPTIONAL / コラム</p>
+              <h3 id="safe-try-column-title">{safeTryColumn.title}</h3>
+              <p>{safeTryColumn.introduction}</p>
+              <figure class="code-block">
+                <figcaption>{safeTryColumn.caption}</figcaption>
+                <Code code={safeTryColumn.code} lang="ts" />
+              </figure>
+              <p>
+                <code>yield*</code> した Result が <code>Err</code> なら、その場で処理を止めて <code>safeTry</code> 全体から同じ失敗を返します。
+                <code>Ok</code> なら成功値を取り出して次の行へ進みます。
+              </p>
+              <p>
+                <code>safeTry</code> は Result の失敗を伝える仕組みであり、<code>throw</code> された例外を捕捉する <code>try/catch</code> ではありません。
+                ResultAsync を扱う場合は <code>async function*</code> を渡せます。
+              </p>
+            </aside>
+          </section>
+
+          <section id="refactor">
+            <h2>演習</h2>
+            <h3>進め方: 言語化 → Agentへの依頼 → 検証</h3>
+            <p>Agentを使わない場合は、テンプレートを実装メモとして使って自分で実装します。以降の「Agentへの依頼文」も実装メモに読み替えてください。</p>
+            <ol class="adv-flow">
+              <li><strong>言語化（{session.adv.articulate}分）</strong>: 失敗後に実行してはいけない処理を1文で書く。</li>
+              <li><strong>依頼（{session.adv.delegate}分）</strong>: その1文と自分の判断をテンプレートへ入れ、Agent に依頼する。</li>
+              <li><strong>検証（{session.adv.verify}分）</strong>: 型、テスト、差分の範囲を確認する。</li>
+            </ol>
+            <div class="delegation-prompt">
+              <h3>プロンプトのテンプレート</h3>
+              <p>角括弧の中は、事故と配布コードを読んだ自分の判断で埋めます。技法名や完成形を先に指定する必要はありません。</p>
+              <pre><code>{delegationPrompt}</code></pre>
+            </div>
+            <h3>この演習で解決しないこと</h3>
+            <p>{narrative.limitation}</p>
+            <h3 data-solution-heading>{exerciseSession.solutionPresentation === "completed-file" ? "完成ファイルの解答例" : "ステップごとの解答"}</h3>
+            {exerciseSession.solutionPresentation === "completed-file" ? (
+              <div class="before-after" aria-label="業務エラーとシステムエラーの見比べ方">
+                <p><strong>演習の開始時点:</strong> 業務エラーとして返す Result と、システムエラーとして外側へ伝える例外経路を分けて読む。</p>
+                <p><strong>完成例:</strong> 下のすべての target file には、後続 step を含む完成状態が表示される。</p>
+              </div>
+            ) : null}
+            {solutionSteps.map(({ step, presentation, snippets }) => (
+              <div class="solution-step">
+                <details class="step-solution" data-presentation={presentation}>
+                  <summary>{step.goal}</summary>
+                  {presentation === "completed-file" ? (
+                    <p class="step-solution__completed-file-note">この完成例には後続 step を含みます。すべての target file を反映してから検証します。</p>
+                  ) : null}
+                  {snippets.map(({ solution, code }) => (
+                    <section class="step-solution__snippet">
+                      <h4><code>{solution.path}</code></h4>
+                      <Code code={code} lang="ts" />
+                    </section>
+                  ))}
+                </details>
+              </div>
+            ))}
+            <CommandBlock phase="green" command={session.exerciseCommand} expected="演習テストがすべて成功します。" />
+            <h3>演習を完了できないとき</h3>
+            <p>{narrative.fallback}</p>
+          </section>
+
+          <section id="review">
+            <h2>レビューと持ち帰り</h2>
+            <div class="exercise-review-checklist">
+              <h3>個人で確認する</h3>
+              <ol>{commonReviewChecks.map((check) => <li>{check}</li>)}</ol>
+              <p>前のセッションの未commit差分は残して構いません。reset、stash、commit は不要です。</p>
+              <p><strong>残すもの:</strong> {reviewCompletionArtifacts.join("、")}</p>
+              <h3>業務へ持ち帰る</h3>
+              <p>{businessReflectionQuestion}</p>
+            </div>
+            <section class="peer-review-panel">
+              <h3>設計を振り返る</h3>
+              <p>ひとりの場合は、次の問いへの答えと根拠になるコードをメモします。複数人の場合は、お互いの差分を見ながら確認します。相互レビューは{session.peerReview.minutes}分・{headcount}を目安にしてください。</p>
+              <p><a href={promisesHref}>進行上の約束事を確認する</a></p>
+              <ol>{session.peerReview.questions.map((question) => <li>{question}</li>)}</ol>
+            </section>
+          </section>
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+        <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>

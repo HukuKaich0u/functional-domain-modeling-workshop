@@ -1,0 +1,557 @@
+---
+import { Code } from "astro:components";
+import CodeGuideCards from "../../components/CodeGuideCards.astro";
+import CommandBlock from "../../components/CommandBlock.astro";
+import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
+import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
+import type { CodeGuide } from "../../code-explorer/code-guide";
+import { projectFilesForSnapshot } from "../../code-explorer/project-files";
+import type { SessionWorkspace } from "../../code-explorer/types";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { loadSolutionSnippets } from "../../sessions/solution-snippets";
+import type {
+  ExerciseSessionSummary,
+  SessionSummary,
+} from "../../sessions/types";
+import "../../styles/code-playground.css";
+import "../../styles/sessions.css";
+
+type TeachingCode = Readonly<{
+  sources?: readonly [string, ...string[]];
+  caption?: string;
+  code: string;
+}>;
+
+type TeachingTopic = Readonly<{
+  name: string;
+  definition: string;
+  before: TeachingCode;
+  after: TeachingCode;
+  example?: Readonly<{ caption: string; code: string }>;
+  why: string;
+}>;
+
+export const session: SessionSummary = {
+  slug: "04-semantic-identifiers",
+  snapshot: "session-04",
+  sequence: "04",
+  kind: "exercise",
+  title: "開始承認の識別子を型で区別する",
+  durationMinutes: 30,
+  timeBreakdown: { brief: 4, teach: 6, exercise: 13, review: 7 },
+  adv: { articulate: 2, delegate: 9, verify: 2 },
+  peerReview: {
+    minutes: 7,
+    pickCount: 2,
+    questions: [
+      "`ZoneId` と `SegmentId` を取り違えたコードは、型テストでコンパイルエラーになりますか。",
+      "作業許可の全状態で、`zoneId` が `ZoneId` になっていますか。",
+      "`approve` は、遮断した系統区間を `SegmentId` として受け取っていますか。",
+    ],
+  },
+  solutionSnapshot: "session-05",
+  solutionPresentation: "excerpt",
+  peerReviewPromises: "reference",
+  animal: { name: "PV-07", type: "segment", avatar: "🏷️" },
+  summary: "開始承認で使う作業区画の識別子と系統区間の識別子を、取り違えられない型にします。",
+  episode: [
+    "開始承認の入力で、作業区画の識別子と遮断した系統区間の識別子が入れ替わっていました。",
+    "どちらも PV-07 の形なので、文字列の検査だけでは取り違えを止められません。",
+    "作業する区画を選ぶ値と、遮断した区間を選ぶ値を、型で区別する必要があります。",
+  ],
+  incident: "開始承認で ZoneId と SegmentId を取り違えても、型検査が通った。遮断していない区間で作業が始まりかけた。",
+  exerciseCommand: "pnpm exercise:04",
+  exerciseModule: {
+    dir: "examples/session-04/src/domain",
+    fileBudget: 5,
+    lineBudget: 34,
+  },
+  delegationPrompt: {
+    request:
+      "開始承認で使う作業区画の識別子と系統区間の識別子を改善してください。同じ PV-NN 形式でも、用途を取り違えたコードはコンパイルを通らない状態を目指します。",
+    decisions: [
+      "ZoneIdとSegmentIdをどの型として定義するか",
+      "用途の区別を作業許可の状態とapproveへどう伝えるか",
+      "取り違えをコンパイルエラーとしてどう残すか",
+    ],
+  },
+  steps: [
+    {
+      id: "s4-brand-approval-ids",
+      goal: "作業区画の識別子と系統区間の識別子を、配布済みの識別子と同じ規約で別々の型にする。",
+      startingFailure: "作業区画と系統区間の識別子を取り違えても、型検査が通る。",
+      targets: [
+        "examples/session-04/src/domain/permit/zoneId.ts",
+        "examples/session-04/src/domain/lockout/segmentId.ts",
+      ],
+      solutions: [
+        {
+          path: "examples/session-05/src/domain/permit/zoneId.ts",
+          symbol: "ZoneId",
+          lines: [3, 6],
+        },
+        {
+          path: "examples/session-05/src/domain/lockout/segmentId.ts",
+          symbol: "SegmentId",
+          lines: [3, 6],
+        },
+      ],
+    },
+    {
+      id: "s4-apply-approval-ids",
+      goal: "作業許可の6状態とapproveが、用途別の識別子を受け取るようにする。",
+      startingFailure: "作業許可の状態とapproveが、用途を区別しないstringを受け取る。",
+      targets: [
+        "examples/session-04/src/domain/permit/permit.ts",
+        "examples/session-04/src/domain/permit/transitions.ts",
+      ],
+      solutions: [
+        {
+          path: "examples/session-05/src/domain/permit/permit.ts",
+          symbol: "Requested",
+          lines: [1, 22],
+        },
+        {
+          path: "examples/session-05/src/domain/permit/transitions.ts",
+          symbol: "approve",
+          lines: [15, 20],
+        },
+      ],
+    },
+    {
+      id: "s4-reject-id-swap",
+      goal: "ZoneIdとSegmentIdを入れ替えたコードがコンパイルできないことを、型テストで確かめる。",
+      startingFailure: "取り違えた2行が、型エラーにならないままコンパイルされる。",
+      targets: ["examples/session-04/src/domain/domain.test-types.ts"],
+      solutions: [{
+        path: "examples/session-05/src/domain/domain.test-types.ts",
+        symbol: "acceptZoneId",
+        lines: [1, 14],
+      }],
+    },
+  ],
+  decisions: [
+    {
+      invariant: "ZoneIdとSegmentIdを取り違えない。",
+    },
+    {
+      invariant: "作業許可はどの状態でもZoneIdを持つ。",
+    },
+    {
+      invariant: "approveは遮断した系統区間をSegmentIdとして受け取る。",
+    },
+  ],
+  finalReferences: [
+    "examples/final/src/domain/permit/permitId.ts",
+    "examples/final/src/domain/permit/zoneId.ts",
+    "examples/final/src/domain/segment/segmentId.ts",
+  ],
+};
+
+export const guides = ([
+  {
+    id: "swapped-domain-identifiers",
+    title: "作業区画の識別子と系統区間の識別子を逆の用途へ渡している",
+    currentDesign: "ZoneIdを必要とする関数へSegmentIdを、SegmentIdを必要とする関数へZoneIdを渡しています。",
+    futureRisk: "どちらの型も実体はstringなので、この2行があっても型検査は成功します。",
+    path: "src/domain/domain.test-types.ts",
+    highlights: [{ startLineNumber: 4, endLineNumber: 11 }],
+  },
+  {
+    id: "untyped-zone-id",
+    title: "PV-NNの書式を検査しても、型検査では作業区画と系統区間を区別できない",
+    currentDesign: "ZoneIdとSegmentIdは書式の検査だけで、用途を表すbrandがありません。PermitIdとWorkerIdにはbrandがあります。",
+    futureRisk: "作業区画の識別子を系統区間の位置へ渡しても、どちらもstringなのでコンパイルは通ります。",
+    path: "src/domain/permit/zoneId.ts",
+    highlights: [{ startLineNumber: 3, endLineNumber: 6 }],
+  },
+  {
+    id: "plain-string-permit",
+    title: "作業許可の状態とapproveがstringを受け取っている",
+    currentDesign: "作業許可のzoneIdと、approveのsegmentIdがstringで宣言されています。",
+    futureRisk: "作業区画と系統区間の識別子を入れ替えても検出できません。",
+    path: "src/domain/permit/permit.ts",
+    highlights: [{ startLineNumber: 13, endLineNumber: 20 }],
+  },
+] as const) satisfies readonly CodeGuide[];
+
+const teaching: readonly TeachingTopic[] = [
+  {
+    name: "用途別の Branded Type",
+    definition:
+      "同じ文字列形式でも、用途の違う識別子は別の型として扱います。zod の brand を付けると、互いに代入できない型ができます。",
+    before: {
+      sources: ["examples/session-04/src/domain/permit/zoneId.ts"],
+      code: `const schema = z.string().regex(/^PV-\\d{2}$/);
+
+export type ZoneId = z.infer<typeof schema>;
+export const ZoneId = { schema, parse: schema.parse } as const;`,
+    },
+    after: {
+      sources: ["examples/session-05/src/domain/permit/zoneId.ts"],
+      code: `const schema = z.string().regex(/^PV-\\d{2}$/).brand<"ZoneId">();
+
+export type ZoneId = z.infer<typeof schema>;
+export const ZoneId = { schema, parse: schema.parse } as const;`,
+    },
+    why: "ZoneIdとSegmentIdは、どちらも PV-NN 形式のstringです。書式の検査だけでは相互に代入できます。演習ではPermitIdとWorkerIdの実装を手本にして、それぞれ別のbrandを付けます。区別するのは値の形式ではなく用途です。作業区画 PV-07 へ給電する系統区間も PV-07 と書くため、値が同じでも取り違えは事故になります。",
+  },
+  {
+    name: "識別子をドメインモデルと状態遷移で利用する",
+    definition:
+      "作業許可の状態を表す型・状態遷移関数を、作成した Branded Type を利用する形に変更します。",
+    before: {
+      sources: [
+        "examples/session-04/src/domain/permit/permit.ts",
+        "examples/session-04/src/domain/permit/transitions.ts",
+      ],
+      code: `export type Requested = Readonly<{
+  kind: "Requested";
+  permitId: PermitId;
+  zoneId: string;
+  // ...
+}>;
+
+export const approve = (
+  permit: Requested,
+  input: Readonly<{
+    segmentId: string;
+    equipmentChecks: EquipmentChecks;
+    approvedBy: Approver;
+  }>,
+  approvedAt: string,
+): Approved =>`,
+    },
+    after: {
+      sources: [
+        "examples/session-05/src/domain/permit/permit.ts",
+        "examples/session-05/src/domain/permit/transitions.ts",
+      ],
+      code: `export type Requested = Readonly<{
+  kind: "Requested";
+  permitId: PermitId;
+  zoneId: ZoneId;
+  // ...
+}>;
+
+export type ApproveInput = Readonly<{
+  segmentId: SegmentId;
+  equipmentChecks: EquipmentChecks;
+  approvedBy: Approver;
+}>;
+
+export const approve = (
+  permit: Requested,
+  input: ApproveInput,
+  approvedAt: string,
+): Approved =>`,
+    },
+    why: "識別子型を定義しただけでは、作業許可の状態と遷移関数がstringを受け取るままです。作業許可の6状態にあるzoneIdをZoneIdへ変え、approveの入力にあるsegmentIdをSegmentIdへ変えます。入力から状態遷移まで同じ型を使うと、取り違えを型検査で止められます。",
+  },
+  {
+    name: "@ts-expect-error による型テスト",
+    definition:
+      "わざとコンパイルエラーになるコードを書き、その行で確かにコンパイルエラーが発生することを検査します。もし誰かが実装を変更して意図せずコンパイルエラーが出なくなってしまった場合、@ts-expect-error は「不要なエラー抑制を行なっている」ことになり、逆にコンパイルエラーとなります。",
+    before: {
+      sources: ["examples/session-04/src/domain/domain.test-types.ts"],
+      code: `const acceptZoneId = (_id: ZoneId): void => undefined;
+const acceptSegmentId = (_id: SegmentId): void => undefined;
+
+acceptZoneId(segmentId);
+acceptSegmentId(zoneId);`,
+    },
+    after: {
+      sources: ["examples/session-05/src/domain/domain.test-types.ts"],
+      code: `const acceptZoneId = (_id: ZoneId): void => undefined;
+const acceptSegmentId = (_id: SegmentId): void => undefined;
+
+// @ts-expect-error SegmentIdをZoneIdとして使えません。
+acceptZoneId(segmentId);
+
+// @ts-expect-error ZoneIdをSegmentIdとして使えません。
+acceptSegmentId(zoneId);`,
+    },
+    why: "実行時テストでは、間違えた値を渡すとコンパイルエラーになることを確かめられません。@ts-expect-errorは次の行に型エラーが必要だと宣言します。後から2つの識別子が同じ型へ戻ると、不要なエラー抑制として型検査が失敗します。",
+  },
+];
+
+const narrative = {
+  requirement: "開始承認の入力にある作業区画の識別子と、遮断した系統区間の識別子を、用途ごとに区別して扱う。",
+  currentRisk: "ZoneIdとSegmentIdは、どちらも書式を検査済みのstringです。approveへ逆の欄で渡しても、型検査では止まりません。値が同じ PV-07 のときは実行時にも気づけません。",
+  design: "2つの識別子を別々のBranded Typeで定義し、作業許可の状態とapproveまで同じ型を使う。",
+  limitation: "異なる用途は区別できますが、同じSegmentId型を持つ別の系統区間を選ぶ誤りは型だけでは検出できない。作業区画に対応する系統区間に遮断札が掛かっているかの確認は、S6以降の判定で扱う。",
+  legacy: "最初に、ZoneIdとSegmentIdを実際に逆の用途へ渡しているコードを読みます。そのうえで、2つの識別子にbrandがなく、作業許可の状態とapproveにもstringが残っていることを確認します。",
+  fallback: "現在の3ステップを順に開き、まずZoneIdとSegmentIdに別々のbrandを付けます。次に作業許可の状態とapproveへ反映し、取り違えがコンパイルエラーになることを型テストで確かめます。相互レビューの約束事はS3のリンク先を確認します。",
+} as const;
+
+const exerciseSession: ExerciseSessionSummary = session;
+
+export const workspace = ({
+  slug: session.slug,
+  snapshot: session.snapshot,
+  initialFile: "exercises/semantic-identifiers.test.ts",
+  description: "開始承認で使う作業区画の識別子と系統区間の識別子を、開始snapshotで確認します。",
+  visibleFiles: [
+    "exercises/semantic-identifiers.test.ts",
+    "test/regression/state-modeling.test.ts",
+    "src/domain/permit/zoneId.ts",
+    "src/domain/lockout/segmentId.ts",
+    "src/domain/permit/permit.ts",
+    "src/domain/permit/transitions.ts",
+    "src/domain/domain.test-types.ts",
+  ],
+} as const) satisfies SessionWorkspace;
+
+const projectFiles = projectFilesForSnapshot(session.snapshot);
+const typecheckCommand =
+  "pnpm --filter @moonbase/session-04 typecheck";
+const solutionSteps = await Promise.all(
+  session.steps.map(async (step) => ({
+    step,
+    presentation: step.solutions[0].presentation ?? "excerpt",
+    snippets: await loadSolutionSnippets(step),
+  })),
+);
+const chapters = [
+  { id: "incident", label: "今回つくるもの" },
+  { id: "legacy", label: "コードを読み、失敗を再現する" },
+  { id: "teach", label: "使う型を知る" },
+  { id: "refactor", label: "型で閉じる" },
+  { id: "review", label: "レビューと持ち帰り" },
+] as const;
+const commonReviewChecks = [
+  "`as` によるキャストが入っていないか全文検索して確認する。",
+  "`git diff --stat -- examples/session-04` で今回の snapshot だけを確認する。`git status --short` で想定外の path がないか確認する。",
+  "型検査では確認できないことを、テストまたは実行時に確認して記録する。",
+] as const;
+const reviewCompletionArtifacts = [
+  "取り違えてはいけない値",
+  "Agentへの依頼文",
+  "型検査では確認できず、テストまたは実行時に確認すること",
+] as const;
+const businessReflectionQuestion =
+  "自分の業務コードで、今回と同種の問題が起きうる箇所はどこですか。";
+export const promisesHref =
+  "/sessions/03-state-transitions/#peer-review-promises";
+export const navigation = ({
+  previous: {
+    href: "/sessions/03-state-transitions/",
+    title: "作業許可の状態と遷移をモデル化する",
+  },
+  next: {
+    href: "/sessions/05-boundaries-and-sensitive-data/",
+    title: "開始承認の入力を境界で検証する",
+  },
+} as const);
+const headcount = session.peerReview.pickCount === 2 ? "1〜2名" : "1名";
+const delegationPrompt = `次の変更を実装してください。
+
+業務背景:
+${session.incident}
+
+依頼:
+${exerciseSession.delegationPrompt.request}
+
+取り違えてはいけない値: [言語化フェーズで書いた1文]
+
+着手前に判断すること:
+${exerciseSession.delegationPrompt.decisions.map((decision) => `- ${decision}: [自分の判断を書く]`).join("\n")}
+
+まず配布コードと失敗しているテストを読み、上の判断と変更方針を短く説明してください。説明のあとで実装に進んでください。設計手段は既存コードに合うものを選び、選んだ理由も示してください。
+
+受け入れ条件:
+${session.steps.map((step) => `- ${step.goal}`).join("\n")}
+
+変更範囲:
+- ${session.exerciseModule.dir}/ のみ
+- 最大 ${session.exerciseModule.fileBudget} ファイル・約 ${session.exerciseModule.lineBudget} 行
+- 範囲外の変更が必要に見えた場合は、変更せず理由を報告する
+- 型エラーを \`as\` によるキャストで回避しない
+
+検証:
+- ${session.exerciseCommand} を実行し、すべての assertion が成功すること
+
+完了時の報告:
+- 変更したファイルと判断理由
+- 検証コマンドの結果
+- 型だけでは守れず、テストまたはレビューに残した点`;
+---
+
+<BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
+  <div class="case-file case-file--session">
+    <header class="case-file__site-header"><a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a></header>
+    <main>
+      <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
+      <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
+        <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
+        <h1 id="session-title">{session.title}</h1>
+        <p class="case-file__summary">
+          <span aria-hidden="true">{session.animal.avatar}</span>
+          {session.summary}
+        </p>
+      </section>
+          <section id="incident">
+            <h2>今回つくるもの</h2>
+            <aside class="case-file__episode" aria-label="日の出基地のひと幕">
+              <p class="case-file__episode-label">日の出基地のひと幕</p>
+              {session.episode.map((line) => <p data-episode-line>{line}</p>)}
+            </aside>
+            <p>事故報告 第3号が破った条文は第3条（遮断）です。S1の型駆動の例が「遮断済みの区間だけを受け取る」としていた条件のうち、まず「どの区画で作業し、どの区間を遮断したか」を用途別の型で表します。</p>
+            <h3 data-story-stage="use-case">追加したい機能</h3>
+            <p>{narrative.requirement}</p>
+            <h3 data-story-stage="pitfall">素朴な実装の落とし穴</h3>
+            <p>{narrative.currentRisk}</p>
+            <h3 data-story-stage="goal">このセッションのゴール</h3>
+            <p>{narrative.design}</p>
+            <h3>このセッションで守ること</h3>
+            <ul class="decision-list">{session.decisions.map(({ invariant }) => <li>{invariant}</li>)}</ul>
+            <p>今回の変更は <code>{session.exerciseModule.dir}</code> 内の1モジュールに限定します。</p>
+            <aside class="decision-card">
+              <h3>他の書き方ではこう書く</h3>
+              <p>
+                オブジェクト指向では、識別子を Value Object のクラスにします。<code>new ZoneId("PV-07")</code> と <code>new SegmentId("PV-07")</code> は別のクラスなので取り違えられず、等価性や書式の検査もクラスの中に置けます。
+                Branded Type は同じ区別を、実行時のオブジェクトを作らずに型だけで行います。値は文字列のまま JSON や SQLite に出せる代わりに、区別は TypeScript の中にしか存在しません。
+              </p>
+            </aside>
+          </section>
+
+          <section id="legacy" class="code-playground">
+            <h2>コードを読み、失敗を再現する</h2>
+            <p>{narrative.legacy}</p>
+            <p>
+              編集する範囲は <code>{session.exerciseModule.dir}</code>、変更するファイル数は最大
+              {session.exerciseModule.fileBudget}ファイル・約{session.exerciseModule.lineBudget}行です。
+            </p>
+            <CodeGuideCards guides={guides} projectFiles={projectFiles} />
+            <h3>取り違えたまま型検査する</h3>
+            <p><code>acceptZoneId</code> と <code>acceptSegmentId</code> の呼び出しは、渡す値が逆です。この状態で型検査を実行します。</p>
+            <figure class="code-block" data-typecheck-reproduction>
+              <figcaption>型検査コマンド</figcaption>
+              <Code code={typecheckCommand} lang="shell" />
+              <p><strong>期待結果:</strong> 取り違えた2行が残っていても、型検査は成功します。</p>
+            </figure>
+            <p>型検査が成功したこと自体が失敗の再現です。現在の <code>ZoneId</code> と <code>SegmentId</code> は、どちらも書式を検査済みの <code>string</code> なので、TypeScriptには用途の違いが見えません。</p>
+            <h3>修正前の失敗を確認する</h3>
+            <p>修正前は、次の{session.steps.length}件に対応する演習テストが失敗します。</p>
+            <ul class="exercise-failures" aria-label="修正前に確認する問題">
+              {session.steps.map((step) => <li>{step.startingFailure}</li>)}
+            </ul>
+            <CommandBlock phase="red" command={session.exerciseCommand} expected={`${session.steps.length}件の演習テストが失敗します。`} />
+            <p>ブラウザ内の変更はローカルへ反映されません。</p>
+            <div data-code-explorer={workspace.slug}>
+              <CodeExplorer
+                client:load
+                workspace={workspace}
+                projectFiles={projectFiles}
+                initialCommand={session.exerciseCommand}
+              />
+            </div>
+          </section>
+
+          <section id="teach">
+            <h2>事前知識（{session.timeBreakdown.teach}分）</h2>
+            <p>この回で利用する型について確認します。配布コードの書き方を before、次のスナップショットの書き方を after として並べています。</p>
+            {teaching.map((topic) => (
+              <article class="teaching-topic">
+                <h3>{topic.name}</h3>
+                <p>{topic.definition}</p>
+                <div class="teaching-topic__diff">
+                  <figure class="code-block">
+                    <figcaption>
+                      before:
+                      {topic.before.caption === undefined ? topic.before.sources?.map((source, index) => (
+                        <Fragment>{index === 0 ? null : "、"}<code>{source}</code></Fragment>
+                      )) : <span>{topic.before.caption}</span>}
+                    </figcaption>
+                    <Code code={topic.before.code} lang="ts" />
+                  </figure>
+                  <figure class="code-block">
+                    <figcaption>
+                      after:
+                      {topic.after.caption === undefined ? topic.after.sources?.map((source, index) => (
+                        <Fragment>{index === 0 ? null : "、"}<code>{source}</code></Fragment>
+                      )) : <span>{topic.after.caption}</span>}
+                    </figcaption>
+                    <Code code={topic.after.code} lang="ts" />
+                  </figure>
+                </div>
+                {topic.example === undefined ? null : (
+                  <figure class="code-block" data-teaching-example>
+                    <figcaption>{topic.example.caption}</figcaption>
+                    <Code code={topic.example.code} lang="ts" />
+                  </figure>
+                )}
+                <p class="teaching-topic__why">{topic.why}</p>
+              </article>
+            ))}
+          </section>
+
+          <section id="refactor">
+            <h2>演習</h2>
+            <h3>進め方: 言語化 → Agentへの依頼 → 検証</h3>
+            <p>Agentを使わない場合は、テンプレートを実装メモとして使って自分で実装します。以降の「Agentへの依頼文」も実装メモに読み替えてください。</p>
+            <ol class="adv-flow">
+              <li><strong>言語化（{session.adv.articulate}分）</strong>: 取り違えてはいけない値を1文で書く。</li>
+              <li><strong>依頼（{session.adv.delegate}分）</strong>: その1文と自分の判断をテンプレートへ入れ、Agent に依頼する。</li>
+              <li><strong>検証（{session.adv.verify}分）</strong>: 型、テスト、差分の範囲を確認する。</li>
+            </ol>
+            <div class="delegation-prompt">
+              <h3>プロンプトのテンプレート</h3>
+              <p>角括弧の中は、事故と配布コードを読んだ自分の判断で埋めます。技法名や完成形を先に指定する必要はありません。</p>
+              <pre><code>{delegationPrompt}</code></pre>
+            </div>
+            <h3>この演習で解決しないこと</h3>
+            <p>{narrative.limitation}</p>
+            <h3 data-solution-heading>{exerciseSession.solutionPresentation === "completed-file" ? "完成ファイルの解答例" : "ステップごとの解答"}</h3>
+            {exerciseSession.solutionPresentation === "completed-file" ? (
+              <div class="before-after" aria-label="業務結果と非同期例外経路の見比べ方">
+                <p><strong>演習の開始時点:</strong> 予期できる業務 Result と、保存処理が reject する技術的な例外経路を分けて読む。</p>
+                <p><strong>完成例:</strong> 下のすべての target file には、後続 step を含む完成状態が表示される。</p>
+              </div>
+            ) : null}
+            {solutionSteps.map(({ step, presentation, snippets }) => (
+              <div class="solution-step">
+                <details class="step-solution" data-presentation={presentation}>
+                  <summary>{step.goal}</summary>
+                  {presentation === "completed-file" ? (
+                    <p class="step-solution__completed-file-note">この完成例には後続 step を含みます。すべての target file を反映してから検証します。</p>
+                  ) : null}
+                  {snippets.map(({ solution, code }) => (
+                    <section class="step-solution__snippet">
+                      <h4><code>{solution.path}</code></h4>
+                      <Code code={code} lang="ts" />
+                    </section>
+                  ))}
+                </details>
+              </div>
+            ))}
+            <CommandBlock phase="green" command={session.exerciseCommand} expected="演習テストがすべて成功します。" />
+            <h3>演習を完了できないとき</h3>
+            <p>{narrative.fallback}</p>
+          </section>
+
+          <section id="review">
+            <h2>レビューと持ち帰り</h2>
+            <div class="exercise-review-checklist">
+              <h3>個人で確認する</h3>
+              <ol>{commonReviewChecks.map((check) => <li>{check}</li>)}</ol>
+              <p>前のセッションの未commit差分は残して構いません。reset、stash、commit は不要です。</p>
+              <p><strong>残すもの:</strong> {reviewCompletionArtifacts.join("、")}</p>
+              <h3>業務へ持ち帰る</h3>
+              <p>{businessReflectionQuestion}</p>
+            </div>
+            <section class="peer-review-panel">
+              <h3>設計を振り返る</h3>
+              <p>ひとりの場合は、次の問いへの答えと根拠になるコードをメモします。複数人の場合は、お互いの差分を見ながら確認します。相互レビューは{session.peerReview.minutes}分・{headcount}を目安にしてください。</p>
+              <p><a href={promisesHref}>進行上の約束事を確認する</a></p>
+              <ol>{session.peerReview.questions.map((question) => <li>{question}</li>)}</ol>
+            </section>
+          </section>
+      <nav slot="footer" class="case-file__session-nav" aria-label="前後のセッション">
+        <a rel="prev" href={navigation.previous.href}>前へ: {navigation.previous.title}</a>
+        <a rel="next" href={navigation.next.href}>次へ: {navigation.next.title}</a>
+      </nav>
+      </SessionPageNavigation>
+    </main>
+  </div>
+</BaseLayout>
