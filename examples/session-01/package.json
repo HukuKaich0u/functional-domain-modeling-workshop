@@ -1,0 +1,19 @@
+{
+  "name": "@moonbase/session-01",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/demo.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.23.0",
+    "vitest": "^2.1.0"
+  }
+}
