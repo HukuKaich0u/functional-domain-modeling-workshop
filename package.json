@@ -1,0 +1,42 @@
+{
+  "name": "functional-domain-modeling-workshop",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "関数型ドメインモデリングハンズオン with TypeScript のサンプルコードとドキュメントサイト",
+  "scripts": {
+    "dev": "pnpm --filter @moonbase/docs dev",
+    "demo:00": "pnpm --filter @moonbase/session-00 dev",
+    "demo:01": "pnpm --filter @moonbase/session-01 dev",
+    "demo:02": "pnpm --filter @moonbase/session-02 dev",
+    "demo:03": "pnpm --filter @moonbase/session-03 dev",
+    "demo:04": "pnpm --filter @moonbase/session-04 dev",
+    "demo:05": "pnpm --filter @moonbase/session-05 dev",
+    "demo:06": "pnpm --filter @moonbase/session-06 dev",
+    "demo:07": "pnpm --filter @moonbase/session-07 dev",
+    "demo:08": "pnpm --filter @moonbase/session-08 dev",
+    "build": "pnpm --filter @moonbase/base-web build && pnpm --filter './examples/session-*' build && pnpm --filter @moonbase/final build && pnpm --filter @moonbase/docs build",
+    "test": "pnpm --filter @moonbase/base-web test && pnpm --filter './examples/session-*' test && pnpm test:continuity && pnpm --filter @moonbase/final test && pnpm --filter @moonbase/docs test && pnpm test:worker",
+    "test:continuity": "pnpm --filter @moonbase/approve-eva-continuity test",
+    "test:worker": "pnpm --filter @moonbase/docs exec vitest run --config vitest.worker.config.ts",
+    "exercise:03": "pnpm --filter @moonbase/session-03 exercise",
+    "exercise:04": "pnpm --filter @moonbase/session-04 exercise",
+    "exercise:05": "pnpm --filter @moonbase/session-05 exercise",
+    "exercise:06": "pnpm --filter @moonbase/session-06 exercise",
+    "exercise:07": "pnpm --filter @moonbase/session-07 exercise",
+    "typecheck": "pnpm --filter @moonbase/base-web typecheck && pnpm --filter './examples/session-*' typecheck && pnpm typecheck:continuity && pnpm --filter @moonbase/final typecheck && pnpm --filter @moonbase/docs typecheck && tsc -p worker/tsconfig.json --noEmit",
+    "typecheck:continuity": "pnpm --filter @moonbase/approve-eva-continuity typecheck",
+    "preview": "pnpm --filter @moonbase/docs preview",
+    "cf:dev": "pnpm build && wrangler dev",
+    "cf:deploy": "pnpm build && wrangler deploy"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260804.1",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.20.0"
+  }
+}

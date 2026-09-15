@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+tmp/
+.superdesign/tmp/
+.astro/
+/examples/session-*/clinic.sqlite*
+/examples/session-*/moonbase.sqlite*
