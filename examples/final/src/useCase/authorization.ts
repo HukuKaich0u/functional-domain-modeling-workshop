@@ -17,8 +17,11 @@ export const ensureCanManageOperations = (user: User): Result<User, Unauthorized
   Permission.canManageOperations(user) ? ok(user) : err(unauthorized(user));
 
 /** 基地長と Admin。装備点検の記録、開始承認、出発と帰還の記録 */
-export const ensureCanApproveEva = (user: User): Result<User, UnauthorizedError> =>
-  Permission.canApproveEva(user) ? ok(user) : err(unauthorized(user));
+export const ensureCanApproveEva = (
+  user: User,
+  baseCommanderIsOutside = false,
+): Result<User, UnauthorizedError> =>
+  Permission.canApproveEva(user, baseCommanderIsOutside) ? ok(user) : err(unauthorized(user));
 
 /** 電気主任と Admin。遮断札と完了 */
 export const ensureCanManageLockout = (user: User): Result<User, UnauthorizedError> =>

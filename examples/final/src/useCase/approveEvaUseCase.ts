@@ -122,6 +122,8 @@ export type Dependencies = Readonly<{
   evaApprovedStore: EvaApprovedStore;
   clock: Clock;
   eventIdGenerator: EventIdGenerator;
+  /** 規程第2条。基地長が船外にいる間だけ地上管制が開始承認を代行できる */
+  baseCommanderIsOutside: () => boolean;
 }>;
 
 export type ApproveEvaUseCase = Readonly<{
@@ -199,7 +201,7 @@ const validateApproval =
     safeTry<EvaApproved, UseCaseError>(async function* () {
       const resolvedActor = yield* dependencies.userResolver.resolveById(input.actorUserId);
       const actor = yield* ensureUserFound(input.actorUserId)(resolvedActor);
-      yield* ensureCanApproveEva(actor);
+      yield* ensureCanApproveEva(actor, dependencies.baseCommanderIsOutside());
 
       const resolvedPermit = yield* dependencies.permitResolver.resolveById(input.permitId);
       const found = yield* ensurePermitFound(input.permitId)(resolvedPermit);
@@ -223,12 +225,13 @@ const validateApproval =
       const segment = yield* ensureSegmentFound(segmentId)(resolvedSegment);
       const lockedOut = yield* ensureLockedOutForPermit(permit)(segment);
 
+      const lunarDay = dependencies.clock.lunarDay();
+      yield* ensureDaytime(permit)(lunarDay);
       const event = yield* createEvent(() => {
-        const context = createEventContext(dependencies, input.actorUserId);
-        return { context, event: EvaPermit.approve(context)(permit, { segmentId: lockedOut.segmentId }) };
+        const context = createEventContext(dependencies, input.actorUserId, lunarDay);
+        return EvaPermit.approve(context)(permit, { segmentId: lockedOut.segmentId });
       });
-      yield* ensureDaytime(permit)(event.context.lunarDay);
-      return ok(event.event);
+      return ok(event);
     });
 
 /** 7条件を通った承認だけを保存し、保存の競合は PermitConflict として返す */

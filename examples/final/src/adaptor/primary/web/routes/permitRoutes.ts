@@ -34,6 +34,7 @@ import {
   requireAbortAuthority,
   requireActor,
   requireBaseCommander,
+  requireApprovalAuthority,
   requireElectrician,
   requireGroundControl,
 } from "../middleware/requestBody.js";
@@ -107,6 +108,7 @@ type PermitRouteDependencies = Readonly<{
   abortPermit: AbortPermitUseCase;
   listSegments: ListSegmentsUseCase;
   listWorkers: ListWorkersUseCase;
+  baseCommanderIsOutside: () => boolean;
 }>;
 
 export type PermitPageView = PermitView;
@@ -123,13 +125,19 @@ export type PermitZoneOption = Readonly<{ zoneId: string; label: string }>;
 export type PermitWorkerOption = Readonly<{ workerId: string; qualification: string }>;
 
 /** 役割と状態から、いま押せる操作だけを画面に出す。判定の権威は use case 側にある */
-const actionsFor = (actor: AuthenticatedActor, permit: PermitView): PermitActions => {
+const actionsFor = (
+  actor: AuthenticatedActor,
+  permit: PermitView,
+  baseCommanderIsOutside: boolean,
+): PermitActions => {
   const commander = actor.user.kind === "Admin" || actor.user.kind === "BaseCommander";
+  const approvalAuthority =
+    commander || (actor.user.kind === "GroundControl" && baseCommanderIsOutside);
   const electrician = actor.user.kind === "Admin" || actor.user.kind === "Electrician";
   const abortAuthority = commander || actor.user.kind === "GroundControl";
   return {
     recordEquipmentCheck: commander && permit.kind === "Requested",
-    approve: commander && permit.kind === "Requested",
+    approve: approvalAuthority && permit.kind === "Requested",
     egress: commander && permit.kind === "Approved",
     returnToBase: commander && permit.kind === "Outside",
     close: electrician && permit.kind === "Returned",
@@ -208,7 +216,7 @@ const renderPermit = async (
             permit,
             equipmentChecks,
             segment: segment === undefined ? null : toSegmentPageView(segment),
-            actions: actionsFor(actor.value, permit),
+            actions: actionsFor(actor.value, permit, dependencies.baseCommanderIsOutside()),
             errors,
           }),
         ),
@@ -375,7 +383,7 @@ export const registerPermitRoutes = (
 
   /** 開始承認。7条件のどれで止まったかを、そのまま画面の文言に写す */
   app.post("/permits/:permitId/approve", async (context) => {
-    const actor = requireBaseCommander(context);
+    const actor = requireApprovalAuthority(context);
     if (actor.isErr()) return actor.error;
     const permitId = parsePermitId(context, context.req.param("permitId"));
     if (permitId.isErr()) return permitId.error;

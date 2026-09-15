@@ -65,6 +65,8 @@ const requireRole =
 export const requireGroundControl = requireRole(["Admin", "GroundControl"]);
 /** 基地長。装備点検、開始承認、出発と帰還の記録 */
 export const requireBaseCommander = requireRole(["Admin", "BaseCommander"]);
+/** 開始承認。地上管制の代行可否は、ユースケースが基地長の在否から判定する */
+export const requireApprovalAuthority = requireRole(["Admin", "GroundControl", "BaseCommander"]);
 /** 電気主任。遮断札と完了 */
 export const requireElectrician = requireRole(["Admin", "Electrician"]);
 /** 中止は地上管制または基地長 */

@@ -156,6 +156,7 @@ const approve =
       {
         permitId: aggregateState.permitId,
         segmentId: aggregateState.segmentId,
+        approvedAt: aggregateState.approvedAt,
         approvedBy: aggregateState.approvedBy,
       },
     );

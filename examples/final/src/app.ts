@@ -162,11 +162,13 @@ export type ApplicationDependencies = Readonly<{
   listSpaceWeather: ListSpaceWeather;
   reportSpaceWeather: ReportSpaceWeather;
   listEvents: ListEvents;
+  baseCommanderIsOutside: () => boolean;
   clock: Clock;
   isProduction: boolean;
 }>;
 
 type CompositionOptions = Readonly<{
+  baseCommanderIsOutside?: () => boolean;
   clock?: Clock;
   isProduction: boolean;
 }>;
@@ -209,6 +211,7 @@ export const createApplicationDependencies = (
   options: CompositionOptions,
 ): ApplicationDependencies => {
   const clock = options.clock ?? systemClock;
+  const baseCommanderIsOutside = options.baseCommanderIsOutside ?? (() => false);
 
   const sessionByTokenHashResolver = createSessionByTokenHashResolver(database);
   const sessionByIdResolver = createSessionByIdResolver(database);
@@ -424,6 +427,7 @@ export const createApplicationDependencies = (
       evaApprovedStore: permitEventStore,
       clock,
       eventIdGenerator,
+      baseCommanderIsOutside,
     }),
     recordEgress: RecordEgressUseCase.create({
       userResolver: userByIdResolver,
@@ -469,6 +473,7 @@ export const createApplicationDependencies = (
       userResolver: userByIdResolver,
       eventHistoryReader,
     }),
+    baseCommanderIsOutside,
     clock,
     isProduction: options.isProduction,
   };
@@ -541,6 +546,7 @@ export const createApp = (dependencies: ApplicationDependencies) => {
     abortPermit: dependencies.abortPermit,
     listSegments: dependencies.listSegments,
     listWorkers: dependencies.listWorkers,
+    baseCommanderIsOutside: dependencies.baseCommanderIsOutside,
   });
   registerSpaceWeatherRoutes(app, {
     listSpaceWeather: dependencies.listSpaceWeather,

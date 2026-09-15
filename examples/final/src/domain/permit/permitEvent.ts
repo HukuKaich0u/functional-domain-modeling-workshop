@@ -40,7 +40,12 @@ export type EvaApproved = PermitDomainEvent<
   Approved,
   "EvaApproved",
   "permit.eva-approved",
-  Readonly<{ permitId: PermitId; segmentId: SegmentId; approvedBy: UserId }>
+  Readonly<{
+    permitId: PermitId;
+    segmentId: SegmentId;
+    approvedAt: Approved["approvedAt"];
+    approvedBy: UserId;
+  }>
 >;
 
 export type CrewEgressed = PermitDomainEvent<

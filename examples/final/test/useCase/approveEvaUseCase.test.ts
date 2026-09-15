@@ -83,6 +83,7 @@ const createDependencies = (overrides: Partial<Dependencies> = {}): Dependencies
   evaApprovedStore: successfulStore([]),
   clock: { now: () => approvedAt, lunarDay: () => day(7) } satisfies Clock,
   eventIdGenerator: { generate: () => eventContext(1).eventId } satisfies EventIdGenerator,
+  baseCommanderIsOutside: () => false,
   ...overrides,
 });
 
@@ -105,13 +106,17 @@ describe("ApproveEvaUseCase", () => {
     });
   });
 
-  test("基地長と Admin だけが承認できる", async () => {
+  test("基地長と Admin、および基地長が船外にいるときの地上管制だけが承認できる", async () => {
     expect((await runWith({ userResolver: userResolverFor(groundControl) }))._unsafeUnwrapErr()).toEqual({
       kind: "Unauthorized",
       actorUserId: ids.groundControl,
     });
     expect((await runWith({ userResolver: userResolverFor(electrician) }))._unsafeUnwrapErr().kind).toBe("Unauthorized");
     expect((await runWith({ userResolver: userResolverFor(undefined) }))._unsafeUnwrapErr().kind).toBe("Unauthorized");
+    expect((await runWith({
+      userResolver: userResolverFor(groundControl),
+      baseCommanderIsOutside: () => true,
+    })).isOk()).toBe(true);
   });
 
   test("申請済でない許可は InvalidPermitState を返す（事故報告 第1号）", async () => {
@@ -215,11 +220,19 @@ describe("ApproveEvaUseCase", () => {
 
   test("条件7: 月面日が第15日以降なら止まり、何も保存しない", async () => {
     const stored: EvaApproved[] = [];
+    let generatedEventIds = 0;
     const result = await runWith({
       clock: { now: () => approvedAt, lunarDay: () => day(15) },
+      eventIdGenerator: {
+        generate: () => {
+          generatedEventIds += 1;
+          return eventContext(1).eventId;
+        },
+      },
       evaApprovedStore: successfulStore(stored),
     });
     expect(result._unsafeUnwrapErr()).toEqual({ kind: "NightTime", permitId: ids.permit, lunarDay: 15 });
+    expect(generatedEventIds).toBe(0);
     expect(stored).toHaveLength(0);
   });
 

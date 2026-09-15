@@ -244,6 +244,7 @@ const EventRowSchema = z.discriminatedUnion("eventName", [
     z.object({
       permitId: PermitId.schema,
       segmentId: SegmentId.schema,
+      approvedAt: Timestamp.schema,
       approvedBy: UserId.schema,
     }).strict(),
   ),
@@ -329,6 +330,7 @@ const validateConsistency = (row: PersistedEventRow): void => {
     case "permit.eva-approved":
       ensureSame(row.aggregateId, row.aggregateState.permitId, row.eventPayload.permitId);
       ensureSame(row.aggregateState.segmentId, row.eventPayload.segmentId);
+      ensureSame(row.aggregateState.approvedAt, row.eventPayload.approvedAt);
       ensureSame(row.aggregateState.approvedBy, row.eventPayload.approvedBy);
       return;
     case "permit.crew-egressed":

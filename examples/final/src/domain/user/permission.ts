@@ -6,9 +6,11 @@ const canManageUsers = (user: User): boolean => isAdmin(user);
 /** 系統区間と隊員の登録、作業許可の申請と中止、宇宙天気の報告 */
 const canManageOperations = (user: User): boolean =>
   user.kind === "Admin" || user.kind === "GroundControl";
-/** 装備点検の記録、開始承認、エアロックの出発と帰還の記録 */
-const canApproveEva = (user: User): boolean =>
-  user.kind === "Admin" || user.kind === "BaseCommander";
+/** 基地長とAdmin。開始承認だけは、基地長が船外にいる間の地上管制も含む */
+const canApproveEva = (user: User, baseCommanderIsOutside = false): boolean =>
+  user.kind === "Admin" ||
+  user.kind === "BaseCommander" ||
+  (user.kind === "GroundControl" && baseCommanderIsOutside);
 /** 遮断札を掛ける・外す、作業許可の完了 */
 const canManageLockout = (user: User): boolean =>
   user.kind === "Admin" || user.kind === "Electrician";

@@ -23,6 +23,7 @@ describe("Permission", () => {
       { role: "BaseCommander", users: false, operations: false, approve: true, lockout: false, abort: true, events: false },
       { role: "Electrician", users: false, operations: false, approve: false, lockout: true, abort: false, events: false },
     ]);
+    expect(Permission.canApproveEva(groundControl, true)).toBe(true);
   });
 
   test("利用者のイベントは表示名やメールアドレスをペイロードに出さない", () => {

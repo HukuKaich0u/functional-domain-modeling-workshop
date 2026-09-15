@@ -184,15 +184,13 @@ describe("ClosePermitUseCase", () => {
     expect(lockoutRemoved.eventId).not.toBe(permitClosed.eventId);
   });
 
-  test("別の電気主任は札を外せない。Admin だけが代行できる（規程第3条）", async () => {
+  test("遮断札は掛けた電気主任以外には外せない（規程第3条）", async () => {
     expect(
       (await ClosePermitUseCase.create(dependencies([], { userResolver: userResolverFor(electricianB) })).run({ ...input, actorUserId: ids.electricianB }))._unsafeUnwrapErr(),
     ).toEqual({ kind: "LockoutTaggedByAnotherUser", segmentId: ids.segment, taggedBy: ids.electrician });
-    const stored: Array<readonly [LockoutRemoved, PermitClosed]> = [];
     expect(
-      (await ClosePermitUseCase.create(dependencies(stored, { userResolver: userResolverFor(admin) })).run({ ...input, actorUserId: ids.admin })).isOk(),
-    ).toBe(true);
-    expect(stored).toHaveLength(1);
+      (await ClosePermitUseCase.create(dependencies([], { userResolver: userResolverFor(admin) })).run({ ...input, actorUserId: ids.admin }))._unsafeUnwrapErr(),
+    ).toEqual({ kind: "LockoutTaggedByAnotherUser", segmentId: ids.segment, taggedBy: ids.electrician });
   });
 
   test("帰還済でない許可、札のない区間、別の許可の札では完了できない", async () => {

@@ -32,7 +32,7 @@ import { createEvent, createEventContext } from "./eventContext.js";
 export type UseCaseInput = Readonly<{ actorUserId: UserId; segmentId: SegmentId }>;
 export type UseCaseOk = Readonly<{ segment: EnergizedSegment }>;
 export type SegmentNotLockedOut = Readonly<{ kind: "SegmentNotLockedOut"; segmentId: SegmentId }>;
-/** 遮断札は掛けた者のみが外す（規程第3条）。Admin だけが代行できる */
+/** 遮断札は掛けた者のみが外す（規程第3条） */
 export type LockoutTaggedByAnotherUser = Readonly<{
   kind: "LockoutTaggedByAnotherUser";
   segmentId: SegmentId;
@@ -73,7 +73,7 @@ const ensureLockedOut = (segment: SegmentState): Result<LockedOutSegment, Segmen
 export const ensureTaggedBy =
   (actor: User) =>
   (segment: LockedOutSegment): Result<LockedOutSegment, LockoutTaggedByAnotherUser> =>
-    actor.kind === "Admin" || segment.lockout.taggedBy === actor.userId
+    segment.lockout.taggedBy === actor.userId
       ? ok(segment)
       : err({
           kind: "LockoutTaggedByAnotherUser",

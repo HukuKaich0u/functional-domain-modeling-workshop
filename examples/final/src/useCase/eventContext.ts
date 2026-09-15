@@ -3,6 +3,7 @@ import { ResultAsync } from "neverthrow";
 import type { Clock } from "../domain/aggregate/clock.js";
 import type { EventContext } from "../domain/aggregate/eventContext.js";
 import type { EventIdGenerator } from "../domain/aggregate/eventIdGenerator.js";
+import type { LunarDay } from "../domain/aggregate/lunarDay.js";
 import type { UserId } from "../domain/user/userId.js";
 import type { IdentityGenerationFailed } from "./errors.js";
 
@@ -15,10 +16,11 @@ export type EventContextDependencies = Readonly<{
 export const createEventContext = (
   dependencies: EventContextDependencies,
   actorUserId: UserId,
+  lunarDay: LunarDay = dependencies.clock.lunarDay(),
 ): EventContext => ({
   eventId: dependencies.eventIdGenerator.generate(),
   occurredAt: dependencies.clock.now(),
-  lunarDay: dependencies.clock.lunarDay(),
+  lunarDay,
   actorUserId,
 });
 

@@ -28,6 +28,7 @@ describe("EvaPermit の状態遷移", () => {
     expect(event.eventPayload).toEqual({
       permitId: ids.permit,
       segmentId: ids.segment,
+      approvedAt: context.occurredAt,
       approvedBy: ids.baseCommander,
     });
   });
