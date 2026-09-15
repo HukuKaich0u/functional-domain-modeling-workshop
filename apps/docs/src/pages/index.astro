@@ -3,8 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
-  title="FP with TypeScript"
-  description="動物病院の業務コードを改善しながら、TypeScriptで関数型ドメインモデリングを学ぶ教材。個人学習にも、勉強会やハンズオンにも使えます。"
+  title="MoonBase — TypeScriptで学ぶ関数型ドメインモデリング"
+  description="月面基地の船外作業許可を題材に、安全規程を型と関数で表す関数型ドメインモデリング教材。"
 >
   <div id="app">
     <div class="home-page wan-nyan-home">
@@ -14,8 +14,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       <header class="landing-header" aria-label="サイトヘッダー">
         <a class="landing-brand" href="#system">
-          <span class="landing-brand__mark" aria-hidden="true">🐾</span>
-          <span>WAN NYAN CLINIC</span>
+          <span class="landing-brand__mark" aria-hidden="true">🌙</span>
+          <span>MOONBASE CONTROL</span>
         </a>
         <nav class="landing-nav" aria-label="メインナビゲーション">
           <a href="#system">TOP</a>
@@ -27,83 +27,84 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       <main class="landing-main">
         <section class="landing-hero" id="system" aria-labelledby="page-title">
-          <span class="floating-pet floating-pet--cat" aria-hidden="true">🐈</span>
-          <span class="floating-pet floating-pet--rabbit" aria-hidden="true">🐇</span>
+          <span class="floating-pet floating-pet--cat" aria-hidden="true">🛰️</span>
+          <span class="floating-pet floating-pet--rabbit" aria-hidden="true">🌘</span>
 
           <div class="landing-hero__grid">
-            <p class="landing-eyebrow">🐱 TypeScriptで学ぶ関数型ドメインモデリング</p>
+            <p class="landing-eyebrow">🌙 TypeScriptで学ぶ関数型ドメインモデリング</p>
             <div class="copy-panel">
-              <h1 id="page-title">ようこそ<br />WAN NYAN<br /><span class="rainbow-word" aria-label="OSへ！！"><span>O</span><span>S</span><span>へ</span><span>！</span><span>！</span></span></h1>
+              <h1 id="page-title">ようこそ<br />MOONBASE<br /><span class="rainbow-word" aria-label="CONTROLへ"><span>C</span><span>O</span><span>N</span><span>T</span><span>R</span><span>O</span><span>L</span></span></h1>
             </div>
             <div class="landing-intro">
-              <p class="landing-lead">動物病院の予約・カルテ管理システムを題材に、業務のルールを型と関数で表す教材です。既存のコードを少しずつ改善しながら、設計の理由を学びます。個人学習にもハンズオンにも使えます。</p>
+              <p class="landing-lead">月面基地の船外作業許可を題材に、安全規程を型と関数で表す教材です。月面では宇宙服でも放射線を完全には防げないため、隊員がこれまでに浴びた量を「被ばく量」として管理します。基地へ引き継がれた未完成コードを読み、7つの開始条件と監査記録を段階的に実装します。</p>
               <div class="learning-actions" aria-label="教材を始める">
                 <a href="/setup/">事前準備 <span aria-hidden="true">→</span></a>
                 <a href="/sessions/">セッション一覧 <span aria-hidden="true">→</span></a>
               </div>
             </div>
 
-            <div class="system-window" aria-label="動物病院の予約・カルテシステム画面">
+            <div class="system-window" aria-label="月面基地の船外作業許可システム画面">
               <div class="system-window__top">
-                <span>WAN NYAN OS / Reservation &amp; Chart</span>
+                <span>MOONBASE CONTROL / EVA Permit</span>
                 <span class="system-window__buttons" aria-hidden="true"><span></span><span></span><span></span></span>
               </div>
               <div class="app-dashboard">
                 <aside class="dashboard-sidebar" aria-label="システムメニュー">
-                  <div class="clinic-stamp">🐾<br />READY<br />09:00</div>
+                  <div class="clinic-stamp">🌙<br />LUNAR DAY<br />07</div>
                   <div class="side-menu">
-                    <span class="is-active">📅 予約</span><span>🩺 カルテ</span><span>💉 検査</span><span>💳 会計</span><span>📝 申し送り</span>
+                    <span class="is-active">📋 作業許可</span><span>⚡ 系統区間</span><span>🧑‍🚀 隊員</span><span>☀️ 宇宙天気</span><span>📜 作業記録</span>
                   </div>
                 </aside>
 
                 <section class="schedule-board" aria-labelledby="dashboard-title">
-                  <div class="board-head"><h2 id="dashboard-title">今日の診察</h2><span class="date-pill">画面例</span></div>
-                  <div class="appointment-grid" aria-label="予約一覧">
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">🐕</span><span class="time">09:20</span><strong>ポチ / ワクチン</strong><p>受付済み。診察室 1 へ案内待ち。体重測定済み。</p></article>
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">🐈</span><span class="time">09:40</span><strong>ミケ / 皮膚相談</strong><p>予約済み。飼い主アプリから問診票が届いた。</p></article>
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">🐇</span><span class="time">10:10</span><strong>もも / 再診</strong><p>診察中。体重と食欲メモをカルテに反映。</p></article>
+                  <div class="board-head"><h2 id="dashboard-title">船外作業許可</h2><span class="date-pill">画面例</span></div>
+                  <div class="appointment-grid" aria-label="作業許可一覧">
+                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">🧑‍🚀</span><span class="time">EVA-0412</span><strong>PV-07 / 太陽電池点検</strong><p>申請済み。装備・被ばく量・宇宙天気・相方・遮断札・月面日を確認中。</p></article>
+                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">⚡</span><span class="time">PV-07</span><strong>給電系統 / 遮断済み</strong><p>電気主任が EVA-0412 の遮断札を取り付けた。</p></article>
+                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">☀️</span><span class="time">DAY 07</span><strong>宇宙天気 / CLEAR</strong><p>フレア警報なし。日照時間内。</p></article>
                   </div>
-                  <div class="chart-card" aria-label="カルテ詳細">
-                    <div class="chart-patient"><span class="big-pet" aria-hidden="true">🐈</span><h3>カルテ #AC-2408</h3><p>ミケ / 3歳 / メス避妊済み。主訴は耳まわりのかゆみと皮膚の赤み。</p><div class="status-flow" aria-label="状態遷移"><span>予約済み</span><span>受付済み</span><span>診察中</span><span>支払済み</span></div></div>
-                    <table class="chart-table" aria-label="カルテ項目"><tbody><tr class="is-alert"><th scope="row">注意</th><td>アレルギー歴: ペニシリン系は要確認</td></tr><tr><th scope="row">バイタル</th><td>体重 4.2kg / 体温 38.4℃ / 食欲あり</td></tr><tr><th scope="row">検査</th><td>皮膚スタンプ検査を実施予定</td></tr><tr><th scope="row">処方</th><td>外用薬 7日分。再診は 2週間後</td></tr><tr><th scope="row">会計</th><td>診察料 + 検査料で見積り作成</td></tr></tbody></table>
+                  <div class="chart-card" aria-label="作業許可詳細">
+                    <div class="chart-patient"><span class="big-pet" aria-hidden="true">🌘</span><h3>作業許可 #EVA-0412</h3><p>区域 PV-07。隊員 W-01 と W-02 が太陽電池アレイを点検する。</p><div class="status-flow" aria-label="状態遷移"><span>申請済み</span><span>承認済み</span><span>船外</span><span>帰還済み</span></div></div>
+                    <table class="chart-table" aria-label="開始条件"><tbody><tr class="is-alert"><th scope="row">未確認</th><td>2名分の装備点検と酸素残時間</td></tr><tr><th scope="row">被ばく量</th><td>作業後も安全上限以内</td></tr><tr><th scope="row">宇宙天気</th><td>フレア警報なし</td></tr><tr><th scope="row">系統</th><td>PV-07 に EVA-0412 の遮断札あり</td></tr><tr><th scope="row">承認</th><td>基地長が7条件を確認して開始を承認</td></tr></tbody></table>
                   </div>
                 </section>
 
-                <aside class="dashboard-notices" aria-label="待合と通知">
-                  <section class="mini-widget"><h3>待合室</h3><div class="queue-row"><span>🐶</span><strong>ポチ</strong><em>あと 1</em></div><div class="queue-row"><span>🐱</span><strong>ミケ</strong><em>問診済</em></div><div class="queue-row"><span>🐰</span><strong>もも</strong><em>診察中</em></div></section>
-                  <section class="mini-widget"><h3>検査結果</h3><p>ポチのワクチン前チェックは異常なし。ミケは皮膚検査待ち。</p></section>
-                  <section class="mini-widget"><h3>追加要求</h3><p>検査後に電話でフォローが必要な患者を抽出したい。連絡先がログに漏れている可能性もある。</p></section>
-                  <section class="mini-widget"><h3>会計</h3><p>ポチはワクチン会計準備中。ミケは検査内容確定後に見積り更新。</p></section>
+                <aside class="dashboard-notices" aria-label="基地状況と通知">
+                  <section class="mini-widget"><h3>担当</h3><div class="queue-row"><span>📡</span><strong>地上管制</strong><em>申請</em></div><div class="queue-row"><span>🧭</span><strong>基地長</strong><em>承認</em></div><div class="queue-row"><span>⚡</span><strong>電気主任</strong><em>遮断</em></div></section>
+                  <section class="mini-widget"><h3>開始条件</h3><p>7条件が一つでも欠ければ船外作業は開始できません。</p></section>
+                  <section class="mini-widget"><h3>追加要求</h3><p>許可の状態と作業記録を同じ整合性境界で保存し、競合時の二重承認を防ぎます。</p></section>
+                  <section class="mini-widget"><h3>機微情報</h3><p>被ばく量は個人の健康に関わる情報です。医務窓口とシステム担当だけが扱い、作業記録では値を伏せます。</p></section>
                 </aside>
               </div>
             </div>
           </div>
-          <div class="below-fold-cue"><span>下にスクロールして、WAN NYAN OS の機能と、現場で起き始めた問題を確認します。</span><span class="animal-train" aria-hidden="true">🐈 🐕 🐇 🐢 🦜 🦔</span></div>
+          <div class="below-fold-cue"><span>下にスクロールして、MoonBase の安全規程と、未完成コードに潜む問題を確認します。</span><span class="animal-train" aria-hidden="true">🌙 🛰️ 🧑‍🚀 ⚡ ☀️ 📡</span></div>
         </section>
 
         <section class="landing-section" id="features" aria-labelledby="features-title">
-          <div class="section-head"><h2 id="features-title">WAN NYAN OSで<span class="mobile-title-break"></span>できること</h2><p>最初は便利でした。予約から会計までがつながり、スタッフは画面を切り替えながら動物たちの来院に対応できるようになりました。</p></div>
+          <div class="section-head"><h2 id="features-title">MOONBASE CONTROLで<span class="mobile-title-break"></span>扱うこと</h2><p>地上管制、基地長、電気主任、医務担当が、それぞれの責務で船外作業の安全を確認します。教材では、この規程をコード上の制約へ変換します。</p></div>
           <div class="feature-splats" aria-label="機能一覧">
-            <article class="splat-card"><span class="icon" aria-hidden="true">📅</span><strong>予約管理</strong><span>来院予定、問診、受付状況をひとつの画面で確認。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">🩺</span><strong>カルテ</strong><span>診察メモ、バイタル、処方、注意事項を記録。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">🐾</span><strong>待合室</strong><span>受付済み、問診済み、診察中の患者を一覧化。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">💳</span><strong>会計</strong><span>診察料、検査料、処方料をまとめて会計。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">☎️</span><strong>フォロー連絡</strong><span>検査後に連絡が必要な飼い主を抽出。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">🔒</span><strong>連絡先管理</strong><span>飼い主の電話番号やメールアドレスを管理。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">📜</span><strong>申し送り</strong><span>スタッフ間で注意事項や次回対応を共有。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">📋</span><strong>作業許可</strong><span>区域、予定時間、2名の隊員を指定して申請。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">🧑‍🚀</span><strong>装備点検</strong><span>2名分の点検と酸素残時間を記録。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">☢️</span><strong>被ばく量の管理</strong><span>今回の作業後も安全上限以内に収まるか確認。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">☀️</span><strong>宇宙天気</strong><span>フレア警報と月面日を開始前に確認。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">⚡</span><strong>遮断札</strong><span>許可に対応する系統区間を安全に遮断。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">🔒</span><strong>役割と権限</strong><span>業務ごとの実行者を境界とユースケースで制限。</span></article>
+            <article class="splat-card"><span class="icon" aria-hidden="true">📜</span><strong>作業記録</strong><span>状態変更と監査イベントを一緒に保存。</span></article>
           </div>
         </section>
 
         <section class="landing-section" id="problems" aria-labelledby="problems-title">
-          <div class="section-head"><h2 id="problems-title">ところが、問題が増えてきた</h2><p>便利になった分だけ、要求も増えました。小さな改修を重ねるうちに、どの状態で何ができるのか、どの情報を外へ出してよいのかが分かりにくくなっています。</p></div>
-          <div class="timeline" aria-label="WAN NYAN OS に起きている問題">
-            <article class="time-stop is-active"><time>Current / S0</time><strong>🐢 現状と事故を対応付ける</strong><span>業務の流れ、画面操作、保存先、ログを確認し、二重請求と個人情報の流出がどこで起きたかを確かめる。</span></article>
-            <article class="time-stop"><time>Workflow / S2</time><strong>🐕 予約キャンセルを設計する</strong><span>「予約がキャンセルされた」から依頼と条件を逆算し、集約とユースケースの流れを図にする。</span></article>
-            <article class="time-stop"><time>Risk / S3</time><strong>🐇 許可されない状態遷移</strong><span>会計済み・キャンセル済みの予約でも診察を開始できてしまうリスクを、状態と遷移の型で防ぐ。</span></article>
-            <article class="time-stop"><time>Risk / S4</time><strong>🐦 識別子の取り違え</strong><span>予約IDと獣医師IDを異なる型で表し、用途の違うIDを渡す間違いを防ぐ。</span></article>
-            <article class="time-stop"><time>Risk / S5</time><strong>🐈 未検証の外部入力</strong><span>HTTPから受け取った値をZodで検証し、診察開始に必要な入力へ変換する。</span></article>
-            <article class="time-stop"><time>Risk / S6</time><strong>🐹 ユースケースの予期できる失敗</strong><span>throw と undefined に埋もれた業務上の失敗を、呼び出し側が扱える結果へ変える。</span></article>
-            <article class="time-stop"><time>Risk / S7</time><strong>🐢 出力イベントと副作用</strong><span>時刻や保存処理を外から渡し、状態と監査記録を同じ整合性境界で保存する。</span></article>
+          <div class="section-head"><h2 id="problems-title">引き継いだコードには、安全規程がない</h2><p>文字列だけの状態や識別子、未検証の入力、例外に埋もれた業務上の失敗を順に見直し、船外作業を開始できる条件をコードで閉じます。</p></div>
+          <div class="timeline" aria-label="MoonBase 教材のセッション">
+            <article class="time-stop is-active"><time>Onboarding / S0</time><strong>🌘 月面基地へ着任する</strong><span>基地の規程、役割、未完成システム、作業許可 EVA-0412 を確認する。</span></article>
+            <article class="time-stop"><time>Compare / S1</time><strong>🧭 実装の違いを読む</strong><span>同じ安全規程を表す実装を比べ、型と実行時検証の境界を話し合う。</span></article>
+            <article class="time-stop"><time>Workflow / S2</time><strong>📋 船外作業の中止を設計する</strong><span>「船外作業が中止された」からアクター、コマンド、業務条件を逆算する。</span></article>
+            <article class="time-stop"><time>Risk / S3</time><strong>🚦 許可されない状態遷移</strong><span>作業許可の状態ごとに可能な操作を型で限定する。</span></article>
+            <article class="time-stop"><time>Risk / S4</time><strong>🏷️ 識別子の取り違え</strong><span>許可ID、隊員ID、系統区間IDを異なる型として扱う。</span></article>
+            <article class="time-stop"><time>Risk / S5</time><strong>📡 未検証の外部入力</strong><span>HTTP入力を境界で検証し、承認に必要な型付き入力へ変換する。</span></article>
+            <article class="time-stop"><time>Risk / S6</time><strong>⚠️ 予期できる業務エラー</strong><span>許可なしや状態不正を、呼び出し側が扱えるResultへ変える。</span></article>
+            <article class="time-stop"><time>Risk / S7</time><strong>📜 イベントと副作用</strong><span>時刻とIDを外から渡し、状態と監査記録を同じ境界で保存する。</span></article>
           </div>
         </section>
 
@@ -112,8 +113,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </div>
 
         <footer class="landing-footer">
-          <p>2026年8月30日のイベントは終了しました。この教材は、個人学習や別のハンズオンでも使えるように引き続き公開しています。</p>
-          <a href="https://github.com/iwasa-kosui/fp-with-ts-hands-on">教材のソースコード</a>
+          <p>MoonBase の物語に沿って、Session 00 から順に安全規程をコードへ移していきます。</p>
+          <a href="/sessions/">セッション一覧を開く</a>
         </footer>
       </main>
     </div>

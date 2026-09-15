@@ -5,5 +5,4 @@ dist/
 tmp/
 .superdesign/tmp/
 .astro/
-/examples/session-*/clinic.sqlite*
 /examples/session-*/moonbase.sqlite*

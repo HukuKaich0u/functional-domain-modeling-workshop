@@ -9,8 +9,7 @@ type: design
 
 教材の全スナップショットが共有する、船外作業許可（`EvaPermit`）の型、
 操作、失敗、記録、依存の定義。各セッションの開始コードと解答はこの仕様に
-合わせる。元教材 `fp-with-ts-hands-on` の `Appointment` と `startExamination`
-の構造を、そのまま月面の題材へ写している。
+合わせる。
 
 世界の設定と規程は [企画方針](../functional-domain-modeling-workshop.md)、
 [船外作業規程](./world/eva-regulations.md)、
@@ -23,16 +22,18 @@ type: design
 - 作業員の装備点検は、承認の入力として2名分の点検記録を受け取る形にする。
   点検済みを独立した状態にはしない。
 - 酸素残時間は装備点検記録に含める。
+- S3〜S8の演習スナップショットでは、条件6は `SegmentId` を必須入力にする
+  ところまで扱う。遮断札の現在状態と許可番号の照合はFinal参照実装で行う。
 
 ## 識別子
 
-| 型 | 書式 | 例 | 元教材 | 配布時点 |
-| --- | --- | --- | --- | --- |
-| `PermitId` | `EVA-` + 4桁 | `EVA-0412` | AppointmentId | S4 開始時点で配布済み（手本） |
-| `WorkerId` | `W-` + 2桁 | `W-03` | PetId / OwnerId | S4 開始時点で配布済み（手本） |
-| `ZoneId` | `PV-` + 2桁 | `PV-07` | AppointmentId 側の役 | S4 で参加者が作る |
-| `SegmentId` | `PV-` + 2桁 | `PV-07` | VeterinarianId 側の役 | S4 で参加者が作る |
-| `EventId` | UUID | | EventId | S7 で配布 |
+| 型 | 書式 | 例 | 配布時点 |
+| --- | --- | --- | --- |
+| `PermitId` | `EVA-` + 4桁 | `EVA-0412` | S4 開始時点で配布済み（手本） |
+| `WorkerId` | `W-` + 2桁 | `W-03` | S4 開始時点で配布済み（手本） |
+| `ZoneId` | `PV-` + 2桁 | `PV-07` | S4 で参加者が作る |
+| `SegmentId` | `PV-` + 2桁 | `PV-07` | S4 で参加者が作る |
+| `EventId` | UUID | | S7 で配布 |
 
 `ZoneId` と `SegmentId` は同じ書式で、値も同じ文字列になることが多い。
 区別するのは値の形式ではなく用途で、取り違えると遮断していない区間で
@@ -49,14 +50,14 @@ export const ZoneId = { schema, parse: schema.parse } as const;
 6状態。`kind` で判別する。共通項目は `permitId`、`zoneId`、`crew`、
 `plannedMinutes`、`requestedAt`。
 
-| kind | 日本語 | 固有の項目 | 元教材 |
-| --- | --- | --- | --- |
-| `Requested` | 申請済 | なし | Scheduled |
-| `Approved` | 承認済 | `segmentId`、`equipmentChecks`、`approvedAt`、`approvedBy` | CheckedIn |
-| `Outside` | 作業中 | 承認済の項目 + `egressAt` | InExamination |
-| `Returned` | 帰還済 | 作業中の項目 + `returnedAt`、`returnRecord` | AwaitingPayment |
-| `Closed` | 完了 | 帰還済の項目 + `lockoutRemovedAt`、`closedAt` | Paid |
-| `Aborted` | 中止 | `reason`、`abortedAt`、`abortedBy` | Canceled |
+| kind | 日本語 | 固有の項目 |
+| --- | --- | --- |
+| `Requested` | 申請済 | なし |
+| `Approved` | 承認済 | `segmentId`、`equipmentChecks`、`approvedAt`、`approvedBy` |
+| `Outside` | 作業中 | 承認済の項目 + `egressAt` |
+| `Returned` | 帰還済 | 作業中の項目 + `returnedAt`、`returnRecord` |
+| `Closed` | 完了 | 帰還済の項目 + `lockoutRemovedAt`、`closedAt` |
+| `Aborted` | 中止 | `reason`、`abortedAt`、`abortedBy` |
 
 ```ts
 type Crew = readonly [WorkerId, WorkerId];
@@ -193,14 +194,14 @@ type EvaApproved = Readonly<{
 
 ## 依存（port）
 
-| port | 役割 | 元教材 |
-| --- | --- | --- |
-| `PermitResolver.resolveById` | 作業許可の現在状態を返す | AppointmentResolver |
-| `CrewDoseResolver.resolve(workerId)` | 医務の累積線量を `Sensitive<number>` で返す | なし（新規） |
-| `SpaceWeather.currentAlert()` | フレア警報の有無 | なし（新規） |
-| `Clock.now()` / `Clock.lunarDay()` | 地球時と月面日 | Clock |
-| `EventIdGenerator.generate()` | 記録ID | EventIdGenerator |
-| `EvaApprovedStore.store(event)` | 状態と作業記録を一度に保存 | ExaminationStartedStore |
+| port | 役割 |
+| --- | --- |
+| `PermitResolver.resolveById` | 作業許可の現在状態を返す |
+| `CrewDoseResolver.resolve(workerId)` | 医務の累積線量を `Sensitive<number>` で返す |
+| `SpaceWeather.currentAlert()` | フレア警報の有無 |
+| `Clock.now()` / `Clock.lunarDay()` | 地球時と月面日 |
+| `EventIdGenerator.generate()` | 記録ID |
+| `EvaApprovedStore.store(event)` | 状態と作業記録を一度に保存 |
 
 ## 機微情報
 

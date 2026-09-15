@@ -1,3 +1,10 @@
+---
+created: 2026-09-15
+updated: 2026-09-15
+author: Koki Aoyagi
+type: runbook
+---
+
 # トラブルシューティング
 
 エラーの全文、実行したコマンド、`node --version` と `pnpm --version` の結果をそろえると、原因を早く切り分けられます。
@@ -51,16 +58,16 @@ pnpm test
 
 ## exercise が赤い
 
-S3〜S6の開始スナップショットは、業務の言葉で命名された assertion failure から始まります。これは意図したREDです。S1はExcalidrawを使う班ワークで、exerciseコマンドはありません。
+S3〜S7の開始スナップショットは、業務の言葉で命名された assertion failure から始まります。これは意図したREDです。S2はExcalidrawを使う班ワークで、exerciseコマンドはありません。
 
-次の件数は失敗行数ではなく参加者ステップ数です。S2は4ステップですが、Step 3に2件の検査があるため、開始時には5件の型要件が表示されます。
+次の件数は失敗行数ではなく参加者ステップ数です。
 
 | セッション | 参加者ステップ | 意図した開始時の見え方 |
 | --- | ---: | --- |
 | S3 | 4件 | 状態遷移と網羅性の assertion が失敗する |
 | S4 | 3件 | 識別子の取り違えと、型テスト不足の assertion が失敗する |
-| S5 | 2件 | 不正な予約IDと担当獣医師IDを拒否する assertion が失敗する |
-| S6 | 3件 | 予約なし、状態不正、同期Result pipeline の assertion が失敗する |
+| S5 | 2件 | 不正な許可IDと系統区間IDを拒否する assertion が失敗する |
+| S6 | 3件 | 作業許可なし、状態不正、同期Result pipeline の assertion が失敗する |
 | S7 | 4件 | 決定性、single store、ResultAsync、保存失敗の assertion が失敗する |
 
 module-not-found、import error、設定エラー、予期しない例外は意図したREDではありません。エラーの最初の行だけでなく、`Caused by` とスタックの先頭までTAへ見せてください。
@@ -76,7 +83,7 @@ git status --short
 git diff --stat -- examples/session-0N
 ```
 
-`session-0N` は現在のセッションページに表示された開始snapshotへ置き換えます。S2では `session-03` です。scoped diffは現在の演習だけ、statusはリポジトリ全体の想定外pathを確認するために使います。
+`session-0N` は現在のセッションページに表示された開始snapshotへ置き換えます。S3では `session-03` です。scoped diffは現在の演習だけ、statusはリポジトリ全体の想定外pathを確認するために使います。
 
 自分が残したい変更を消さないよう、戻す前にTAとパスを確認します。追跡済みで、今回不要な変更だけを戻す場合は明示したパスに限定します。
 
@@ -94,7 +101,7 @@ git restore --source=HEAD -- path/to/file
 2. ページを再読み込みする。
 3. ブラウザの開発者ツールにSharedArrayBuffer、cross-origin isolation、WebContainerのエラーがないか確認する。
 4. 起動や依存取得が止まる場合は、主線であるローカル clone へ戻る。
-5. エージェントを使わない場合、S3〜S5はページの「ステップごとの解答」の `details` を1件ずつ開く。S6は「完成ファイルの解答例」の `details` を開き、後続stepを含む完成ファイルを全targetへ反映してから同じexerciseを実行する。1stepずつの個別GREENは約束しない。
+5. エージェントを使わない場合、S3〜S6はページの「ステップごとの解答」の `details` を1件ずつ開く。S7は「完成ファイルの解答例」の `details` を開き、後続stepを含む完成ファイルを全targetへ反映してから同じexerciseを実行する。1stepずつの個別GREENは約束しない。
 
 Playgroundのために新しいAPIキーを用意する必要はありません。Finalは講師ツアーなのでPlayground操作も不要です。
 
@@ -116,4 +123,4 @@ pnpm dev --port 5174
 
 ## 相互レビューが時間内に終わらない
 
-レビュー自体と最後のシート記入1分は残します。2人目の比較枠2分を落とし、S3・S4・S4は1名の5分版、S6・S6は1名の6分版へ切り替えます。次の回では未選出者を優先し、5回で全員を最低1回選べるよう記録欄を調整します。
+レビュー自体と最後のシート記入1分は残します。2人目の比較枠2分を落とし、S3〜S5は1名の5分版、S6・S7は1名の6分版へ切り替えます。次の回では未選出者を優先し、5回で全員を最低1回選べるよう記録欄を調整します。
