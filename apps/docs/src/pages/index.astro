@@ -212,7 +212,7 @@ const stateLabel: Record<Condition["state"], string> = {
             <li class="crew__member" data-reveal style={`--i: ${index}`}>
               <figure>
                 <div class="crew__photo">
-                  <img src={crewPhotoPath(member.id)} alt={member.alt} width="1124" height="1408" loading="lazy" decoding="async" />
+                  <img src={crewPhotoPath(member.id)} alt={member.alt} width="1122" height="1402" loading="lazy" decoding="async" />
                 </div>
                 <figcaption>
                   <span class="crew__no">No. {member.no}</span>
@@ -270,42 +270,99 @@ const stateLabel: Record<Condition["state"], string> = {
   </div>
 
   <script>
-    // 星空。スクロールに追従して奥行きごとに違う速さで流れ、ゆっくり瞬く。
-    // reduced-motion では静止した星だけを描く。
+    // 星空。ハッブルのディープフィールドのように、暗い空に無数の淡い光を散らす。
+    // 遠い層ほど小さく数が多く、色は青白から琥珀、ごく一部が赤味を帯びる。
+    // 星のほかに、傾いた楕円の淡い銀河と、回折の十字を持つ明るい星を少数だけ描く。
+    // スクロールに追従して奥行きごとに違う速さで流れ、星だけがゆっくり瞬く。
+    // reduced-motion では静止した空を描く。
     const canvas = document.querySelector<HTMLCanvasElement>("#starfield");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (canvas) {
       const context = canvas.getContext("2d");
       if (context) {
-        type Star = { x: number; y: number; r: number; alpha: number; depth: number; phase: number; warm: boolean };
+        type Star = { x: number; y: number; r: number; alpha: number; depth: number; phase: number; color: string };
+        type Galaxy = {
+          x: number; y: number; rx: number; ry: number; rotation: number; alpha: number; depth: number; color: string;
+          gradient: CanvasGradient | null;
+        };
+        type BrightStar = { x: number; y: number; r: number; spike: number; alpha: number; depth: number; phase: number; color: string };
+
+        // 手前ほど青白く、遠いほど暖色が混じる（赤方偏移の気分）
+        const cool = ["#e4e8f2", "#d9e2ff", "#eef0f5"];
+        const warm = ["#efd9a0", "#e9c38a", "#e2a96b"];
+        const red = ["#d98d6c", "#c9755e"];
+        const pick = (list: readonly string[]) => list[Math.floor(Math.random() * list.length)] ?? list[0]!;
+        const starColor = (warmRate: number, redRate: number) => {
+          const t = Math.random();
+          if (t < redRate) return pick(red);
+          if (t < redRate + warmRate) return pick(warm);
+          return pick(cool);
+        };
+
         const layers = [
-          { count: 150, depth: 0.12, radius: [0.4, 0.9] as const },
-          { count: 70, depth: 0.3, radius: [0.7, 1.2] as const },
-          { count: 22, depth: 0.55, radius: [1.1, 1.7] as const },
+          { count: 820, depth: 0.1, radius: [0.3, 0.75] as const, alpha: [0.22, 0.6] as const, warm: 0.3, red: 0.08 },
+          { count: 260, depth: 0.26, radius: [0.7, 1.15] as const, alpha: [0.38, 0.8] as const, warm: 0.24, red: 0.04 },
+          { count: 52, depth: 0.5, radius: [1.1, 1.65] as const, alpha: [0.55, 0.9] as const, warm: 0.18, red: 0 },
         ];
+        const galaxyCount = 72;
+        const brightCount = 7;
+
         let width = 0;
         let height = 0;
         let stars: Star[] = [];
+        let galaxies: Galaxy[] = [];
+        let brights: BrightStar[] = [];
         let scrollY = window.scrollY;
         let frame = 0;
 
+        const between = (range: readonly [number, number]) => range[0] + Math.random() * (range[1] - range[0]);
+
         const seed = () => {
           stars = [];
+          galaxies = [];
+          brights = [];
           const scale = Math.max(0.5, (width * height) / (1280 * 800));
+          const span = height * 1.6;
           for (const layer of layers) {
             const count = Math.round(layer.count * scale);
             for (let i = 0; i < count; i += 1) {
               stars.push({
                 x: Math.random() * width,
-                y: Math.random() * height * 1.6,
-                r: layer.radius[0] + Math.random() * (layer.radius[1] - layer.radius[0]),
-                alpha: 0.3 + Math.random() * 0.55,
+                y: Math.random() * span,
+                r: between(layer.radius),
+                alpha: between(layer.alpha),
                 depth: layer.depth,
                 phase: Math.random() * Math.PI * 2,
-                warm: Math.random() < 0.18,
+                color: starColor(layer.warm, layer.red),
               });
             }
+          }
+          for (let i = 0; i < Math.round(galaxyCount * scale); i += 1) {
+            const rx = 1.4 + Math.random() * 3.2;
+            galaxies.push({
+              x: Math.random() * width,
+              y: Math.random() * span,
+              rx,
+              ry: rx * (0.32 + Math.random() * 0.6),
+              rotation: Math.random() * Math.PI,
+              alpha: 0.3 + Math.random() * 0.35,
+              depth: 0.18,
+              color: Math.random() < 0.55 ? pick(warm) : pick(cool),
+              gradient: null,
+            });
+          }
+          for (let i = 0; i < brightCount; i += 1) {
+            brights.push({
+              x: Math.random() * width,
+              y: Math.random() * span,
+              r: 1.4 + Math.random() * 0.8,
+              spike: 7 + Math.random() * 9,
+              alpha: 0.7 + Math.random() * 0.25,
+              depth: 0.42,
+              phase: Math.random() * Math.PI * 2,
+              color: Math.random() < 0.4 ? "#efd9a0" : "#e9eef8",
+            });
           }
         };
 
@@ -319,19 +376,74 @@ const stateLabel: Record<Condition["state"], string> = {
           seed();
         };
 
+        const wrap = (y: number, depth: number, span: number) =>
+          ((((y - scrollY * depth) % span) + span) % span) - height * 0.3;
+
         const draw = (now: number) => {
           frame = 0;
           context.clearRect(0, 0, width, height);
           const span = height * 1.6;
+
+          // 銀河。瞬かない。中心から外へ薄れる楕円
+          for (const galaxy of galaxies) {
+            const y = wrap(galaxy.y, galaxy.depth, span);
+            if (y < -8 || y > height + 8) continue;
+            if (!galaxy.gradient) {
+              const gradient = context.createRadialGradient(0, 0, 0, 0, 0, galaxy.rx);
+              gradient.addColorStop(0, galaxy.color);
+              gradient.addColorStop(0.45, galaxy.color);
+              gradient.addColorStop(1, "rgb(0 0 0 / 0)");
+              galaxy.gradient = gradient;
+            }
+            context.save();
+            context.translate(galaxy.x, y);
+            context.rotate(galaxy.rotation);
+            context.scale(1, galaxy.ry / galaxy.rx);
+            context.globalAlpha = galaxy.alpha;
+            context.fillStyle = galaxy.gradient;
+            context.beginPath();
+            context.arc(0, 0, galaxy.rx, 0, Math.PI * 2);
+            context.fill();
+            context.restore();
+          }
+
+          // 星
           for (const star of stars) {
-            const y = ((((star.y - scrollY * star.depth) % span) + span) % span) - height * 0.3;
-            const twinkle = reduceMotion ? 1 : 0.7 + 0.3 * Math.sin(now / 1600 + star.phase);
+            const y = wrap(star.y, star.depth, span);
+            if (y < -2 || y > height + 2) continue;
+            const twinkle = reduceMotion ? 1 : 0.72 + 0.28 * Math.sin(now / 1700 + star.phase);
             context.globalAlpha = star.alpha * twinkle;
-            context.fillStyle = star.warm ? "#efd9a0" : "#dfe2ea";
+            context.fillStyle = star.color;
             context.beginPath();
             context.arc(star.x, y, star.r, 0, Math.PI * 2);
             context.fill();
           }
+
+          // 明るい星。淡い滲みと、望遠鏡の回折による細い十字
+          for (const bright of brights) {
+            const y = wrap(bright.y, bright.depth, span);
+            if (y < -20 || y > height + 20) continue;
+            const twinkle = reduceMotion ? 1 : 0.85 + 0.15 * Math.sin(now / 2300 + bright.phase);
+            context.globalAlpha = bright.alpha * 0.16 * twinkle;
+            context.fillStyle = bright.color;
+            context.beginPath();
+            context.arc(bright.x, y, bright.r * 3.2, 0, Math.PI * 2);
+            context.fill();
+            context.globalAlpha = bright.alpha * 0.55 * twinkle;
+            context.strokeStyle = bright.color;
+            context.lineWidth = 0.7;
+            context.beginPath();
+            context.moveTo(bright.x - bright.spike, y);
+            context.lineTo(bright.x + bright.spike, y);
+            context.moveTo(bright.x, y - bright.spike);
+            context.lineTo(bright.x, y + bright.spike);
+            context.stroke();
+            context.globalAlpha = bright.alpha * twinkle;
+            context.beginPath();
+            context.arc(bright.x, y, bright.r, 0, Math.PI * 2);
+            context.fill();
+          }
+
           context.globalAlpha = 1;
           if (!reduceMotion && !document.hidden) {
             frame = window.requestAnimationFrame(draw);

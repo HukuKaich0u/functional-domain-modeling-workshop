@@ -1,6 +1,6 @@
 /**
  * 日の出基地の乗員名簿。トップページの名簿と、各セッションの場面写真で共有する。
- * 写真は apps/docs/public/crew/ に、ここに書いたファイル名で置く（縦 4:5、jpg）。
+ * 写真は apps/docs/public/crew/ に、<id>.jpg の名前で置く（1122×1402、JPEG）。
  */
 export type CrewId =
   | "base-commander"
