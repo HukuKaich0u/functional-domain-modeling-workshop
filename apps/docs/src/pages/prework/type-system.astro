@@ -1,0 +1,84 @@
+---
+import PreworkLayout from "../../layouts/PreworkLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+import structural from "../../prework/examples/structural.ts?raw";
+import states from "../../prework/examples/states.ts?raw";
+import boundary from "../../prework/examples/boundary.ts?raw";
+import operators from "../../prework/examples/type-operators.ts?raw";
+const chapters = [
+  { id: "roles", label: "型システム・型駆動・型レベルの違い" },
+  { id: "structure", label: "型の名前と値の構造" },
+  { id: "states", label: "積と和で状態を表す" },
+  { id: "boundary", label: "unknownから検証済みの値へ" },
+  { id: "operators", label: "型から別の型を作る" },
+  { id: "exercise", label: "状態を増やして確かめる" },
+  { id: "references", label: "本編と公式ドキュメントへ" },
+];
+---
+<PreworkLayout title="型システムと型駆動プログラミングの基礎" description="型を変数の注釈として使うところから、許される状態と操作を表すところへ進みます。コンパイル時に分かることと、実行時に確かめることを分けて学びます。" duration="40〜50分" chapters={chapters}>
+  <section id="roles">
+    <h2>型システム・型駆動・型レベルの違い</h2>
+    <p>管制担当から「承認済みなら必ず承認者が分かるようにしたい。申請中の許可を受け取る処理に、承認済みの許可を渡す間違いも防ぎたい」と頼まれました。一方、外部端末は作業時間を文字列や負の数で送るかもしれません。どこまでを型で守り、どこからを実行時に検査するかが今回の問いです。</p>
+    <ul>
+      <li><strong>型システム：</strong>値や式を型で分類し、代入や操作が許されるか判断する仕組み。TypeScriptの静的検査は実行前に行われ、型注釈の多くはJavaScriptへの変換時に消えます。</li>
+      <li><strong>型駆動プログラミング：</strong>表現したい状態と操作を型・関数のシグネチャに書き、実装を組み立てる設計の進め方。本編の主題です。</li>
+      <li><strong>型レベルプログラミング：</strong>GenericsやMapped Typesなどで型から型を組み立てること。最後に小さな例を扱います。高度な型の技巧は本編の前提ではありません。</li>
+    </ul>
+    <p>静的・動的は「いつ検査するか」、構造的・公称的は「何をもって型を区別するか」という別の軸です。「強い型／弱い型」は意味が揺れやすいため、ここでは具体的に、どの代入や値を拒否できるかを確認します。</p>
+    <p>完了条件は、承認者の欠落を型エラーにし、外部の不正な作業時間を実行時に拒否し、その違いを説明できることです。サンプルはstrict設定で確認します。</p>
+  </section>
+  <section id="structure">
+    <h2>型の名前と値の構造</h2>
+    <CodeBlock code={structural} language="typescript" label="structural.ts · 別名だけでは区別されない" />
+    <p><code>ZoneId</code> と <code>SegmentId</code> はどちらもstringの別名です。名前が違っても代入できます。TypeScriptは基本的に構造的型付けで、必要なプロパティがあるかなど、型の構造で互換性を判断します。同じ公開プロパティを持つクラスも、クラス名だけで必ず区別されるわけではありません。</p>
+    <p>後半は、実行時にも存在する <code>kind</code> を使って形を分けました。<code>"ZoneId"</code> は任意のstringではなく、その文字列だけを許すリテラル型です。<code>Segment</code> のkindは違うため <code>readZone</code> に渡せません。本編のSession 04では、識別子の取り違えを防ぐ別の手段としてBranded Typeを扱います。</p>
+    <p>このタグはIDの書式や実在を証明しません。「区画のIDとして扱う」と「その区画が存在する」は別の検証です。</p>
+  </section>
+  <section id="states">
+    <h2>積と和で状態を表す</h2>
+    <p>オブジェクトで「idもstatusも持つ」と組み合わせるのが積の型の考え方です。Unionの <code>A | B</code> は「AまたはB」を表す和の型です。例えば2通りの値を持つ項目が2つなら積は4通り。異なるタグで区別した2状態と3状態をまとめる和なら5通りになります。</p>
+    <p><code>status: "Draft" | "Approved"</code> と <code>approvedBy?: string</code> を別々に持つと、「Approvedなのに承認者なし」も表せます。状態ごとに必要な項目をまとめてからUnionにします。</p>
+    <CodeBlock code={states} language="typescript" label="states.ts · 状態ごとのデータと操作" />
+    <p><code>status</code> で分岐すると、コンパイラはその枝で扱う型を絞り込みます。Approvedの枝では <code>approvedBy</code> が必ずあります。<code>never</code> はあり得る値がない型で、すべての状態を処理したかの確認に使えます。</p>
+    <p>関数の型 <code>Draft → Approved</code> には遷移前と遷移後が現れます。新しい値を返すので、元のDraftは変更しません。ただし元のDraftをもう一度渡すことまでは防げません。現実の許可の二重承認や同時更新は、保存側での整合性の仕組みも必要です。</p>
+    <p><code>readonly</code> はその型を通じた書き換えを静的に制限します。自動で深い不変性を保証したり、実行時にObject.freezeを呼んだりする機能ではありません。この例では各状態のプロパティがプリミティブなので、浅いReadonlyで形を示しています。</p>
+  </section>
+  <section id="boundary">
+    <h2>unknownから検証済みの値へ</h2>
+    <CodeBlock code={boundary} language="typescript" label="boundary.ts · 検査の結果も型で返す" />
+    <p><code>unknown</code> は、値が何であるかまだ分からないことを表します。<code>typeof</code> でnumberへ絞り込み、有限か、正かを実行時に調べます。number型だけではNaN、Infinity、負の値を除けません。</p>
+    <p><code>Result&lt;T, E&gt;</code> のTとEは型の引数です。ここでは成功値にMinutes、失敗値にInvalidMinutesを入れます。Genericsは、具体的な型を差し替えながら同じ関係を保つための仕組みです。呼び出し側もokで分岐してからvalueを使います。</p>
+    <p><code>as Minutes</code> は検証ではありません。コンパイラへ型を主張するだけで、不正な値を変換も拒否もしません。anyは多くの検査を回避できるため、外部入力の安全性の根拠にはできません。</p>
+    <p>この小さな例のMinutesは、同じ構造の値を別の場所で直接作れてしまいます。すべてのMinutesが必ず検証を通ることまで保証するには、生成経路を制限する設計が必要です。本編では境界でのスキーマ検証とBranded Typeを組み合わせます。型にできる前提と、その前提を成立させる検査の両方を考えます。</p>
+  </section>
+  <section id="operators">
+    <h2>型から別の型を作る</h2>
+    <CodeBlock code={operators} language="typescript" label="type-operators.ts · keyof、Mapped Types、Indexed Access Types" />
+    <p><code>keyof T</code> はキーの型、<code>T[K]</code> はそのキーに対応する値の型です。<code>K extends keyof T</code> はキーの指定を制限します。readFieldの呼び出しでは、入力オブジェクトとキーから戻り値の型が決まります。</p>
+    <p><code>FieldErrors&lt;T&gt;</code> は元の型の項目に対応したエラー表示の型を作ります。入力の項目が変わったとき、存在しない項目名のエラーを静的に見つけられます。ただしこの型は、実行時にエラーのオブジェクトを生成しません。値を作るコードは別に必要です。</p>
+    <p>型レベルの処理は、値を扱う処理との対応を保つために使えます。複雑な条件型や再帰型を導入する前に、単純なUnionとGenericsで意図を表せないか考えてください。</p>
+  </section>
+  <section id="exercise">
+    <h2>状態を増やして確かめる</h2>
+    <ol>
+      <li>states.tsの <code>Permit</code> に、<code>status: "Cancelled"</code>、id、必須の <code>reason: string</code> を持つ状態を追加します。</li>
+      <li>typecheckを実行し、labelのneverへの代入が失敗することを確認します。switchにCancelledの枝を追加して、中止理由を表示します。</li>
+      <li>テストに「中止済みの表示」と、<code>parseMinutes</code> が0、負数、文字列を拒否し、30を受け入れるケースがあることを確認します。Cancelledの表示のケースは自分で追加します。</li>
+    </ol>
+    <details><summary>確認する結果と振り返り</summary>
+      <p>未処理のCancelledがある間、defaultのpermitはneverになりません。枝を足すと型検査が通り、実行時テストでは指定した中止理由が表示されます。</p>
+      <p>「必須項目の欠落」「未対応の状態」は静的検査で分かります。一方、外部端末から届く値が正の数かは実行時に調べます。両方が必要な理由と、型だけではDBの最新状態を保証できない理由を説明できれば、この事前学習は完了です。</p>
+    </details>
+  </section>
+  <section id="references">
+    <h2>本編と公式ドキュメントへ</h2>
+    <p><a href="/sessions/03-state-transitions/">Session 03</a>は状態と遷移、<a href="/sessions/04-semantic-identifiers/">Session 04</a>は識別子、<a href="/sessions/05-boundaries-and-sensitive-data/">Session 05</a>は入力の境界、<a href="/sessions/06-workflow-errors/">Session 06</a>は失敗の表現を扱います。本編を初めて読む場合は、業務背景を紹介するSession 00から進めてください。</p>
+    <ul>
+      <li><a href="https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html">TypeScript for the New Programmer</a>：静的検査と型の消去。</li>
+      <li><a href="https://www.typescriptlang.org/docs/handbook/type-compatibility.html">Type Compatibility</a>：構造的型付けと互換性。</li>
+      <li><a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">Narrowing</a>：絞り込み、判別可能なUnion、never。</li>
+      <li><a href="https://www.typescriptlang.org/docs/handbook/2/generics.html">Generics</a>と<a href="https://www.typescriptlang.org/docs/handbook/2/types-from-types.html">Creating Types from Types</a>：型の引数と型の組み立て。</li>
+    </ul>
+  </section>
+  <Fragment slot="next"><a rel="prev" href="/prework/programming-paradigms/">← パラダイムの解説</a><a href="/sessions/00-system-handover/">Session 00から本編へ →</a></Fragment>
+</PreworkLayout>

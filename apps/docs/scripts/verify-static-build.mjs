@@ -22,6 +22,9 @@ const requiredHtmlFiles = [
   "404.html",
   "setup/index.html",
   "sessions/index.html",
+  "prework/index.html",
+  "prework/programming-paradigms/index.html",
+  "prework/type-system/index.html",
   ...sessionSlugs.map((slug) => `sessions/${slug}/index.html`),
 ];
 
@@ -39,7 +42,7 @@ if (missingHtmlFiles.length > 0) {
 }
 
 const sessionPaths = requiredHtmlFiles
-  .filter((htmlFile) => htmlFile.startsWith("sessions/"))
+  .filter((htmlFile) => /^(sessions|prework)\//.test(htmlFile))
   .map((htmlFile) => `/${htmlFile.replace(/index\.html$/, "")}`);
 const allowedPaths = new Set([
   "/",

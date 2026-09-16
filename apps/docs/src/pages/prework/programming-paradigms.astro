@@ -1,0 +1,77 @@
+---
+import PreworkLayout from "../../layouts/PreworkLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
+import procedural from "../../prework/examples/procedural.ts?raw";
+import objectOriented from "../../prework/examples/object-oriented.ts?raw";
+import functional from "../../prework/examples/functional.ts?raw";
+import ruleData from "../../prework/examples/rule-data.ts?raw";
+const chapters = [
+  { id: "request", label: "同じ要求を、違う単位で整理する" },
+  { id: "procedural", label: "手続き型：手順を書く" },
+  { id: "objects", label: "オブジェクト指向：責務を分ける" },
+  { id: "functions", label: "関数型：入力と出力でつなぐ" },
+  { id: "data", label: "宣言型・データ指向：規則をデータで表す" },
+  { id: "map", label: "本編の10通りとのつながり" },
+  { id: "exercise", label: "条件を追加して確かめる" },
+];
+---
+<PreworkLayout title="プログラミングのパラダイムを読み比べる" description="「何指向か」という名前から一歩進み、同じ要求をどの単位に分け、どう組み立てるかをコードで確かめます。" duration="30〜40分" chapters={chapters}>
+  <section id="request">
+    <h2>同じ要求を、違う単位で整理する</h2>
+    <p>月面基地の管制担当から「装備点検が済み、フレア警報が出ていないときだけ船外作業を始めたい。問題が複数あればまとめて知らせてほしい」と依頼されました。未点検で警報も出ている申請が届いたとき、2つの理由を返す必要があります。</p>
+    <p>本編の7条件のうち2条件だけを取り出します。空の配列は承認可能、理由の入った配列は承認不可です。4つの例は、すべて同じ入力から同じ順序の理由を返します。外部通信や保存は扱いません。</p>
+    <p>パラダイムはプログラムを組み立てる考え方です。Strategyなどの個別の設計パターンより大きな視点ですが、分類は重なります。TypeScriptでは複数の考え方を一緒に使えます。今回の完了条件は、規則を1つ追加するとき、各実装のどこを変えるか説明できることです。</p>
+  </section>
+  <section id="procedural">
+    <h2>手続き型：手順を書く</h2>
+    <CodeBlock code={procedural} language="typescript" label="procedural.ts · 条件を順に調べる" />
+    <p><code>reasons</code> を作り、条件を確認して追加し、返す。処理の順番をそのまま読めます。規則が増えたら、この関数にif文を足します。小さな処理では見通しがよい一方、問い合わせや保存まで混ざると、順番と依存関係を追う負担が増えます。</p>
+    <p>この例は全件を収集します。最初の不備でreturnすることもできますが、それは報告方針の選択です。「手続き型だから最初の1件しか返せない」という制約はありません。</p>
+  </section>
+  <section id="objects">
+    <h2>オブジェクト指向：責務を分ける</h2>
+    <CodeBlock code={objectOriented} language="typescript" label="object-oriented.ts · 共通の契約を持つ規則に問い合わせる" />
+    <p><code>Rule</code> は「申請を受け取って理由を返す」という契約です。方針を表す <code>ApprovalPolicy</code> は個々の規則の中身を知らず、同じメソッドを呼びます。共通の契約で異なる実装を扱うのが、ここで使う多態です。</p>
+    <p>規則はクラスごとに分かれ、追加するときは新しい規則を作ってconstructorへ渡します。継承階層は不要です。この例は規則を差し替えられる点に重心を置いています。オブジェクト指向では、状態とその状態を扱う操作を一緒に持たせ、外からの変更を制限する設計もできます。</p>
+    <p>クラスを書くだけで設計がよくなるわけではありません。2条件なら分割のほうが大げさに感じるかもしれません。規則がそれぞれ独立した責務を持つか、交換する必要があるかで判断します。</p>
+  </section>
+  <section id="functions">
+    <h2>関数型：入力と出力でつなぐ</h2>
+    <CodeBlock code={functional} language="typescript" label="functional.ts · 規則を関数として合成する" />
+    <p>規則を関数にすると、関数自体を配列に入れて渡せます。<code>combine</code> は関数を受け取って別の関数を返す高階関数です。<code>flatMap</code> は各規則の返した配列を1つにまとめます。</p>
+    <p>ここでの規則は、同じ入力に同じ内容の結果を返し、外部の状態を変更しない純粋関数です。結果の配列が毎回別の参照でも構いません。時刻の取得、DBへの保存、通知を関数の外へ出せば、入力と期待結果だけで試せます。本編のSession 07で副作用の置き場所を設計します。</p>
+    <p>最初の手続き型の例も、外から見ると純粋関数です。ローカルな配列へのpushと、共有状態の変更は同じではありません。「ifやループを使わないこと」や「すべてをmapにすること」が関数型の目的ではありません。</p>
+  </section>
+  <section id="data">
+    <h2>宣言型・データ指向：規則をデータで表す</h2>
+    <CodeBlock code={ruleData} language="typescript" label="rule-data.ts · 規則の記述と評価器を分ける" />
+    <p>規則の配列には「どの項目が、どの値であるべきか」を書き、下の関数がそれを評価します。手順の詳細より、満たすべき条件を記述する宣言型の例です。同時に、振る舞いとデータを分け、汎用的なデータ構造で表すData-Oriented Programming（DOP）の入口でもあります。</p>
+    <p>この2分類は同義ではありません。ここでは重なる小さな例を選びました。DOPでは不変なデータや境界でのスキーマ検証も重視します。メモリ配置やキャッシュ効率を重視するData-Oriented Designとは区別します。</p>
+    <p>booleanの等値比較なら規則を簡単に追加できます。一方、「医務の記録と月面日の両方で判断する」条件は、このデータ形式では表せません。記述形式を広げるか関数を使うか、要求に合わせて選びます。外部JSONから規則を読むなら、型注釈だけでなく実行時検証も必要です。</p>
+  </section>
+  <section id="map">
+    <h2>本編の10通りとのつながり</h2>
+    <p><a href="/sessions/01-design-approaches/">Session 01</a>では、ここで扱った4つの見方に加え、次の見方を含む10実装を比較します。宣言型とデータ指向は別の実装で登場します。すべてが同じ分類階層の、排他的な選択肢というわけではありません。</p>
+    <ul>
+      <li><strong>型駆動：</strong>渡してよい値と返す値を先に設計する。次の事前学習で扱います。オブジェクト指向や関数型と併用できます。</li>
+      <li><strong>イベント駆動：</strong>「承認された」などの出来事を受けて別の処理を動かす。規則の書き方に加え、処理同士の連携を考える視点です。</li>
+      <li><strong>メッセージ指向・Actor Model：</strong>状態を持つ主体がメッセージを受け取り処理する。状態の所有者ややり取りを中心に考えます。</li>
+      <li><strong>Reactive：</strong>時間とともに届く値の流れを変換・合成する。警報の変化に応じた再判定などを考える入口です。</li>
+      <li><strong>Logic Programming：</strong>事実と規則から、問いを満たす答えを求める。条件を満たす組み合わせを導く見方です。</li>
+    </ul>
+    <p>本編のActor、Reactive、Logicの実装は比較用の小さなモデルです。実運用の分散処理、ストリーム基盤、論理言語の機能を網羅するものではありません。</p>
+  </section>
+  <section id="exercise">
+    <h2>条件を追加して確かめる</h2>
+    <ol>
+      <li>変更前に4実装へ <code>{`{ equipmentChecked: false, flareAlert: true }`}</code> を渡した結果を予想し、事前学習のテストを実行します。</li>
+      <li><code>Request</code> に <code>buddyPresent: boolean</code>、<code>Reason</code> に <code>"BuddyMissing"</code> を追加します。相方不在なら、この理由も返すよう4実装を変更します。</li>
+      <li>テストの既存入力には <code>buddyPresent: true</code> を補います。そのうえで、相方だけ不在の入力と3条件とも不成立の入力を追加し、実行結果を確認します。</li>
+    </ol>
+    <details><summary>確認する結果と振り返り</summary>
+      <p>変更前は <code>["EquipmentNotChecked", "FlareAlertActive"]</code> です。変更後、相方だけ不在なら <code>["BuddyMissing"]</code>、3条件とも不成立なら規則の順に3つの理由を返します。</p>
+      <p>手続き型はif文、オブジェクト指向は規則クラスと登録、関数型は規則関数と登録、今回のデータ形式なら規則の1行を追加します。処理を分ける単位が違うことと、全件報告の方針はどれでも実現できることを、自分の言葉で説明してください。</p>
+    </details>
+  </section>
+  <Fragment slot="next"><a rel="prev" href="/prework/">← 事前学習一覧</a><a rel="next" href="/prework/type-system/">型システムの基礎へ →</a></Fragment>
+</PreworkLayout>

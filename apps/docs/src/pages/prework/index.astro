@@ -1,0 +1,22 @@
+---
+import PreworkLayout from "../../layouts/PreworkLayout.astro";
+const chapters = [{ id: "choose", label: "読むページを選ぶ" }, { id: "practice", label: "コードの試し方" }];
+---
+<PreworkLayout title="事前学習" description="プログラミングの考え方とTypeScriptの型を、小さなコード例から学びます。本編の前でも、途中で立ち戻っても読める補助教材です。" chapters={chapters}>
+  <section id="choose">
+    <h2>読むページを選ぶ</h2>
+    <p>JavaScriptの変数、関数、配列、オブジェクト、if文を読めることを前提にしています。関数型や型駆動の経験は不要です。すでに説明できる内容は飛ばして構いません。本編のセッション番号と所要時間には含めません。</p>
+    <h3><a href="/prework/programming-paradigms/">01 · プログラミングのパラダイムを読み比べる</a></h3>
+    <p>目安30〜40分。同じ承認条件を手続き型、オブジェクト指向、関数型、宣言型・データ指向で表し、変更する場所の違いを確かめます。Session 01の10通りの比較を読む準備です。</p>
+    <h3><a href="/prework/type-system/">02 · 型システムと型駆動プログラミングの基礎</a></h3>
+    <p>目安40〜50分。構造的型付け、積と和、絞り込み、Generics、型レベルの操作、実行時検証を学びます。Session 03〜06で扱う状態、識別子、境界、失敗の表現につながります。</p>
+  </section>
+  <section id="practice">
+    <h2>コードの試し方</h2>
+    <p>ページは「背景と要求 → コードを読む → 手を動かす → 確認と気づき」の順で進みます。読むだけなら環境構築は不要です。実行・編集する場合は<a href="/setup/">事前準備</a>を済ませてください。</p>
+    <p>掲載コードはリポジトリの <code>apps/docs/src/prework/examples/</code> にあります。パラダイムの例は同じフォルダの型をimportするので、ファイルをまとめて開きます。コードブロックはそのファイル全体を表示しています。</p>
+    <p><code>pnpm --filter @moonbase/docs test -- src/prework/examples.test.ts</code> で例の実行結果を、<code>pnpm --filter @moonbase/docs typecheck</code> で型を確認できます。編集した後も同じコマンドで確かめます。</p>
+    <p><code>@ts-expect-error</code> は「次の行で型エラーが起きるはず」という検証です。該当行が通るようになると、指示が不要になったこと自体が型エラーになります。エディタで診断を見たいときは、一時的にこの行を外してください。</p>
+  </section>
+  <Fragment slot="next"><a href="/prework/programming-paradigms/">パラダイムの解説から読む →</a><a href="/sessions/00-system-handover/">本編を始める →</a></Fragment>
+</PreworkLayout>

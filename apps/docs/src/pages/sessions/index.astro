@@ -43,6 +43,12 @@ const sessions = Object.values(
           <span aria-hidden="true">→</span>
         </a>
       </section>
+      <section class="session-directory__setup" aria-labelledby="prework-heading">
+        <p class="session-directory__setup-label">必要なところから読める補助教材</p>
+        <h2 id="prework-heading">事前学習</h2>
+        <p>プログラミングのパラダイムと型システムの基礎を、小さなコード例で学びます。本編のセッション番号には含まれない、任意の学習です。</p>
+        <a class="session-directory__setup-link" href="/prework/">事前学習を開く <span aria-hidden="true">→</span></a>
+      </section>
       <ol class="session-directory__list" aria-label="セッション一覧">
         {sessions.map((session) => (
           <li>
