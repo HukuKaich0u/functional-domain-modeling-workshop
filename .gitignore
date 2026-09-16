@@ -6,3 +6,4 @@ tmp/
 .superdesign/tmp/
 .astro/
 /examples/session-*/moonbase.sqlite*
+**/.DS_Store
