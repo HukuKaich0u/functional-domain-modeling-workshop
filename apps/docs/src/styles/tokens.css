@@ -1,0 +1,58 @@
+/*
+ * MoonBase 日の出基地の共通トークン。
+ * 宇宙の深い青を地に、月の灰色と日の出の薄い黄色を差し色にする。
+ * 線は 1px の半透明を基本にして、人の目にきつい高コントラストを避ける。
+ */
+:root {
+  /* 空間 — 深い青のグラデーション。数字が大きいほど深い */
+  --mb-space-950: #04071a;
+  --mb-space-900: #080d22;
+  --mb-space-800: #0d1530;
+  --mb-space-700: #131d3f;
+  --mb-space-600: #1b2952;
+
+  /* 線 — 常に半透明。太さより濁りで強弱をつける */
+  --mb-line-faint: rgb(176 188 226 / 8%);
+  --mb-line-soft: rgb(176 188 226 / 14%);
+  --mb-line: rgb(176 188 226 / 24%);
+  --mb-line-strong: rgb(176 188 226 / 42%);
+
+  /* 文字 — 純白は使わない */
+  --mb-ink: #e7eaf4;
+  --mb-ink-soft: #bcc3da;
+  --mb-muted: #8892b4;
+  --mb-faint: #5d678c;
+
+  /* 月 — レゴリスの灰色 */
+  --mb-moon: #d6d8df;
+  --mb-moon-shadow: #8f949f;
+  --mb-moon-deep: #4b5060;
+
+  /* 日の出 — 薄い黄色。強調と主導線にだけ使う */
+  --mb-sun: #f0dc9c;
+  --mb-sun-strong: #ffd978;
+  --mb-sun-glow: rgb(240 220 156 / 18%);
+
+  /* 遮断札の赤と承認の緑。警報・未確認・承認済みの状態表示に限る */
+  --mb-tag: #ff7a66;
+  --mb-tag-soft: rgb(255 122 102 / 14%);
+  --mb-ok: #8fd6b4;
+  --mb-ok-soft: rgb(143 214 180 / 12%);
+
+  /* 書体 — Web フォントは読み込まず、端末のゴシックと等幅を使う */
+  --mb-font-sans:
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", Meiryo,
+    system-ui, -apple-system, sans-serif;
+  --mb-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 動き — 押した手応えと出入りだけ。飾りの動きは足さない */
+  --mb-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --mb-duration-press: 140ms;
+  --mb-duration-hover: 180ms;
+
+  /* 寸法 */
+  --mb-content-width: 72rem;
+  --mb-radius-sm: 0.25rem;
+  --mb-radius: 0.5rem;
+  --mb-radius-lg: 0.75rem;
+}

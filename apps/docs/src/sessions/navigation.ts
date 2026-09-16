@@ -3,6 +3,19 @@ export type SessionNavigationItem = Readonly<{
   title: string;
 }>;
 
+export type Curriculum = Readonly<{
+  title: string;
+  href: string;
+  pageLabel: string;
+  unit: string;
+  items: readonly Readonly<{
+    slug: string;
+    title: string;
+    sequence: string;
+    href: string;
+  }>[];
+}>;
+
 export const sessionNavigationItems = [
   { slug: "00-system-handover", title: "業務とシステムを引き継ぐ" },
   {
@@ -26,3 +39,15 @@ export const sessionNavigationItems = [
   { slug: "07-effects-and-consistency", title: "副作用と整合性境界を設計する" },
   { slug: "final", title: "参照実装で境界をたどる" },
 ] as const satisfies readonly SessionNavigationItem[];
+
+export const sessionCurriculum: Curriculum = {
+  title: "セッション一覧",
+  href: "/sessions/",
+  pageLabel: "Session",
+  unit: "セッション",
+  items: sessionNavigationItems.map((item) => ({
+    ...item,
+    sequence: item.slug === "final" ? "Final" : item.slug.slice(0, 2),
+    href: `/sessions/${item.slug}/`,
+  })),
+};

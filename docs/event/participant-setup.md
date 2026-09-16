@@ -1,6 +1,6 @@
 ---
 created: 2026-09-15
-updated: 2026-09-15
+updated: 2026-09-16
 author: Koki Aoyagi
 type: guide
 ---
@@ -11,14 +11,14 @@ type: guide
 
 ## 必要なもの
 
-- Node.js 20以上
+- Node.js 24（CIと同じバージョン。package.jsonの要件は20以上）
 - pnpm 9.12.0
 - Git
 - TypeScript を編集できるエディタ
 - デスクトップ版 Chrome または Edge の現行版
 - 普段利用しているコーディングエージェント（任意）
 
-データベース、Docker、外部サービスのAPIキーは必要ありません。コーディングエージェントも必須ではなく、このリポジトリのために新しいAPIキーを発行する必要はありません。
+デモはローカルのSQLiteを使うため、別途データベースサーバーやDockerを用意する必要はありません。コーディングエージェントも必須ではなく、このリポジトリのために新しいAPIキーを発行する必要はありません。
 
 ## バージョンの確認
 
@@ -37,11 +37,11 @@ Node.js は `v20` 以上、pnpm は `9.12.0` であることを確認してく�
 作業する場所でリポジトリを clone します。
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/HukuKaich0u/functional-domain-modeling-workshop.git
 cd functional-domain-modeling-workshop
 ```
 
-すでに clone 済みの場合は、そのリポジトリのディレクトリで作業します。演習の主な作業場所はこのローカル clone です。
+すでに clone 済みの場合は、そのリポジトリのディレクトリで作業します。演習の主な作業場所はこのローカル clone です。以降のコマンドはすべてリポジトリのルートで実行します。
 
 ## 事前に済ませること
 
@@ -54,7 +54,15 @@ pnpm test
 
 編集前の `pnpm test` は成功するのが正常です。失敗した場合は、演習を始める前に [トラブルシューティング](./troubleshooting.md) の「tests fail before edits」を確認してください。
 
-教材サイトも事前に表示できます。
+続けて、Session 00で使う作業許可システムのデモを起動します。
+
+```bash
+pnpm demo:00
+```
+
+ターミナルに表示されたURL（通常は `http://localhost:3000`）を開き、作業許可 `EVA-0412` が表示されれば準備完了です。操作結果はローカルのSQLiteに保存され、サーバーを再起動しても残ります。最初から試すときは画面の「デモを初期状態へ戻す」を使ってください。
+
+教材サイトも手元で開く場合は、別のターミナルでリポジトリのルートから次を実行します。教材サイトとデモは別のアプリです。
 
 ```bash
 pnpm dev

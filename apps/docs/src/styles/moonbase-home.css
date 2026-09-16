@@ -1,0 +1,719 @@
+/*
+ * トップページ。日の出基地の作業許可書を、深い青の空間に置いた構成。
+ * 線は 1px の半透明、面は space-800、強調は日の出の薄い黄色に限る。
+ */
+
+html:has(body.landing-body),
+body.landing-body {
+  background: var(--mb-space-900);
+  color: var(--mb-ink-soft);
+}
+
+.landing {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: clip;
+  color: var(--mb-ink-soft);
+  background:
+    radial-gradient(circle at 18% 22%, rgb(214 216 223 / 55%) 0 0.6px, transparent 1.2px),
+    radial-gradient(circle at 63% 71%, rgb(214 216 223 / 45%) 0 0.6px, transparent 1.2px),
+    radial-gradient(circle at 84% 37%, rgb(240 220 156 / 55%) 0 0.7px, transparent 1.3px),
+    radial-gradient(circle at 37% 88%, rgb(214 216 223 / 40%) 0 0.5px, transparent 1.1px),
+    radial-gradient(circle at 92% 9%, rgb(214 216 223 / 50%) 0 0.6px, transparent 1.2px),
+    var(--mb-space-900);
+  background-size: 41rem 37rem, 53rem 47rem, 61rem 43rem, 47rem 59rem, 67rem 53rem, auto;
+  font-family: var(--mb-font-sans);
+  font-feature-settings: "palt";
+  line-height: 1.8;
+}
+
+/* 月。ヒーロー右上に、作業許可書の後ろから覗く */
+.landing::before {
+  position: absolute;
+  z-index: -1;
+  top: 3rem;
+  right: -7rem;
+  width: 36rem;
+  height: 36rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgb(255 255 255 / 10%) 0 6%, transparent 7%),
+    radial-gradient(circle at 66% 58%, rgb(0 0 0 / 18%) 0 9%, transparent 10%),
+    radial-gradient(circle at 44% 72%, rgb(0 0 0 / 12%) 0 5%, transparent 6%),
+    radial-gradient(circle at 36% 34%, #767b88 0, #474c5b 52%, #262a3c 100%);
+  box-shadow: inset -2.5rem -2rem 5rem rgb(4 7 26 / 70%);
+  content: "";
+  opacity: 0.55;
+}
+
+.landing :where(a, button):focus-visible {
+  outline: 2px solid var(--mb-sun);
+  outline-offset: 3px;
+  border-radius: var(--mb-radius-sm);
+}
+
+/* ヘッダー */
+.landing__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  width: min(100% - 2rem, var(--mb-content-width));
+  margin-inline: auto;
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--mb-line-soft);
+}
+
+.landing__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  color: var(--mb-ink);
+  text-decoration: none;
+}
+
+.landing__brand-mark {
+  flex: none;
+  color: var(--mb-sun);
+}
+
+.landing__brand-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.landing__brand-system {
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--mb-line);
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.landing__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.landing__nav a {
+  padding-block: 0.35rem;
+  color: var(--mb-muted);
+  text-decoration: none;
+  transition: color var(--mb-duration-hover) ease;
+}
+
+.landing__nav a:hover {
+  color: var(--mb-ink);
+}
+
+.landing__nav .landing__nav-start {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--mb-line-strong);
+  border-radius: 0.375rem;
+  color: var(--mb-ink);
+  transition:
+    border-color var(--mb-duration-hover) ease,
+    color var(--mb-duration-hover) ease;
+}
+
+.landing__nav .landing__nav-start:hover {
+  border-color: var(--mb-sun);
+  color: var(--mb-sun);
+}
+
+/* 本文 */
+.landing__main {
+  width: min(100% - 2rem, var(--mb-content-width));
+  margin-inline: auto;
+}
+
+/* ボタン。押した手応えだけ動かす */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  transition:
+    background-color var(--mb-duration-hover) ease,
+    border-color var(--mb-duration-hover) ease,
+    color var(--mb-duration-hover) ease,
+    transform var(--mb-duration-press) var(--mb-ease-out);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button--primary {
+  background: var(--mb-sun-strong);
+  color: var(--mb-space-950);
+}
+
+.button--primary:hover {
+  background: #ffe39a;
+}
+
+.button--ghost {
+  border-color: var(--mb-line-strong);
+  color: var(--mb-ink);
+}
+
+.button--ghost:hover {
+  border-color: var(--mb-sun);
+  color: var(--mb-sun);
+}
+
+/* ヒーロー */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+  padding-block: clamp(3rem, 8vw, 6rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+/* 地平線。日の出の光がヒーローの下端から立ち上がる */
+.hero::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mb-sun) 25% 75%, transparent);
+  box-shadow: 0 -0.5rem 4rem 1rem var(--mb-sun-glow);
+  content: "";
+  opacity: 0.55;
+}
+
+.hero__copy {
+  min-width: 0;
+  padding-top: 1rem;
+}
+
+.hero__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  margin: 0 0 1.5rem;
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+}
+
+.hero h1 {
+  margin: 0 0 1.5rem;
+  color: var(--mb-ink);
+  font-size: clamp(2.5rem, 5.8vw, 4.6rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+
+.hero__lead {
+  max-width: 34em;
+  margin: 0;
+  color: var(--mb-ink-soft);
+  font-size: 1.04rem;
+  line-height: 1.95;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.hero__note {
+  max-width: 34em;
+  margin: 2.5rem 0 0;
+  padding-left: 1rem;
+  border-left: 1px solid var(--mb-line);
+  color: var(--mb-muted);
+  font-size: 0.875rem;
+  line-height: 1.9;
+}
+
+/* 作業許可書 */
+.permit {
+  min-width: 0;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--mb-line);
+  border-radius: var(--mb-radius-lg);
+  background: var(--mb-space-800);
+  box-shadow: 0 1.5rem 3.5rem rgb(2 4 16 / 45%);
+}
+
+.permit__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "kind status"
+    "id status";
+  column-gap: 1rem;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--mb-line);
+}
+
+.permit__head p {
+  margin: 0;
+}
+
+.permit__kind {
+  grid-area: kind;
+  color: var(--mb-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.permit__id {
+  grid-area: id;
+  color: var(--mb-ink);
+  font-family: var(--mb-font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.permit__status {
+  display: inline-flex;
+  grid-area: status;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--mb-line);
+  border-radius: 999px;
+  color: var(--mb-ink-soft);
+  font-size: 0.78rem;
+}
+
+.permit__status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--mb-sun);
+  box-shadow: 0 0 0.6rem var(--mb-sun);
+}
+
+.permit__track {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.permit__track li {
+  padding-top: 0.55rem;
+  border-top: 2px solid var(--mb-line-soft);
+  color: var(--mb-faint);
+  font-family: var(--mb-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.permit__track li.is-current {
+  border-top-color: var(--mb-sun);
+  color: var(--mb-ink);
+}
+
+.permit__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem 1.25rem;
+  margin: 1.4rem 0 0;
+}
+
+.permit__meta dt {
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.permit__meta dd {
+  margin: 0.15rem 0 0;
+  color: var(--mb-ink-soft);
+  font-size: 0.9rem;
+}
+
+.permit__section {
+  margin: 1.6rem 0 0.25rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--mb-line-soft);
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.permit__conditions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.permit__condition {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--mb-line-faint);
+  font-size: 0.86rem;
+}
+
+.permit__condition:last-child {
+  border-bottom: 0;
+}
+
+.permit__condition-label {
+  color: var(--mb-ink-soft);
+  font-weight: 500;
+}
+
+.permit__condition-value {
+  color: var(--mb-muted);
+}
+
+.permit__condition-state {
+  padding: 0.12rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--mb-radius-sm);
+  font-family: var(--mb-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.permit__condition.is-pending .permit__condition-label {
+  color: var(--mb-ink);
+}
+
+.permit__condition.is-pending .permit__condition-state {
+  border-color: rgb(255 122 102 / 35%);
+  background: var(--mb-tag-soft);
+  color: var(--mb-tag);
+}
+
+.permit__condition.is-ok .permit__condition-state {
+  background: var(--mb-ok-soft);
+  color: var(--mb-ok);
+}
+
+.permit__condition.is-masked .permit__condition-state {
+  background: var(--mb-sun-glow);
+  color: var(--mb-sun);
+}
+
+.permit__foot {
+  margin-top: 1.1rem;
+}
+
+.permit__foot p {
+  margin: 0;
+  color: var(--mb-muted);
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+
+/* セクション共通 */
+.topics,
+.curriculum {
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+}
+
+.curriculum {
+  border-top: 1px solid var(--mb-line-soft);
+}
+
+.section-head {
+  max-width: 44rem;
+  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.section-head__eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--mb-sun);
+  font-family: var(--mb-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+}
+
+.section-head h2 {
+  margin: 0 0 1rem;
+  color: var(--mb-ink);
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.section-head__lead {
+  margin: 0;
+  color: var(--mb-ink-soft);
+  line-height: 1.9;
+}
+
+/* 題材。1px の隙間で区切った表 */
+.topics__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 1px;
+  background: var(--mb-line-faint);
+  border-radius: var(--mb-radius);
+}
+
+.topics__item {
+  padding: 1.25rem 1.25rem 1.35rem;
+  background: var(--mb-space-900);
+}
+
+.topics__item dt {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--mb-ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.topics__icon {
+  flex: none;
+  color: var(--mb-sun);
+}
+
+.topics__item dd {
+  margin: 0.55rem 0 0;
+  color: var(--mb-muted);
+  font-size: 0.875rem;
+  line-height: 1.8;
+}
+
+/* セッションの道筋 */
+.curriculum__list {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--mb-line-faint);
+  list-style: none;
+}
+
+.curriculum__stop a {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.15rem 0.25rem;
+  border-bottom: 1px solid var(--mb-line-faint);
+  text-decoration: none;
+  transition: background-color var(--mb-duration-hover) ease;
+}
+
+.curriculum__stop a:hover {
+  background: rgb(176 188 226 / 4%);
+}
+
+.curriculum__code {
+  padding-top: 0.2rem;
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.85rem;
+}
+
+.curriculum__body {
+  display: block;
+  min-width: 0;
+}
+
+.curriculum__phase {
+  display: block;
+  color: var(--mb-sun);
+  font-family: var(--mb-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+}
+
+.curriculum__title {
+  display: block;
+  margin: 0.15rem 0 0.25rem;
+  color: var(--mb-ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  transition: color var(--mb-duration-hover) ease;
+}
+
+.curriculum__stop a:hover .curriculum__title {
+  color: var(--mb-sun);
+}
+
+.curriculum__description {
+  display: block;
+  color: var(--mb-muted);
+  font-size: 0.875rem;
+  line-height: 1.8;
+}
+
+.curriculum__arrow {
+  align-self: center;
+  color: var(--mb-faint);
+  transition: color var(--mb-duration-hover) ease;
+}
+
+.curriculum__stop a:hover .curriculum__arrow {
+  color: var(--mb-sun);
+}
+
+.curriculum__final {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-top: 2rem;
+  padding: 1.35rem 1.5rem;
+  border: 1px dashed var(--mb-line);
+  border-radius: var(--mb-radius);
+}
+
+.curriculum__final p {
+  max-width: 40em;
+  margin: 0;
+  color: var(--mb-muted);
+  font-size: 0.9rem;
+}
+
+/* フッター */
+.landing__footer {
+  width: min(100% - 2rem, var(--mb-content-width));
+  margin-inline: auto;
+  padding-block: clamp(3rem, 6vw, 4.5rem) 3rem;
+  border-top: 1px solid var(--mb-line-soft);
+  text-align: center;
+}
+
+.landing__footer p {
+  margin: 0 auto 1.5rem;
+  color: var(--mb-ink-soft);
+}
+
+.landing__footer-note {
+  max-width: 44em;
+  margin-top: 2.5rem;
+  color: var(--mb-faint);
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+
+/* 狭い画面 */
+@media (max-width: 56rem) {
+  .landing::before {
+    top: 1rem;
+    right: -12rem;
+    width: 26rem;
+    height: 26rem;
+    opacity: 0.4;
+  }
+
+  .landing__brand-system {
+    display: none;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: clamp(2.5rem, 8vw, 4rem) 3rem;
+  }
+
+  .hero__copy {
+    padding-top: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 10vw, 3.4rem);
+  }
+
+  .permit__condition {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label state"
+      "value value";
+    row-gap: 0.2rem;
+  }
+
+  .permit__condition-label {
+    grid-area: label;
+  }
+
+  .permit__condition-value {
+    grid-area: value;
+    font-size: 0.82rem;
+  }
+
+  .permit__condition-state {
+    grid-area: state;
+  }
+
+  .curriculum__stop a {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .curriculum__arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 36rem) {
+  .landing__header {
+    padding-block: 0.9rem;
+  }
+
+  .landing__nav {
+    gap: 0.25rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
+  .permit__head {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "kind"
+      "id"
+      "status";
+    row-gap: 0.4rem;
+  }
+
+  .permit__status {
+    justify-self: start;
+  }
+
+  .permit__meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing * {
+    transition: none !important;
+  }
+}

@@ -1,122 +1,264 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import MoonbaseIcon from "../components/MoonbaseIcon.astro";
+import type { MoonbaseIconName } from "../components/moonbaseIcons";
+import "../styles/moonbase-home.css";
+
+type Condition = Readonly<{
+  label: string;
+  value: string;
+  state: "pending" | "ok" | "masked";
+}>;
+
+/** 作業許可書 EVA-0412 に載せる7つの開始条件。未確認が残っている状態を見せる */
+const conditions: readonly Condition[] = [
+  { label: "装備点検", value: "2名分 未確認", state: "pending" },
+  { label: "酸素残時間", value: "未確認", state: "pending" },
+  { label: "被ばく量", value: "作業後も上限以内", state: "masked" },
+  { label: "宇宙天気", value: "フレア警報なし", state: "ok" },
+  { label: "遮断札", value: "PV-07 に EVA-0412 の札", state: "ok" },
+  { label: "相方", value: "作業員a · 作業員b", state: "ok" },
+  { label: "月面日", value: "第1日 · 日照中", state: "ok" },
+];
+
+type Topic = Readonly<{ icon: MoonbaseIconName; term: string; description: string }>;
+
+const topics: readonly Topic[] = [
+  { icon: "permit", term: "作業許可", description: "区画、予定時間、2名の隊員を指定して申請する。" },
+  { icon: "suit", term: "装備点検", description: "2名分の点検と酸素残時間を記録する。" },
+  { icon: "exposure", term: "被ばく量", description: "今回の作業後も安全上限以内に収まるか確認する。" },
+  { icon: "sun", term: "宇宙天気", description: "フレア警報と月面日を開始前に確認する。" },
+  { icon: "tag", term: "遮断札", description: "許可に対応する系統区間を遮断し、札を掛ける。" },
+  { icon: "roles", term: "役割と権限", description: "業務ごとの実行者を境界とユースケースで制限する。" },
+  { icon: "log", term: "作業記録", description: "状態変更と監査イベントを一緒に保存する。" },
+];
+
+type Stop = Readonly<{
+  code: string;
+  phase: string;
+  title: string;
+  description: string;
+  href: string;
+}>;
+
+const stops: readonly Stop[] = [
+  {
+    code: "S0",
+    phase: "着任",
+    title: "月面基地へ着任する",
+    description: "基地の規程、役割、未完成システム、作業許可 EVA-0412 を確認する。",
+    href: "/sessions/00-system-handover/",
+  },
+  {
+    code: "S1",
+    phase: "比較",
+    title: "実装の違いを読む",
+    description: "同じ安全規程を表す実装を比べ、型と実行時検証の境界を話し合う。",
+    href: "/sessions/01-design-approaches/",
+  },
+  {
+    code: "S2",
+    phase: "業務",
+    title: "船外作業の中止を設計する",
+    description: "「船外作業が中止された」からアクター、コマンド、業務条件を逆算する。",
+    href: "/sessions/02-business-events-and-workflows/",
+  },
+  {
+    code: "S3",
+    phase: "状態",
+    title: "許可されない状態遷移",
+    description: "作業許可の状態ごとに可能な操作を型で限定する。",
+    href: "/sessions/03-state-transitions/",
+  },
+  {
+    code: "S4",
+    phase: "識別子",
+    title: "識別子の取り違え",
+    description: "許可ID、隊員ID、系統区間IDを異なる型として扱う。",
+    href: "/sessions/04-semantic-identifiers/",
+  },
+  {
+    code: "S5",
+    phase: "境界",
+    title: "未検証の外部入力",
+    description: "HTTP入力を境界で検証し、承認に必要な型付き入力へ変換する。",
+    href: "/sessions/05-boundaries-and-sensitive-data/",
+  },
+  {
+    code: "S6",
+    phase: "失敗",
+    title: "予期できる業務エラー",
+    description: "許可なしや状態不正を、呼び出し側が扱える Result へ変える。",
+    href: "/sessions/06-workflow-errors/",
+  },
+  {
+    code: "S7",
+    phase: "副作用",
+    title: "イベントと副作用",
+    description: "時刻とIDを外から渡し、状態と監査記録を同じ境界で保存する。",
+    href: "/sessions/07-effects-and-consistency/",
+  },
+];
+
+const roles = ["地上管制", "基地長", "電気主任", "医務", "船外作業員"];
 ---
 
 <BaseLayout
-  title="MoonBase — TypeScriptで学ぶ関数型ドメインモデリング"
+  title="MoonBase 日の出基地 — TypeScriptで学ぶ関数型ドメインモデリング"
   description="月面基地の船外作業許可を題材に、安全規程を型と関数で表す関数型ドメインモデリング教材。"
+  bodyClass="landing-body"
 >
-  <div id="app">
-    <div class="home-page wan-nyan-home">
-      <span class="home-shape home-shape--mint" aria-hidden="true"></span>
-      <span class="home-shape home-shape--lemon" aria-hidden="true"></span>
-      <span class="home-shape home-shape--pink" aria-hidden="true"></span>
+  <div class="landing">
+    <header class="landing__header" aria-label="サイトヘッダー">
+      <a class="landing__brand" href="/">
+        <MoonbaseIcon name="moon" size={22} class="landing__brand-mark" />
+        <span class="landing__brand-name">MoonBase 日の出基地</span>
+        <span class="landing__brand-system">EVA Permit System</span>
+      </a>
+      <nav class="landing__nav" aria-label="メインナビゲーション">
+        <a href="#topics">題材</a>
+        <a href="#curriculum">セッション</a>
+        <a href="/setup/">事前準備</a>
+        <a class="landing__nav-start" href="/sessions/">セッション一覧</a>
+      </nav>
+    </header>
 
-      <header class="landing-header" aria-label="サイトヘッダー">
-        <a class="landing-brand" href="#system">
-          <span class="landing-brand__mark" aria-hidden="true">🌙</span>
-          <span>MOONBASE CONTROL</span>
-        </a>
-        <nav class="landing-nav" aria-label="メインナビゲーション">
-          <a href="#system">TOP</a>
-          <a href="#features">題材</a>
-          <a href="/setup/">事前準備</a>
-          <a class="landing-nav__start" href="/sessions/">START SESSION</a>
-        </nav>
-      </header>
-
-      <main class="landing-main">
-        <section class="landing-hero" id="system" aria-labelledby="page-title">
-          <span class="floating-pet floating-pet--cat" aria-hidden="true">🛰️</span>
-          <span class="floating-pet floating-pet--rabbit" aria-hidden="true">🌘</span>
-
-          <div class="landing-hero__grid">
-            <p class="landing-eyebrow">🌙 TypeScriptで学ぶ関数型ドメインモデリング</p>
-            <div class="copy-panel">
-              <h1 id="page-title">ようこそ<br />MOONBASE<br /><span class="rainbow-word" aria-label="CONTROLへ"><span>C</span><span>O</span><span>N</span><span>T</span><span>R</span><span>O</span><span>L</span></span></h1>
-            </div>
-            <div class="landing-intro">
-              <p class="landing-lead">月面基地の船外作業許可を題材に、安全規程を型と関数で表す教材です。月面では宇宙服でも放射線を完全には防げないため、隊員がこれまでに浴びた量を「被ばく量」として管理します。基地へ引き継がれた未完成コードを読み、7つの開始条件と監査記録を段階的に実装します。</p>
-              <div class="learning-actions" aria-label="教材を始める">
-                <a href="/setup/">事前準備 <span aria-hidden="true">→</span></a>
-                <a href="/sessions/">セッション一覧 <span aria-hidden="true">→</span></a>
-              </div>
-            </div>
-
-            <div class="system-window" aria-label="月面基地の船外作業許可システム画面">
-              <div class="system-window__top">
-                <span>MOONBASE CONTROL / EVA Permit</span>
-                <span class="system-window__buttons" aria-hidden="true"><span></span><span></span><span></span></span>
-              </div>
-              <div class="app-dashboard">
-                <aside class="dashboard-sidebar" aria-label="システムメニュー">
-                  <div class="clinic-stamp">🌙<br />LUNAR DAY<br />07</div>
-                  <div class="side-menu">
-                    <span class="is-active">📋 作業許可</span><span>⚡ 系統区間</span><span>🧑‍🚀 隊員</span><span>☀️ 宇宙天気</span><span>📜 作業記録</span>
-                  </div>
-                </aside>
-
-                <section class="schedule-board" aria-labelledby="dashboard-title">
-                  <div class="board-head"><h2 id="dashboard-title">船外作業許可</h2><span class="date-pill">画面例</span></div>
-                  <div class="appointment-grid" aria-label="作業許可一覧">
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">🧑‍🚀</span><span class="time">EVA-0412</span><strong>PV-07 / 太陽電池点検</strong><p>申請済み。装備・被ばく量・宇宙天気・相方・遮断札・月面日を確認中。</p></article>
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">⚡</span><span class="time">PV-07</span><strong>給電系統 / 遮断済み</strong><p>電気主任が EVA-0412 の遮断札を取り付けた。</p></article>
-                    <article class="appointment-card"><span class="pet-icon" aria-hidden="true">☀️</span><span class="time">DAY 07</span><strong>宇宙天気 / CLEAR</strong><p>フレア警報なし。日照時間内。</p></article>
-                  </div>
-                  <div class="chart-card" aria-label="作業許可詳細">
-                    <div class="chart-patient"><span class="big-pet" aria-hidden="true">🌘</span><h3>作業許可 #EVA-0412</h3><p>区域 PV-07。隊員 W-01 と W-02 が太陽電池アレイを点検する。</p><div class="status-flow" aria-label="状態遷移"><span>申請済み</span><span>承認済み</span><span>船外</span><span>帰還済み</span></div></div>
-                    <table class="chart-table" aria-label="開始条件"><tbody><tr class="is-alert"><th scope="row">未確認</th><td>2名分の装備点検と酸素残時間</td></tr><tr><th scope="row">被ばく量</th><td>作業後も安全上限以内</td></tr><tr><th scope="row">宇宙天気</th><td>フレア警報なし</td></tr><tr><th scope="row">系統</th><td>PV-07 に EVA-0412 の遮断札あり</td></tr><tr><th scope="row">承認</th><td>基地長が7条件を確認して開始を承認</td></tr></tbody></table>
-                  </div>
-                </section>
-
-                <aside class="dashboard-notices" aria-label="基地状況と通知">
-                  <section class="mini-widget"><h3>担当</h3><div class="queue-row"><span>📡</span><strong>地上管制</strong><em>申請</em></div><div class="queue-row"><span>🧭</span><strong>基地長</strong><em>承認</em></div><div class="queue-row"><span>⚡</span><strong>電気主任</strong><em>遮断</em></div></section>
-                  <section class="mini-widget"><h3>開始条件</h3><p>7条件が一つでも欠ければ船外作業は開始できません。</p></section>
-                  <section class="mini-widget"><h3>追加要求</h3><p>許可の状態と作業記録を同じ整合性境界で保存し、競合時の二重承認を防ぎます。</p></section>
-                  <section class="mini-widget"><h3>機微情報</h3><p>被ばく量は個人の健康に関わる情報です。医務窓口とシステム担当だけが扱い、作業記録では値を伏せます。</p></section>
-                </aside>
-              </div>
-            </div>
+    <main class="landing__main">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero__copy">
+          <p class="hero__eyebrow">
+            <span>月面日 第1日</span>
+            <span aria-hidden="true">·</span>
+            <span>日照 残り 14 日</span>
+            <span aria-hidden="true">·</span>
+            <span>TypeScript で学ぶ関数型ドメインモデリング</span>
+          </p>
+          <h1 id="page-title">日没まで、<br />あと十四日。</h1>
+          <p class="hero__lead">
+            月面基地の船外作業許可を題材に、安全規程を型と関数で表す教材です。
+            補給便で着任したシステム担当として、前任者から引き継いだ未完成コードを読み、
+            7つの開始条件と監査記録を段階的に実装していきます。
+          </p>
+          <div class="hero__actions">
+            <a class="button button--primary" href="/setup/">
+              事前準備をする
+              <MoonbaseIcon name="arrow" size={16} />
+            </a>
+            <a class="button button--ghost" href="/sessions/">セッション一覧を見る</a>
           </div>
-          <div class="below-fold-cue"><span>下にスクロールして、MoonBase の安全規程と、未完成コードに潜む問題を確認します。</span><span class="animal-train" aria-hidden="true">🌙 🛰️ 🧑‍🚀 ⚡ ☀️ 📡</span></div>
-        </section>
-
-        <section class="landing-section" id="features" aria-labelledby="features-title">
-          <div class="section-head"><h2 id="features-title">MOONBASE CONTROLで<span class="mobile-title-break"></span>扱うこと</h2><p>地上管制、基地長、電気主任、医務担当が、それぞれの責務で船外作業の安全を確認します。教材では、この規程をコード上の制約へ変換します。</p></div>
-          <div class="feature-splats" aria-label="機能一覧">
-            <article class="splat-card"><span class="icon" aria-hidden="true">📋</span><strong>作業許可</strong><span>区域、予定時間、2名の隊員を指定して申請。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">🧑‍🚀</span><strong>装備点検</strong><span>2名分の点検と酸素残時間を記録。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">☢️</span><strong>被ばく量の管理</strong><span>今回の作業後も安全上限以内に収まるか確認。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">☀️</span><strong>宇宙天気</strong><span>フレア警報と月面日を開始前に確認。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">⚡</span><strong>遮断札</strong><span>許可に対応する系統区間を安全に遮断。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">🔒</span><strong>役割と権限</strong><span>業務ごとの実行者を境界とユースケースで制限。</span></article>
-            <article class="splat-card"><span class="icon" aria-hidden="true">📜</span><strong>作業記録</strong><span>状態変更と監査イベントを一緒に保存。</span></article>
-          </div>
-        </section>
-
-        <section class="landing-section" id="problems" aria-labelledby="problems-title">
-          <div class="section-head"><h2 id="problems-title">引き継いだコードには、安全規程がない</h2><p>文字列だけの状態や識別子、未検証の入力、例外に埋もれた業務上の失敗を順に見直し、船外作業を開始できる条件をコードで閉じます。</p></div>
-          <div class="timeline" aria-label="MoonBase 教材のセッション">
-            <article class="time-stop is-active"><time>Onboarding / S0</time><strong>🌘 月面基地へ着任する</strong><span>基地の規程、役割、未完成システム、作業許可 EVA-0412 を確認する。</span></article>
-            <article class="time-stop"><time>Compare / S1</time><strong>🧭 実装の違いを読む</strong><span>同じ安全規程を表す実装を比べ、型と実行時検証の境界を話し合う。</span></article>
-            <article class="time-stop"><time>Workflow / S2</time><strong>📋 船外作業の中止を設計する</strong><span>「船外作業が中止された」からアクター、コマンド、業務条件を逆算する。</span></article>
-            <article class="time-stop"><time>Risk / S3</time><strong>🚦 許可されない状態遷移</strong><span>作業許可の状態ごとに可能な操作を型で限定する。</span></article>
-            <article class="time-stop"><time>Risk / S4</time><strong>🏷️ 識別子の取り違え</strong><span>許可ID、隊員ID、系統区間IDを異なる型として扱う。</span></article>
-            <article class="time-stop"><time>Risk / S5</time><strong>📡 未検証の外部入力</strong><span>HTTP入力を境界で検証し、承認に必要な型付き入力へ変換する。</span></article>
-            <article class="time-stop"><time>Risk / S6</time><strong>⚠️ 予期できる業務エラー</strong><span>許可なしや状態不正を、呼び出し側が扱えるResultへ変える。</span></article>
-            <article class="time-stop"><time>Risk / S7</time><strong>📜 イベントと副作用</strong><span>時刻とIDを外から渡し、状態と監査記録を同じ境界で保存する。</span></article>
-          </div>
-        </section>
-
-        <div class="learning-actions landing-start">
-          <a href="/setup/">事前準備をする <span aria-hidden="true">→</span></a>
+          <p class="hero__note">
+            月面では宇宙服でも放射線を完全には防げません。隊員がこれまでに浴びた量を「被ばく量」として管理し、
+            承認の判定には使っても記録には残さない。そうした規程を、コードの制約として書き直します。
+          </p>
         </div>
 
-        <footer class="landing-footer">
-          <p>MoonBase の物語に沿って、Session 00 から順に安全規程をコードへ移していきます。</p>
-          <a href="/sessions/">セッション一覧を開く</a>
-        </footer>
-      </main>
-    </div>
+        <article class="permit" aria-label="作業許可書 EVA-0412 の例">
+          <header class="permit__head">
+            <p class="permit__kind">作業許可書</p>
+            <p class="permit__id">EVA-0412</p>
+            <p class="permit__status">
+              <span class="permit__status-dot" aria-hidden="true"></span>
+              承認待ち
+            </p>
+          </header>
+
+          <ol class="permit__track" aria-label="作業許可の状態">
+            <li class="is-current">申請済み</li>
+            <li>承認済み</li>
+            <li>船外</li>
+            <li>帰還済み</li>
+          </ol>
+
+          <dl class="permit__meta">
+            <div><dt>作業区画</dt><dd>PV-07 · 太陽電池アレイ点検</dd></div>
+            <div><dt>隊員</dt><dd>作業員a · 作業員b</dd></div>
+            <div><dt>予定</dt><dd>90分 · 第1日 06:40 UTC</dd></div>
+            <div><dt>承認者</dt><dd>基地長</dd></div>
+          </dl>
+
+          <h2 class="permit__section">開始条件</h2>
+          <ul class="permit__conditions">
+            {conditions.map((condition) => (
+              <li class={`permit__condition is-${condition.state}`}>
+                <span class="permit__condition-label">{condition.label}</span>
+                <span class="permit__condition-value">{condition.value}</span>
+                <span class="permit__condition-state">
+                  {condition.state === "pending" && "未確認"}
+                  {condition.state === "ok" && "確認"}
+                  {condition.state === "masked" && "医務のみ"}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <footer class="permit__foot">
+            <p>7条件が一つでも欠ければ、基地長は開始を承認できません。</p>
+          </footer>
+        </article>
+      </section>
+
+      <section class="topics" id="topics" aria-labelledby="topics-title">
+        <div class="section-head">
+          <p class="section-head__eyebrow">題材</p>
+          <h2 id="topics-title">日の出基地で扱うこと</h2>
+          <p class="section-head__lead">
+            {roles.join("、")}が、それぞれの責務で船外作業の安全を確認します。
+            教材では、この規程を一つずつコード上の制約へ変換します。
+          </p>
+        </div>
+        <dl class="topics__list">
+          {topics.map((topic) => (
+            <div class="topics__item">
+              <dt>
+                <MoonbaseIcon name={topic.icon} size={20} class="topics__icon" />
+                <span>{topic.term}</span>
+              </dt>
+              <dd>{topic.description}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section class="curriculum" id="curriculum" aria-labelledby="curriculum-title">
+        <div class="section-head">
+          <p class="section-head__eyebrow">セッション</p>
+          <h2 id="curriculum-title">引き継いだコードには、安全規程がない</h2>
+          <p class="section-head__lead">
+            文字列だけの状態や識別子、未検証の入力、例外に埋もれた業務上の失敗を順に見直し、
+            船外作業を開始できる条件をコードで閉じます。
+          </p>
+        </div>
+        <ol class="curriculum__list">
+          {stops.map((stop) => (
+            <li class="curriculum__stop">
+              <a href={stop.href}>
+                <span class="curriculum__code">{stop.code}</span>
+                <span class="curriculum__body">
+                  <span class="curriculum__phase">{stop.phase}</span>
+                  <span class="curriculum__title">{stop.title}</span>
+                  <span class="curriculum__description">{stop.description}</span>
+                </span>
+                <MoonbaseIcon name="arrow" size={16} class="curriculum__arrow" />
+              </a>
+            </li>
+          ))}
+        </ol>
+        <div class="curriculum__final">
+          <p>すべてのセッションを終えると、7つの集約からなる日の出基地の参照実装にたどり着きます。</p>
+          <a class="button button--ghost" href="/sessions/final/">Final の参照実装を見る</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="landing__footer">
+      <p>MoonBase の物語に沿って、Session 00 から順に安全規程をコードへ移していきます。</p>
+      <a class="button button--primary" href="/sessions/">
+        セッション一覧を開く
+        <MoonbaseIcon name="arrow" size={16} />
+      </a>
+      <p class="landing__footer-note">
+        MoonBase と日の出基地は教材のための架空の企業と施設です。実在の宇宙機関、計画、企業とは関係ありません。
+      </p>
+    </footer>
   </div>
 </BaseLayout>

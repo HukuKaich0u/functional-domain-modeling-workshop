@@ -5,17 +5,22 @@ import { CopyButton } from "../components/CopyButton";
 import "../styles/sessions.css";
 import "../styles/setup.css";
 
-const cloneCommand =
-  "git clone https://github.com/iwasa-kosui/fp-with-ts-hands-on.git";
-const verificationCommand = `cd fp-with-ts-hands-on
-pnpm install --frozen-lockfile
-pnpm test
-pnpm dev`;
+const repositoryUrl =
+  "https://github.com/HukuKaich0u/functional-domain-modeling-workshop";
+const guideUrl = `${repositoryUrl}/blob/master/docs/event`;
+const versionCommand = `node --version
+pnpm --version
+git --version`;
+const cloneCommand = `git clone ${repositoryUrl}.git
+cd functional-domain-modeling-workshop`;
+const verificationCommand = `pnpm install --frozen-lockfile
+pnpm test`;
+const demoCommand = "pnpm demo:00";
 ---
 
 <BaseLayout
-  title="事前準備 | FP with TypeScript"
-  description="TypeScriptの演習を始めるために、ツールの準備から教材の起動までを案内します。"
+  title="事前準備 | 関数型ドメインモデリングワークショップ"
+  description="functional-domain-modeling-workshopの取得から、日の出基地のデモ起動と演習の進め方までを案内します。"
 >
   <div class="case-file setup-page">
     <header class="case-file__site-header">
@@ -26,7 +31,7 @@ pnpm dev`;
       <header class="setup-page__hero">
         <p class="case-file__eyebrow">GETTING STARTED</p>
         <h1>事前準備</h1>
-        <p>TypeScriptの基本文法を読み書きできる方に向けた教材です。説明を読むだけなら、<a href="/sessions/00-system-handover/">Session 00</a>へ進めます。</p>
+        <p>月面基地「日の出基地」の船外作業許可システムを、TypeScriptで改善していくワークショップです。手元にコードとデモを用意して、<a href="/sessions/00-system-handover/">Session 00</a>の引き継ぎから始めます。説明を読むだけなら、環境構築は不要です。</p>
       </header>
 
       <section aria-labelledby="prework-title">
@@ -36,14 +41,22 @@ pnpm dev`;
 
       <section id="environment" aria-labelledby="environment-title">
       <h2 id="environment-title">環境を準備する</h2>
-      <p>コードを編集する演習は、ローカル環境で進めます。</p>
+      <p>TypeScriptの基本文法を読み書きできる方を対象にしています。コードを編集する演習はローカル環境で進めます。以下のコマンドは、clone後はすべてリポジトリのルートで実行してください。</p>
       <ol class="setup-page__steps" aria-label="事前準備の手順">
         <li class="setup-step">
           <span class="setup-step__number" aria-hidden="true">01</span>
           <div>
             <p class="setup-step__label">使うツールをそろえる</p>
             <h3>Node.js・pnpm・Gitを用意する</h3>
-            <p>Node.js 20以上、pnpm 9.12.0、Git、TypeScriptを編集できるエディタを用意します。ブラウザはデスクトップ版ChromeまたはEdgeを使ってください。</p>
+            <p>Node.js 24（このリポジトリのCIと同じバージョン）、pnpm 9.12.0、Git、TypeScriptを編集できるエディタを用意します。package.jsonのNode.js要件は20以上です。ブラウザはデスクトップ版ChromeまたはEdgeを使ってください。</p>
+            <div class="setup-step__command">
+              <div class="setup-step__command-header">
+                <span>Terminal</span>
+                <CopyButton client:idle value={versionCommand} />
+              </div>
+              <CodeBlock code={versionCommand} language="shell" />
+            </div>
+            <p>pnpmが未導入なら <code>npm install --global pnpm@9.12.0</code> で導入できます。デモはローカルのSQLiteを使うため、別途データベースサーバーやDockerを用意する必要はありません。コーディングエージェントの利用は任意です。</p>
           </div>
         </li>
 
@@ -52,7 +65,7 @@ pnpm dev`;
           <div>
             <p class="setup-step__label">教材を手元に置く</p>
             <h3>リポジトリをcloneする</h3>
-            <p>作業する場所で、次のコマンドを実行してください。</p>
+            <p>このワークショップの<a href={repositoryUrl}>リポジトリ</a>を取得します。すでにclone済みなら、そのディレクトリへ移動してください。</p>
             <div class="setup-step__command">
               <div class="setup-step__command-header">
                 <span>Terminal</span>
@@ -67,9 +80,9 @@ pnpm dev`;
           <span class="setup-step__number" aria-hidden="true">03</span>
           <div>
             <p class="setup-step__label">ローカル環境を確認する</p>
-            <h3>依存関係を入れて教材を起動する</h3>
+            <h3>依存関係を入れて通常テストを確認する</h3>
             <p>
-              続けて、次のコマンドを実行してください。
+              依存関係をインストールして、編集前のコードでテストが成功することを確認します。ハンズオンに参加する場合は、ここまでを事前に済ませてください。
             </p>
             <div class="setup-step__command">
               <div class="setup-step__command-header">
@@ -79,16 +92,38 @@ pnpm dev`;
               <CodeBlock code={verificationCommand} language="shell" />
             </div>
             <p>
-              テストが成功したら、表示されたlocalhostのURLをChromeまたはEdgeで開きます。終了するときは
-              <code>Ctrl+C</code> を押してください。
+              <code>pnpm test</code> は成功するのが正常です。失敗した場合は、先にトラブルシューティングを確認してください。演習用の <code>pnpm exercise:03</code> 〜 <code>pnpm exercise:07</code> は、各回の開始時には未実装の条件を示すassertion failureになります。
             </p>
           </div>
         </li>
+        <li class="setup-step">
+          <span class="setup-step__number" aria-hidden="true">04</span>
+          <div>
+            <p class="setup-step__label">引き継ぐシステムを開く</p>
+            <h3>Session 00のデモを起動する</h3>
+            <p>テストが成功したら、日の出基地の作業許可と作業記録を確認するデモを起動します。</p>
+            <div class="setup-step__command">
+              <div class="setup-step__command-header">
+                <span>Terminal</span>
+                <CopyButton client:idle value={demoCommand} />
+              </div>
+              <CodeBlock code={demoCommand} language="shell" />
+            </div>
+            <p>ターミナルに表示されたURL（通常は <code>http://localhost:3000</code>）を開き、作業許可 <code>EVA-0412</code> が表示されたら準備完了です。終了するときは <code>Ctrl+C</code> を押します。デモの操作結果はSQLiteに保存されます。最初から試すときは画面の「デモを初期状態へ戻す」を使ってください。</p>
+          </div>
+        </li>
       </ol>
-      <p class="setup-page__help">環境構築で困ったら、<a href="https://github.com/iwasa-kosui/fp-with-ts-hands-on/blob/main/docs/event/troubleshooting.md">トラブルシューティング</a>を確認してください。</p>
+      <p>この教材サイトも手元で開く場合は、別のターミナルでリポジトリのルートから <code>pnpm dev</code> を実行し、表示されたURLを開きます。教材サイトと作業許可システムのデモは別のアプリです。</p>
+      <p class="setup-page__help">環境構築で困ったら、<a href={`${guideUrl}/troubleshooting.md`}>トラブルシューティング</a>を確認してください。</p>
       </section>
 
-      <p>ハンズオンを開催する方は、<a href="https://github.com/iwasa-kosui/fp-with-ts-hands-on/blob/main/docs/event/facilitator-guide.md">ファシリテーターガイド</a>も参照できます。</p>
+      <section aria-labelledby="exercise-title">
+        <h2 id="exercise-title">演習の進め方</h2>
+        <p>コードを編集するのはSession 03〜07です。各ページに沿って <code>examples/session-03</code> などの対象ディレクトリを編集し、対応する <code>pnpm exercise:03</code> などのコマンドで確認します。次のセッションには前の回の改善が取り込み済みなので、自分の変更をコピーする必要はありません。</p>
+        <p>各回のデモは <code>pnpm demo:00</code> 〜 <code>pnpm demo:08</code> で起動できます。同じポートを使うため、切り替える前に起動中のデモを <code>Ctrl+C</code> で終了してください。詳しい手順は<a href={`${guideUrl}/participant-setup.md`}>学習用セットアップ</a>にまとめています。</p>
+      </section>
+
+      <p>ハンズオンを開催する方は、<a href={`${guideUrl}/facilitator-guide.md`}>ファシリテーターガイド</a>も参照できます。</p>
 
       <footer class="setup-page__next">
         <a class="setup-page__start" href="/sessions/00-system-handover/">Session 00から始める <span aria-hidden="true">→</span></a>

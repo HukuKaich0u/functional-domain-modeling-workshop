@@ -1,32 +1,33 @@
 ---
-import { sessionNavigationItems } from "../sessions/navigation";
+import { sessionCurriculum, type Curriculum } from "../sessions/navigation";
 
 interface Props {
   currentSlug: string;
   chapters: readonly Readonly<{ id: string; label: string }>[];
+  curriculum?: Curriculum;
 }
 
-const { currentSlug, chapters } = Astro.props;
+const { currentSlug, chapters, curriculum = sessionCurriculum } = Astro.props;
 ---
 
-<nav class="case-file__curriculum" aria-label="セッション一覧">
+<nav class="case-file__curriculum" aria-label={curriculum.title}>
   <ol class="case-file__sessions">
     {
-      sessionNavigationItems.map(({ slug, title }, index) => (
+      curriculum.items.map(({ slug, title, sequence, href }, index) => (
         <li class:list={{ "is-current": slug === currentSlug }}>
           <a
             class="case-file__session-link"
-            href={`/sessions/${slug}/`}
+            href={href}
             aria-label={title}
             aria-current={slug === currentSlug ? "page" : undefined}
           >
             <span class="case-file__session-number" aria-hidden="true">
-              {slug === "final" ? "Final" : slug.slice(0, 2)}
+              {sequence}
             </span>
             <span class="case-file__session-name">{title}</span>
             {slug === currentSlug && (
               <span class="case-file__current-label" aria-hidden="true">
-                現在地 · {index + 1} / {sessionNavigationItems.length}
+                現在地 · {index + 1} / {curriculum.items.length}
               </span>
             )}
           </a>

@@ -1,43 +1,44 @@
 ---
-import { sessionNavigationItems } from "../sessions/navigation";
+import { sessionCurriculum, type Curriculum } from "../sessions/navigation";
 import SessionCurriculum from "./SessionCurriculum.astro";
 import "../styles/session-layout.css";
 
 interface Props {
   currentSlug: string;
   chapters: readonly Readonly<{ id: string; label: string }>[];
+  curriculum?: Curriculum;
 }
 
-const { currentSlug, chapters } = Astro.props;
-const currentIndex = sessionNavigationItems.findIndex(({ slug }) => slug === currentSlug);
-const current = sessionNavigationItems[currentIndex];
-const position = `${currentIndex + 1} / ${sessionNavigationItems.length}`;
-const sequence = currentSlug === "final" ? "Final" : currentSlug.slice(0, 2);
+const { currentSlug, chapters, curriculum = sessionCurriculum } = Astro.props;
+const currentIndex = curriculum.items.findIndex(({ slug }) => slug === currentSlug);
+const current = curriculum.items[currentIndex];
+const position = `${currentIndex + 1} / ${curriculum.items.length}`;
+const currentLabel = `${curriculum.pageLabel} ${current?.sequence ?? ""}`;
 ---
 
 <div class="case-file__body" data-session-navigation>
-  <aside class="case-file__curriculum--desktop" aria-label="全セッションと現在地">
-    <p class="case-file__rail-title">セッション一覧 <span>全{sessionNavigationItems.length}セッション</span></p>
-    <SessionCurriculum currentSlug={currentSlug} chapters={chapters} />
+  <aside class="case-file__curriculum--desktop" aria-label={`全${curriculum.unit}と現在地`}>
+    <p class="case-file__rail-title">{curriculum.title} <span>全{curriculum.items.length}{curriculum.unit}</span></p>
+    <SessionCurriculum currentSlug={currentSlug} chapters={chapters} curriculum={curriculum} />
   </aside>
 
   <div class="case-file__mobile-navigation">
     <details class="case-file__mobile-menu case-file__mobile-menu--curriculum">
       <summary>
         <span class="case-file__mobile-current">
-          <span>現在地 {position} · Session {sequence}</span>
+          <span>現在地 {position} · {currentLabel}</span>
           <strong>{current?.title}</strong>
         </span>
         <span class="case-file__mobile-menu-label">目次 <span aria-hidden="true">⌄</span></span>
       </summary>
       <div class="case-file__mobile-menu-content">
-        <SessionCurriculum currentSlug={currentSlug} chapters={chapters} />
+        <SessionCurriculum currentSlug={currentSlug} chapters={chapters} curriculum={curriculum} />
       </div>
     </details>
   </div>
 
   <div class="case-file__reading-pane">
-    <p class="case-file__location"><a href="/sessions/">セッション</a><span aria-hidden="true">/</span><strong>Session {sequence}</strong></p>
+    <p class="case-file__location"><a href={curriculum.href}>{curriculum.unit === "セッション" ? "セッション" : curriculum.title}</a><span aria-hidden="true">/</span><strong>{currentLabel}</strong></p>
     <div class="case-file__sheet">
       <slot name="hero" />
       <article class="case-file__content">
