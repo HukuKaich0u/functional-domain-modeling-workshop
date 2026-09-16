@@ -3,6 +3,8 @@ import EventStormingRopComparison from "../../components/EventStormingRopCompari
 import RailwayOrientedProgramming from "../../components/RailwayOrientedProgramming.astro";
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SkyHeader from "../../components/SkyHeader.astro";
+import EarthriseFooter from "../../components/EarthriseFooter.astro";
 import type { SessionSummary } from "../../sessions/types";
 import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/sessions.css";
@@ -63,9 +65,7 @@ export const navigation = ({
 
 <BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
   <div class="case-file case-file--session">
-    <header class="case-file__site-header">
-      <a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a>
-    </header>
+    <SkyHeader label={`MB-DOC 0412 · Session ${session.sequence}`} />
     <main>
       <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
       <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
@@ -226,5 +226,6 @@ export const navigation = ({
       </nav>
       </SessionPageNavigation>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

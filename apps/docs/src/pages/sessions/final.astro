@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SkyHeader from "../../components/SkyHeader.astro";
+import EarthriseFooter from "../../components/EarthriseFooter.astro";
 import type { CodeGuide } from "../../code-explorer/code-guide";
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import type { SessionNavigation, SessionSummary } from "../../sessions/types";
@@ -88,9 +90,7 @@ export const navigation = ({
 
 <BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
   <div class="case-file case-file--session">
-    <header class="case-file__site-header">
-      <a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a>
-    </header>
+    <SkyHeader label="MB-DOC 0412 · Final" />
     <main>
       <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
       <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
@@ -164,5 +164,6 @@ export const navigation = ({
       </nav>
       </SessionPageNavigation>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

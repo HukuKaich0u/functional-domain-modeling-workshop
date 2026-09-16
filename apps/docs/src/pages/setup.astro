@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import SkyHeader from "../components/SkyHeader.astro";
+import EarthriseFooter from "../components/EarthriseFooter.astro";
 import CodeBlock from "../components/CodeBlock.astro";
 import { CopyButton } from "../components/CopyButton";
 import "../styles/sessions.css";
@@ -23,9 +25,7 @@ const demoCommand = "pnpm demo:00";
   description="functional-domain-modeling-workshopの取得から、日の出基地のデモ起動と演習の進め方までを案内します。"
 >
   <div class="case-file setup-page">
-    <header class="case-file__site-header">
-      <a href="/"><span class="case-file__brand-mark" aria-hidden="true"></span><span>MoonBase 日の出基地</span></a>
-    </header>
+    <SkyHeader label="MB-DOC 0412 · 事前準備" />
 
     <main class="setup-page__main">
       <header class="setup-page__hero">
@@ -130,5 +130,6 @@ const demoCommand = "pnpm demo:00";
         <a href="/sessions/">セッション一覧を見る</a>
       </footer>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

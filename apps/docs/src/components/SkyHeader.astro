@@ -1,0 +1,32 @@
+---
+/**
+ * 内側ページの上の帯。表紙と同じ夜空を細く敷き、三日月の徽章と文書番号を載せる。
+ * 本文の紙面は明るいままにして、帯の高さだけで表紙とのつながりを作る。
+ */
+import { skyStarsMarkup } from "./skyStars";
+import "../styles/moonbase-chrome.css";
+
+interface Props {
+  /** 中央の等幅ラベル。文書番号やページの位置を書く */
+  label?: string;
+}
+
+const { label = "MB-DOC 0412 · 月面日 第1日" } = Astro.props;
+const stars = skyStarsMarkup({ seed: 412, width: 1600, height: 120, density: 1400, bright: 2, galaxies: 5 });
+---
+
+<header class="mb-sky" aria-label="サイトヘッダー">
+  <svg class="mb-sky__stars" viewBox="0 0 1600 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" set:html={stars} />
+  <div class="mb-sky__inner">
+    <a class="mb-sky__brand" href="/">
+      <span class="mb-sky__mark" aria-hidden="true"></span>
+      <span class="mb-sky__name">MoonBase</span>
+      <span class="mb-sky__base">日の出基地</span>
+    </a>
+    <p class="mb-sky__label">{label}</p>
+    <nav class="mb-sky__nav" aria-label="サイト内の移動">
+      <a href="/sessions/">セッション一覧</a>
+      <a href="/setup/">事前準備</a>
+    </nav>
+  </div>
+</header>

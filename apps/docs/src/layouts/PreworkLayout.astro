@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import SkyHeader from "../components/SkyHeader.astro";
+import EarthriseFooter from "../components/EarthriseFooter.astro";
 import SessionPageNavigation from "../components/SessionPageNavigation.astro";
 import { preworkCurriculum } from "../prework/navigation";
 import "../styles/sessions.css";
@@ -17,9 +19,7 @@ if (current === undefined) throw new Error(`Unknown prework page: ${Astro.url.pa
 
 <BaseLayout title={`${title} | FP with TypeScript`} description={description}>
   <div class="case-file case-file--session">
-    <header class="case-file__site-header">
-      <a href="/"><span class="case-file__brand-mark" aria-hidden="true"></span><span>MoonBase 日の出基地</span></a>
-    </header>
+    <SkyHeader label={`MB-DOC 0412 · Prework ${current.sequence}`} />
     <main>
       <SessionPageNavigation currentSlug={current.slug} chapters={chapters} curriculum={preworkCurriculum}>
         <section slot="hero" class="case-file__hero" aria-labelledby="prework-title">
@@ -32,5 +32,6 @@ if (current === undefined) throw new Error(`Unknown prework page: ${Astro.url.pa
         <nav slot="footer" class="case-file__session-nav" aria-label="次の学習"><slot name="next" /></nav>
       </SessionPageNavigation>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

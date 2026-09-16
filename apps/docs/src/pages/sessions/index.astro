@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SkyHeader from "../../components/SkyHeader.astro";
+import EarthriseFooter from "../../components/EarthriseFooter.astro";
 import { crewPhotoPath } from "../../sessions/crew";
 import type { SessionSummary } from "../../sessions/types";
 import "../../styles/sessions.css";
@@ -24,9 +26,7 @@ const sessions = Object.values(
   description="関数型ドメインモデリングをTypeScriptで学ぶ全セッションの一覧"
 >
   <div class="case-file session-directory">
-    <header class="case-file__site-header">
-      <a href="/"><span class="case-file__brand-mark" aria-hidden="true"></span><span>MoonBase 日の出基地</span></a>
-    </header>
+    <SkyHeader label="MB-DOC 0412 · セッション一覧" />
     <main class="session-directory__main">
       <header class="session-directory__hero">
         <p class="case-file__eyebrow">MOONBASE CURRICULUM</p>
@@ -70,5 +70,6 @@ const sessions = Object.values(
         ))}
       </ol>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

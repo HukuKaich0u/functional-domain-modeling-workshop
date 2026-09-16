@@ -8,6 +8,8 @@ import type { CodeGuide } from "../../code-explorer/code-guide";
 import { projectFilesForSnapshot } from "../../code-explorer/project-files";
 import type { SessionWorkspace } from "../../code-explorer/types";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SkyHeader from "../../components/SkyHeader.astro";
+import EarthriseFooter from "../../components/EarthriseFooter.astro";
 import { loadSolutionSnippets } from "../../sessions/solution-snippets";
 import type {
   ExerciseSessionSummary,
@@ -380,7 +382,7 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
 
 <BaseLayout title={`${session.title} | FP with TypeScript`} description={session.summary}>
   <div class="case-file case-file--session">
-    <header class="case-file__site-header"><a href="/"><span class="case-file__brand-mark" aria-hidden="true">🌙</span>MoonBase 日の出基地</a></header>
+    <SkyHeader label={`MB-DOC 0412 · Session ${session.sequence}`} />
     <main>
       <SessionPageNavigation currentSlug={session.slug} chapters={chapters}>
       <section slot="hero" class="case-file__hero" aria-labelledby="session-title">
@@ -562,5 +564,6 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
       </nav>
       </SessionPageNavigation>
     </main>
+    <EarthriseFooter />
   </div>
 </BaseLayout>

@@ -1,0 +1,290 @@
+/*
+ * 内側ページの上下の帯。表紙の夜空を、読みものの紙面を挟む窓として引き継ぐ。
+ * 紙面（.case-file）の配色には触らず、帯だけを --mb-* の夜空トークンで描く。
+ * 線は 1px 半透明、強調は琥珀、地平はレゴリスの灰色。
+ */
+
+/* 上の帯 — 星空の細い帯 */
+.mb-sky {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--mb-space-900);
+  color: var(--mb-ink);
+  font-family: var(--mb-font-sans);
+  font-feature-settings: "palt";
+  border-bottom: 1px solid var(--mb-line-soft);
+}
+
+.mb-sky__stars,
+.mb-horizon__stars {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mb-sky__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  width: min(100% - 2rem, var(--mb-content-width));
+  min-height: 3.25rem;
+  margin-inline: auto;
+  padding-block: 0.55rem;
+}
+
+.mb-sky__brand,
+.mb-horizon__brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  color: var(--mb-ink);
+  text-decoration: none;
+}
+
+/* 三日月の徽章。表紙と同じ、暗い円に細い月 */
+.mb-sky__mark {
+  position: relative;
+  align-self: center;
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--mb-space-600);
+  box-shadow: var(--mb-shadow-border);
+}
+
+.mb-sky__mark::before {
+  position: absolute;
+  top: 0.28rem;
+  left: 0.28rem;
+  width: 0.84rem;
+  height: 0.84rem;
+  border-radius: 50%;
+  box-shadow: inset -0.26rem 0.11rem 0 0 var(--mb-ink);
+  content: "";
+}
+
+.mb-sky__name {
+  font-family: var(--mb-font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.mb-sky__base {
+  color: var(--mb-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.mb-sky__label {
+  margin: 0;
+  color: var(--mb-muted);
+  font-family: var(--mb-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.mb-sky__nav {
+  display: flex;
+  gap: 1.1rem;
+  font-size: 0.82rem;
+}
+
+.mb-sky__nav a,
+.mb-horizon__nav a {
+  padding-block: 0.3rem;
+  color: var(--mb-ink-soft);
+  text-decoration: none;
+  transition: color var(--mb-duration-hover) ease-out;
+}
+
+.mb-sky__nav a:hover,
+.mb-horizon__nav a:hover {
+  color: var(--mb-amber);
+}
+
+.mb-sky :where(a):focus-visible,
+.mb-horizon :where(a):focus-visible {
+  outline: 2px solid var(--mb-amber);
+  outline-offset: 3px;
+  border-radius: var(--mb-radius-sm);
+}
+
+/* 下の帯 — 地球の出 */
+.mb-horizon {
+  --horizon-height: clamp(5rem, 12vw, 8.5rem);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(18rem, 36vw, 26rem);
+  background: var(--mb-space-950);
+  color: var(--mb-ink);
+  font-family: var(--mb-font-sans);
+  font-feature-settings: "palt";
+}
+
+/* 地球。右上から日が当たり、左下が夜側 */
+.mb-horizon__earth {
+  --earth-size: clamp(3.4rem, 6vw, 5.5rem);
+  position: absolute;
+  z-index: 0;
+  right: clamp(1.5rem, 14%, 14rem);
+  bottom: calc(var(--horizon-height) + clamp(1.5rem, 4vw, 3.5rem));
+  width: var(--earth-size);
+  height: var(--earth-size);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 70% 28%, transparent 0 50%, rgb(3 5 11 / 45%) 64%, rgb(3 5 11 / 97%) 79%),
+    radial-gradient(ellipse 36% 15% at 40% 28%, rgb(247 248 251 / 94%), transparent 72%),
+    radial-gradient(ellipse 22% 11% at 68% 46%, rgb(242 245 250 / 88%), transparent 72%),
+    radial-gradient(ellipse 42% 9% at 52% 66%, rgb(238 241 248 / 82%), transparent 72%),
+    radial-gradient(ellipse 16% 20% at 80% 24%, rgb(250 250 252 / 78%), transparent 72%),
+    radial-gradient(ellipse 14% 26% at 30% 56%, rgb(244 246 250 / 70%), transparent 72%),
+    radial-gradient(ellipse 16% 22% at 56% 42%, rgb(122 108 66 / 60%), transparent 72%),
+    radial-gradient(circle at 62% 34%, #6a9be0 0, #2f66b8 36%, #163f86 68%, #0b2557 100%);
+  box-shadow:
+    inset -0.3rem -0.4rem 0.9rem rgb(2 4 10 / 75%),
+    inset 0.18rem 0.18rem 0.5rem rgb(196 220 255 / 35%),
+    0 0 0.8rem rgb(120 170 255 / 22%);
+}
+
+/* 大気の薄い縁 */
+.mb-horizon__earth::before {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  box-shadow: 0 0 3px 1px rgb(160 196 255 / 38%);
+  content: "";
+}
+
+.mb-horizon__ground {
+  position: absolute;
+  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--horizon-height);
+  pointer-events: none;
+}
+
+.mb-horizon__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    "brand nav"
+    "note note"
+    "caption caption";
+  gap: 1rem 2rem;
+  align-items: start;
+  width: min(100% - 2rem, var(--mb-content-width));
+  min-height: clamp(18rem, 36vw, 26rem);
+  margin-inline: auto;
+  padding-block: clamp(1.75rem, 4vw, 2.75rem) 0.9rem;
+}
+
+.mb-horizon__brand {
+  grid-area: brand;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.mb-horizon__nav {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: nav;
+  gap: 0.25rem 1.25rem;
+  justify-content: end;
+  font-size: 0.85rem;
+}
+
+.mb-horizon__note {
+  grid-area: note;
+  align-self: start;
+  max-width: 44em;
+  margin: 0;
+  color: var(--mb-muted);
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+
+/* キャプションは地平の上に立つので、暗い文字にする */
+.mb-horizon__caption {
+  grid-area: caption;
+  align-self: end;
+  margin: 0;
+  color: rgb(20 21 26 / 82%);
+  font-family: var(--mb-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+@media (max-width: 56rem) {
+  .mb-sky__inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .mb-sky__label {
+    display: none;
+  }
+
+  .mb-horizon__earth {
+    right: 2rem;
+    bottom: calc(var(--horizon-height) + 2rem);
+  }
+}
+
+@media (max-width: 36rem) {
+  .mb-sky__inner {
+    grid-template-columns: 1fr;
+    padding-block: 0.7rem;
+  }
+
+  .mb-sky__nav {
+    font-size: 0.8rem;
+  }
+
+  .mb-horizon {
+    min-height: 24rem;
+  }
+
+  .mb-horizon__inner {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "brand"
+      "nav"
+      "note"
+      "caption";
+    gap: 0.9rem;
+    min-height: 24rem;
+  }
+
+  /* 地球は右下に寄せ、但し書きはその左で折り返す */
+  .mb-horizon__earth {
+    right: 1.5rem;
+    bottom: calc(var(--horizon-height) + 1.25rem);
+  }
+
+  .mb-horizon__note {
+    padding-right: 5.5rem;
+  }
+
+  .mb-horizon__nav {
+    justify-content: start;
+  }
+
+  .mb-horizon__caption {
+    text-align: left;
+  }
+}
