@@ -47,6 +47,10 @@
   margin-top: 2rem;
 }
 
+.setup-page__exercise {
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+}
+
 .setup-step {
   position: relative;
   display: grid;
