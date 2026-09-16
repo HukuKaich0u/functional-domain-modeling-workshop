@@ -4,6 +4,7 @@ import CommandBlock from "../../components/CommandBlock.astro";
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
 import type { CodeGuide } from "../../code-explorer/code-guide";
+import { highlightInitialFile } from "../../code-explorer/highlight-initial-file";
 import { projectFilesForSnapshot } from "../../code-explorer/project-files";
 import type { SessionWorkspace } from "../../code-explorer/types";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -102,6 +103,7 @@ export const workspace = ({
 } as const) satisfies SessionWorkspace;
 
 const projectFiles = projectFilesForSnapshot(session.snapshot);
+const initialSyntaxLines = await highlightInitialFile(workspace, projectFiles);
 
 const conditions = [
   { number: 1, text: "2名分の装備点検が記録済み", article: "第2条", representation: "型（長さ2のタプル）", reason: "EquipmentCheckMissing" },
@@ -359,6 +361,7 @@ export const navigation = ({
         client:load
         workspace={workspace}
         projectFiles={projectFiles}
+        initialSyntaxLines={initialSyntaxLines}
         initialCommand="pnpm test"
       />
     </div>

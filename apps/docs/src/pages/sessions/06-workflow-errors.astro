@@ -5,6 +5,7 @@ import CommandBlock from "../../components/CommandBlock.astro";
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import { CodeExplorer } from "../../components/code-explorer/CodeExplorer";
 import type { CodeGuide } from "../../code-explorer/code-guide";
+import { highlightInitialFile } from "../../code-explorer/highlight-initial-file";
 import { projectFilesForSnapshot } from "../../code-explorer/project-files";
 import type { SessionWorkspace } from "../../code-explorer/types";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -442,6 +443,7 @@ export const workspace = ({
 } as const) satisfies SessionWorkspace;
 
 const projectFiles = projectFilesForSnapshot(session.snapshot);
+const initialSyntaxLines = await highlightInitialFile(workspace, projectFiles);
 const solutionSteps = await Promise.all(
   session.steps.map(async (step) => ({
     step,
@@ -581,6 +583,7 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
                 client:load
                 workspace={workspace}
                 projectFiles={projectFiles}
+                initialSyntaxLines={initialSyntaxLines}
                 initialCommand={session.exerciseCommand}
               />
             </div>

@@ -19,7 +19,8 @@ type EditorRuntime = EditorResources & {
   highlightDecorations?: Monaco.editor.IEditorDecorationsCollection;
 };
 
-export const modelUriFor = (path: string): string => `file:///${path}`;
+export const modelUriFor = (path: string): string =>
+  new URL(path, "file:///").href;
 
 const languageForPath = (path: string): string => {
   const extension = path.toLowerCase().split(".").at(-1);
@@ -107,7 +108,7 @@ const registerExtraLibs = (
     runtime.extraLibs.push(
       runtime.monaco.typescript.typescriptDefaults.addExtraLib(
         source,
-        path.startsWith("file:///") ? path : `file:///${path}`,
+        modelUriFor(path),
       ),
     );
   }
@@ -173,6 +174,7 @@ export const MonacoEditor = (props: EditorProps) => {
     disabled,
     readOnly,
     highlights,
+    syntaxLines,
     onChange,
   } = props;
   const editorHost = useRef<HTMLDivElement>(null);
@@ -311,7 +313,11 @@ export const MonacoEditor = (props: EditorProps) => {
                       : "code-explorer__source-line"
                   }
                 >
-                  {line}
+                  {syntaxLines?.[index]?.map((token, tokenIndex) => (
+                    <span key={tokenIndex} style={{ color: token.color }}>
+                      {token.content}
+                    </span>
+                  )) ?? line}
                 </span>
               );
             })}

@@ -1,7 +1,8 @@
 import { act, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MonacoEditor } from "./MonacoEditor";
+import { modelUriFor, MonacoEditor } from "./MonacoEditor";
 
 const monacoState = vi.hoisted(() => {
   class FakeModel {
@@ -114,6 +115,35 @@ describe("MonacoEditor", () => {
     });
     document.body.replaceChildren();
     vi.unstubAllGlobals();
+  });
+
+  it("renders syntax colors in the server fallback before Monaco loads", () => {
+    const html = renderToStaticMarkup(
+      <MonacoEditor
+        path="src/first.ts"
+        value={projectFiles["src/first.ts"]}
+        files={projectFiles}
+        typeFiles={{}}
+        disabled={false}
+        readOnly={false}
+        highlights={[]}
+        syntaxLines={[[
+          { content: "const", color: "#F97583" },
+          { content: " first = true;", color: "#E1E4E8" },
+        ]]}
+        onChange={() => undefined}
+      />,
+    );
+
+    expect(html).toContain('style="color:#F97583"');
+    expect(html).toContain('style="color:#E1E4E8"');
+    expect(html).toContain("コード: src/first.ts");
+  });
+
+  it("normalizes fixture paths for the TypeScript worker", () => {
+    expect(modelUriFor("../fixtures/moonbase.ts")).toBe(
+      "file:///fixtures/moonbase.ts",
+    );
   });
 
   it("disposes a projected model after its file is removed", async () => {

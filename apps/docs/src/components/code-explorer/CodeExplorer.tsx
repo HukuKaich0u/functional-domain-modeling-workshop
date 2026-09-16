@@ -12,6 +12,7 @@ import type {
   WorkspaceChange,
 } from "../../code-explorer/runner";
 import type { CodeGuide, CodeHighlight } from "../../code-explorer/code-guide";
+import type { SyntaxLine } from "../../code-explorer/highlight-initial-file";
 import type { ProjectFiles, SessionWorkspace } from "../../code-explorer/types";
 import {
   canResetFile,
@@ -35,6 +36,7 @@ export type EditorProps = Readonly<{
   disabled: boolean;
   readOnly: boolean;
   highlights: readonly CodeHighlight[];
+  syntaxLines?: readonly SyntaxLine[];
   onChange: (value: string) => void;
 }>;
 
@@ -43,6 +45,7 @@ export type CodeExplorerProps = Readonly<{
   projectFiles: ProjectFiles;
   initialCommand?: string;
   guides?: readonly CodeGuide[];
+  initialSyntaxLines?: readonly SyntaxLine[];
   Editor?: ComponentType<EditorProps>;
   runnerFactory?: () => TerminalRunner;
   supportsRuntime?: () => boolean;
@@ -61,6 +64,7 @@ export const CodeExplorer = ({
   projectFiles,
   initialCommand,
   guides,
+  initialSyntaxLines,
   Editor = MonacoEditor,
   runnerFactory,
   supportsRuntime,
@@ -209,6 +213,12 @@ export const CodeExplorer = ({
               disabled={isPreparing}
               readOnly={isGuided}
               highlights={selectedGuide?.highlights ?? noHighlights}
+              syntaxLines={
+                selectedPath === workspace.initialFile &&
+                workspaceState.contents[selectedPath] === projectFiles[selectedPath]
+                  ? initialSyntaxLines
+                  : undefined
+              }
               onChange={(value) => {
                 if (isGuided) return;
                 dispatch({
