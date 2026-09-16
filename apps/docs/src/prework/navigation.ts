@@ -8,14 +8,20 @@ export const preworkCurriculum = {
   items: [
     { slug: "index", sequence: "案内", title: "事前学習の進め方", href: "/prework/" },
     {
-      slug: "programming-paradigms",
+      slug: "domain-modeling",
       sequence: "01",
+      title: "ドメインモデリングの入口",
+      href: "/prework/domain-modeling/",
+    },
+    {
+      slug: "programming-paradigms",
+      sequence: "02",
       title: "プログラミングのパラダイムを読み比べる",
       href: "/prework/programming-paradigms/",
     },
     {
       slug: "type-system",
-      sequence: "02",
+      sequence: "03",
       title: "型システムと型駆動プログラミングの基礎",
       href: "/prework/type-system/",
     },

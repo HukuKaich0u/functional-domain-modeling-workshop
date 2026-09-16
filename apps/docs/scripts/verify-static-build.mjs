@@ -23,6 +23,7 @@ const requiredHtmlFiles = [
   "setup/index.html",
   "sessions/index.html",
   "prework/index.html",
+  "prework/domain-modeling/index.html",
   "prework/programming-paradigms/index.html",
   "prework/type-system/index.html",
   ...sessionSlugs.map((slug) => `sessions/${slug}/index.html`),
