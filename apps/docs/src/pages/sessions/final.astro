@@ -56,7 +56,7 @@ export const session: SessionSummary = {
   title: "参照実装で境界をたどる",
   durationMinutes: 5,
   timeBreakdown: { brief: 0, teach: 4, exercise: 0, review: 1 },
-  animal: { name: "MoonBase", type: "moon", avatar: "🌙" },
+  scene: { place: "作業状況ボードの前", role: "開発者", avatar: "🌙" },
   summary: "ここまでの学習内容を、より大きな参照実装へ接続します。",
   episode: [
     "ここまで直した頃、隊員たちはとっくにエアロックの内側に戻り、開発者だけが参照実装の前に残っていました。",
@@ -96,8 +96,12 @@ export const navigation = ({
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
   <section id="incident">

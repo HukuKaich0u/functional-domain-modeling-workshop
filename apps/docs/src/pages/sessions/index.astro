@@ -24,11 +24,11 @@ const sessions = Object.values(
 >
   <div class="case-file session-directory">
     <header class="case-file__site-header">
-      <a href="/">MoonBase 日の出基地</a>
+      <a href="/"><span class="case-file__brand-mark" aria-hidden="true"></span><span>MoonBase 日の出基地</span></a>
     </header>
     <main class="session-directory__main">
       <header class="session-directory__hero">
-        <p class="case-file__eyebrow">CURRICULUM</p>
+        <p class="case-file__eyebrow">MOONBASE CURRICULUM</p>
         <h1>セッション一覧</h1>
         <p>Session 00から順番に、月面太陽光発電所の船外作業管理の業務とコードを確認していきます。ひとりで1回ずつ進めることも、ハンズオンで一緒に取り組むこともできます。表示時間は目安です。</p>
       </header>
@@ -51,7 +51,10 @@ const sessions = Object.values(
                 <span>SESSION {session.sequence.toUpperCase()}</span>
                 <span>{session.durationMinutes}分</span>
               </span>
-              <span class="session-directory__animal" aria-hidden="true">{session.animal.avatar}</span>
+              <span class="session-directory__scene">
+                <span aria-hidden="true">{session.scene.avatar}</span>
+                <span>{session.scene.place}</span>
+              </span>
               <h2>{session.title}</h2>
               <p>{session.summary}</p>
               <span class="session-directory__open">セッションを開く</span>

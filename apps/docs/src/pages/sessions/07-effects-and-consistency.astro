@@ -37,7 +37,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-08",
   solutionPresentation: "completed-file",
   peerReviewPromises: "reference",
-  animal: { name: "EVA-0412", type: "work-log", avatar: "🕰️" },
+  scene: { place: "作業記録の保管庫", role: "基地長と開発者", avatar: "🕰️" },
   summary: "時刻や記録 ID など実行のたびに変わる値と保存を port に切り出し、状態と作業記録を一度に保存します。",
   episode: [
     "PV-07 の開始承認で、作業許可の状態だけが先に承認済になり、承認の作業記録はどこにも残りませんでした。",
@@ -288,8 +288,12 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">

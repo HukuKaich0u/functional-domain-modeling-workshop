@@ -55,7 +55,7 @@
   padding: clamp(1.25rem, 4vw, 2rem);
   border: 2px solid var(--case-line);
   background: var(--case-paper);
-  box-shadow: 0.45rem 0.45rem 0 var(--case-mint);
+  box-shadow: 0.45rem 0.45rem 0 var(--case-regolith);
 }
 
 .setup-step > div,
@@ -64,11 +64,11 @@
 }
 
 .setup-step--repository {
-  box-shadow: 0.45rem 0.45rem 0 var(--case-lemon);
+  box-shadow: 0.45rem 0.45rem 0 var(--case-sunrise);
 }
 
 .setup-step--verification {
-  box-shadow: 0.45rem 0.45rem 0 var(--case-coral);
+  box-shadow: 0.45rem 0.45rem 0 var(--case-flare);
 }
 
 .setup-step__number {
@@ -78,16 +78,16 @@
   place-items: center;
   border: 2px solid var(--case-line);
   border-radius: 50%;
-  background: var(--case-mint);
+  background: var(--case-regolith);
   font-weight: 900;
 }
 
 .setup-step--repository .setup-step__number {
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
 }
 
 .setup-step--verification .setup-step__number {
-  background: var(--case-coral);
+  background: var(--case-flare);
 }
 
 .setup-step__label {
@@ -122,7 +122,7 @@
 }
 
 .setup-page__start:hover {
-  background: var(--case-coral);
+  background: var(--case-flare);
   color: var(--case-ink);
 }
 
@@ -138,7 +138,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.65rem 0.75rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   font-size: 0.85rem;
   font-weight: 800;
 }
@@ -180,4 +180,199 @@
   .setup-step {
     grid-template-columns: 1fr;
   }
+}
+
+/* Crew onboarding checklist. */
+.setup-page__main {
+  width: min(100% - 2rem, 58rem);
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.setup-page__hero {
+  max-width: 54rem;
+  margin-bottom: clamp(3rem, 7vw, 5rem);
+  padding-left: clamp(1rem, 3vw, 2rem);
+  border-left: 1px solid #607784;
+}
+
+.setup-page__hero h1 {
+  color: #edf2ef;
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  font-weight: 550;
+  letter-spacing: -0.05em;
+}
+
+.setup-page__hero > p:last-child {
+  max-width: 48rem;
+  color: #a5b4ba;
+  font-size: 1rem;
+  line-height: 1.95;
+}
+
+.setup-page__hero a,
+.setup-page > p a { color: var(--case-sunrise); }
+
+#environment {
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid #506b79;
+  background: rgb(13 27 39 / 88%);
+}
+
+#environment > h2 {
+  margin-top: 0;
+  color: #edf2ef;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 600;
+}
+
+#environment > p,
+.setup-page__help {
+  color: #a5b4ba;
+}
+
+.setup-page__steps {
+  gap: 1px;
+  margin-top: 2rem;
+  border: 1px solid #526975;
+  background: #526975;
+}
+
+.setup-step,
+.setup-step--repository,
+.setup-step--verification {
+  gap: clamp(1rem, 3vw, 1.5rem);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 0;
+  background: var(--case-paper);
+  box-shadow: none;
+  color: var(--case-ink);
+}
+
+.setup-step__number,
+.setup-step--repository .setup-step__number,
+.setup-step--verification .setup-step__number {
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--case-line);
+  border-radius: 0;
+  background: transparent;
+  color: #183d50;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.74rem;
+}
+
+.setup-step--repository .setup-step__number { color: #9a5c0b; }
+.setup-step--verification .setup-step__number { color: #a33e31; }
+
+.setup-step__label {
+  color: #52636a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.setup-step h3 {
+  color: var(--case-ink);
+  font-weight: 650;
+}
+
+.setup-step__command {
+  border: 1px solid var(--case-line);
+  background: #09151e;
+}
+
+.setup-step__command-header {
+  border-bottom: 1px solid #3a515e;
+  background: #142936;
+  color: #c6d3d0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+}
+
+.setup-step__command .copy-button {
+  border: 1px solid #5a707c;
+  border-radius: 0;
+  background: transparent;
+  color: #e1e9e6;
+}
+
+.setup-page > .setup-page__main > p {
+  color: #9fafb6;
+}
+
+.setup-page__next {
+  border-top: 1px solid #3f5968;
+  color: #a5b4ba;
+}
+
+.setup-page__start {
+  border: 1px solid var(--case-sunrise);
+  background: var(--case-sunrise);
+  color: #18130d;
+}
+
+.setup-page__start:hover {
+  border-color: var(--case-cyan);
+  background: var(--case-cyan);
+  color: var(--case-space);
+}
+
+@media (max-width: 30rem) {
+  #environment { padding-inline: 1rem; }
+}
+
+/* Calm setup page. */
+.setup-page__main {
+  width: min(100% - 2rem, 52rem);
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+.setup-page__hero {
+  margin-bottom: 3rem;
+  border-left-color: #aeb9b7;
+}
+
+.setup-page__hero h1 {
+  color: var(--case-ink);
+  font-size: clamp(2.75rem, 8vw, 5rem);
+}
+
+.setup-page__hero > p:last-child {
+  color: var(--case-muted);
+}
+
+#environment {
+  border-color: #b9c3c0;
+  background: #f8f7f2;
+  color: var(--case-ink);
+}
+
+#environment > h2 {
+  color: var(--case-ink);
+}
+
+#environment > p,
+.setup-page__help {
+  color: var(--case-muted);
+}
+
+.setup-page__steps {
+  gap: 1rem;
+  border: 0;
+  background: transparent;
+}
+
+.setup-step,
+.setup-step--repository,
+.setup-step--verification {
+  border: 1px solid #c1c9c6;
+}
+
+.setup-page > .setup-page__main > p,
+.setup-page__next {
+  color: var(--case-muted);
+}
+
+.setup-page__next {
+  border-top-color: #b8c2bf;
 }

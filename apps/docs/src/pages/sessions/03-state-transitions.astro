@@ -52,7 +52,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-04",
   solutionPresentation: "excerpt",
   peerReviewPromises: "inline",
-  animal: { name: "EVA-0415", type: "permit", avatar: "🔁" },
+  scene: { place: "エアロックの前", role: "基地長と電気主任", avatar: "🚪" },
   summary: "作業許可の6状態を Discriminated Union で表し、許可されていない状態遷移を型で拒否します。",
   episode: [
     "月面日第13日、装備点検の記録がないまま、PV-06 補修の作業許可が承認済になりました。",
@@ -487,8 +487,12 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">

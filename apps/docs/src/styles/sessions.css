@@ -1,10 +1,12 @@
+/* 日の出基地の配色。regolith は月の砂、sunrise は日の出、flare は太陽フレアの警報、tag は遮断札 */
 :root {
-  --case-mint: #bcebd7;
-  --case-lemon: #fff29f;
-  --case-coral: #ff8f7d;
-  --case-ink: #16251f;
-  --case-paper: #fffdf7;
-  --case-line: #2c493e;
+  --case-regolith: #d8dde6;
+  --case-sunrise: #ffd9a0;
+  --case-flare: #ff6b57;
+  --case-ink: #10131c;
+  --case-paper: #f8f6f0;
+  --case-line: #1b2a4a;
+  --case-tag: #ffd60a;
 }
 
 .case-file {
@@ -41,7 +43,7 @@
   display: inline-block;
   margin: 0 0 1rem;
   padding: 0.35rem 0.65rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -65,8 +67,8 @@
   margin-top: 2rem;
   padding: 1rem 1.25rem;
   border: 2px solid var(--case-line);
-  border-inline-start: 0.6rem solid var(--case-coral);
-  background: color-mix(in srgb, var(--case-lemon) 28%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-flare);
+  background: color-mix(in srgb, var(--case-sunrise) 28%, var(--case-paper));
   line-height: 1.7;
 }
 
@@ -92,7 +94,7 @@
 
 .case-file__toc {
   border: 2px solid var(--case-line);
-  background: var(--case-mint);
+  background: var(--case-regolith);
 }
 
 .case-file__curriculum--desktop,
@@ -140,8 +142,8 @@
 }
 
 .case-file__curriculum a[aria-current="page"] {
-  border-inline-start-color: var(--case-coral);
-  background: var(--case-lemon);
+  border-inline-start-color: var(--case-flare);
+  background: var(--case-sunrise);
   font-weight: 800;
   text-decoration: none;
 }
@@ -182,7 +184,7 @@
 }
 
 .case-file__mobile-menu[open] summary {
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
 }
 
 .case-file__mobile-menu nav {
@@ -251,12 +253,12 @@
 }
 
 .case-file__content thead th {
-  background: var(--case-mint);
+  background: var(--case-regolith);
   font-weight: 800;
 }
 
 .case-file__content tbody th {
-  background: color-mix(in srgb, var(--case-lemon) 45%, var(--case-paper));
+  background: color-mix(in srgb, var(--case-sunrise) 45%, var(--case-paper));
   font-weight: 800;
 }
 
@@ -285,7 +287,7 @@
 
 .case-file__content dt {
   border-inline-end: 1px solid var(--case-line);
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   font-weight: 800;
 }
 
@@ -316,7 +318,7 @@
    .case-file を前置して詳細度で上回る。 */
 .case-file .code-block figcaption {
   padding: 0.45rem 0.75rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   color: var(--case-ink);
   font-weight: 700;
 }
@@ -339,11 +341,11 @@
 }
 
 .command-block--red {
-  border-left: 0.75rem solid var(--case-coral);
+  border-left: 0.75rem solid var(--case-flare);
 }
 
 .command-block--green {
-  border-left: 0.75rem solid var(--case-mint);
+  border-left: 0.75rem solid var(--case-regolith);
 }
 
 .command-block__header {
@@ -362,7 +364,7 @@
 .copy-button {
   padding: 0.55rem 0.8rem;
   border: 2px solid currentColor;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   color: var(--case-ink);
   font: inherit;
   font-weight: 800;
@@ -370,7 +372,7 @@
 }
 
 .case-file :is(a, button, summary):focus-visible {
-  outline: 3px solid var(--case-coral);
+  outline: 3px solid var(--case-flare);
   outline-offset: 4px;
 }
 
@@ -402,7 +404,7 @@
   padding: 0.75rem 1rem;
   border: 2px solid var(--case-line);
   border-radius: 1rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
 }
 
 .onboarding-story__bubble::after {
@@ -418,7 +420,7 @@
 }
 
 .onboarding-story__line--director .onboarding-story__bubble {
-  background: var(--case-mint);
+  background: var(--case-regolith);
 }
 
 .onboarding-story__line--director .onboarding-story__bubble::after {
@@ -429,8 +431,8 @@
 .onboarding-decision {
   margin-block: 1.5rem;
   padding: 1rem;
-  border-inline-start: 0.35rem solid var(--case-coral);
-  background: var(--case-lemon);
+  border-inline-start: 0.35rem solid var(--case-flare);
+  background: var(--case-sunrise);
 }
 
 .exercise-steps,
@@ -448,16 +450,16 @@
 .adv-flow li,
 .final-differences li {
   padding: 0.75rem;
-  border-inline-start: 0.35rem solid var(--case-mint);
-  background: color-mix(in srgb, var(--case-mint) 28%, var(--case-paper));
+  border-inline-start: 0.35rem solid var(--case-regolith);
+  background: color-mix(in srgb, var(--case-regolith) 28%, var(--case-paper));
 }
 
 .adv-flow li:nth-child(2) {
-  border-inline-start-color: var(--case-lemon);
+  border-inline-start-color: var(--case-sunrise);
 }
 
 .adv-flow li:nth-child(3) {
-  border-inline-start-color: var(--case-coral);
+  border-inline-start-color: var(--case-flare);
 }
 
 .delegation-prompt,
@@ -507,14 +509,14 @@
 .exercise-review-checklist {
   margin-block: 1.5rem;
   padding: 1rem;
-  border-inline-start: 0.6rem solid var(--case-lemon);
-  background: color-mix(in srgb, var(--case-lemon) 28%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-sunrise);
+  background: color-mix(in srgb, var(--case-sunrise) 28%, var(--case-paper));
 }
 
 .before-after {
   display: grid;
   gap: 0.75rem;
-  border-inline-start: 0.6rem solid var(--case-coral);
+  border-inline-start: 0.6rem solid var(--case-flare);
 }
 
 .before-after p {
@@ -535,13 +537,13 @@
   min-width: 0;
   padding: 1rem;
   border: 2px solid var(--case-line);
-  border-inline-start: 0.6rem solid var(--case-coral);
-  background: color-mix(in srgb, var(--case-coral) 12%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-flare);
+  background: color-mix(in srgb, var(--case-flare) 12%, var(--case-paper));
 }
 
 .boundary-results article[data-boundary-result="desired"] {
-  border-inline-start-color: var(--case-mint);
-  background: color-mix(in srgb, var(--case-mint) 24%, var(--case-paper));
+  border-inline-start-color: var(--case-regolith);
+  background: color-mix(in srgb, var(--case-regolith) 24%, var(--case-paper));
 }
 
 .boundary-results :is(h4, p) {
@@ -579,7 +581,7 @@
   top: 0;
   left: 0;
   padding: 0.25rem 0.55rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   content: counter(boundary-stage);
   font-weight: 800;
 }
@@ -644,8 +646,8 @@
   margin-block: 1.5rem 0;
   padding: 1rem;
   border: 2px solid var(--case-line);
-  border-inline-start: 0.6rem solid var(--case-mint);
-  background: color-mix(in srgb, var(--case-mint) 28%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-regolith);
+  background: color-mix(in srgb, var(--case-regolith) 28%, var(--case-paper));
 }
 
 .teaching-column h3 {
@@ -656,7 +658,7 @@
   display: inline-block;
   margin: 0 0 0.5rem;
   padding: 0.25rem 0.5rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -678,7 +680,7 @@
 
 .step-solution summary {
   padding: 0.8rem 1rem;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   cursor: pointer;
   font-weight: 800;
 }
@@ -693,8 +695,8 @@
 .decision-card {
   min-width: 0;
   padding: 1rem;
-  border-inline-start: 0.6rem solid var(--case-mint);
-  background: color-mix(in srgb, var(--case-mint) 24%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-regolith);
+  background: color-mix(in srgb, var(--case-regolith) 24%, var(--case-paper));
 }
 
 .decision-card h4,
@@ -785,8 +787,8 @@
 }
 
 .peer-review-panel {
-  border-inline-start: 0.6rem solid var(--case-coral);
-  background: color-mix(in srgb, var(--case-lemon) 35%, var(--case-paper));
+  border-inline-start: 0.6rem solid var(--case-flare);
+  background: color-mix(in srgb, var(--case-sunrise) 35%, var(--case-paper));
 }
 
 .peer-review-panel h3 {
@@ -814,7 +816,7 @@
   bottom: -1rem;
   left: 0.95rem;
   width: 2px;
-  background: var(--case-mint);
+  background: var(--case-regolith);
   content: "";
 }
 
@@ -825,7 +827,7 @@
   height: 2rem;
   place-items: center;
   border-radius: 50%;
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
   font-weight: 800;
 }
 
@@ -859,7 +861,7 @@
   padding: 0.2rem 0.45rem;
   border: 1px solid var(--case-line);
   border-radius: 0.35rem;
-  background: var(--case-mint);
+  background: var(--case-regolith);
   font-weight: 800;
   line-height: 1.4;
 }
@@ -872,8 +874,8 @@
 .visit-timeline__branch {
   margin: 1.25rem 0 0 2.75rem;
   padding: 0.75rem 1rem;
-  border-left: 0.4rem solid var(--case-coral);
-  background: color-mix(in srgb, var(--case-lemon) 35%, var(--case-paper));
+  border-left: 0.4rem solid var(--case-flare);
+  background: color-mix(in srgb, var(--case-sunrise) 35%, var(--case-paper));
 }
 
 .visit-timeline__branch h4,
@@ -889,7 +891,7 @@
   margin-top: 1rem;
   padding: 0.75rem 1rem;
   border: 2px solid var(--case-line);
-  background: var(--case-lemon);
+  background: var(--case-sunrise);
 }
 
 .visit-timeline .sr-only {
@@ -961,4 +963,181 @@
   .case-file__mobile-navigation {
     display: none;
   }
+}
+
+.case-file__scene {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  color: var(--case-ink);
+  font-size: 0.9rem;
+}
+
+.case-file__scene-label {
+  padding: 0.1rem 0.5rem;
+  border: 2px solid var(--case-line);
+  border-radius: 0.25rem;
+  background: var(--case-regolith);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+/* MoonBase mission-document visual system. */
+.case-file {
+  --case-space: #071019;
+  --case-space-raised: #0d1b27;
+  --case-panel: #142632;
+  --case-regolith: #c5cbc6;
+  --case-sunrise: #f3b562;
+  --case-flare: #ef705c;
+  --case-cyan: #78c6cc;
+  --case-ink: #14212a;
+  --case-paper: #f0f1eb;
+  --case-line: #294454;
+  --case-muted: #66777e;
+  --case-divider: #c7cdca;
+  min-height: 100vh;
+  color: #e9efeb;
+  background:
+    radial-gradient(circle at 14% 8%, rgb(120 198 204 / 14%) 0 0.08rem, transparent 0.1rem),
+    radial-gradient(circle at 80% 15%, rgb(233 239 235 / 16%) 0 0.06rem, transparent 0.08rem),
+    linear-gradient(rgb(66 91 104 / 10%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(66 91 104 / 10%) 1px, transparent 1px),
+    var(--case-space);
+  background-size: 19rem 19rem, 23rem 23rem, 4rem 4rem, 4rem 4rem, auto;
+  font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic", Meiryo, system-ui, sans-serif;
+}
+
+.case-file .case-file__site-header {
+  width: 100%;
+  margin: 0;
+  padding: 0.8rem max(1rem, calc((100% - 88rem) / 2));
+  border-bottom: 1px solid #294454;
+  background: rgb(7 16 25 / 92%);
+  color: #e9efeb;
+  letter-spacing: 0;
+}
+
+.case-file .case-file__site-header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.case-file .case-file__brand-mark {
+  position: relative;
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid #6f8792;
+  border-radius: 50%;
+  background: var(--case-sunrise);
+  box-shadow: none;
+  font-size: 0;
+}
+
+.case-file .case-file__brand-mark::after {
+  position: absolute;
+  top: -0.16rem;
+  right: -0.12rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--case-space);
+  content: "";
+}
+
+.case-file .case-file__eyebrow {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--case-sunrise);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  rotate: 0deg;
+}
+
+.case-file .case-file__eyebrow::before {
+  display: inline-block;
+  width: 1.7rem;
+  height: 1px;
+  margin-right: 0.65rem;
+  vertical-align: middle;
+  background: currentColor;
+  content: "";
+}
+
+.case-file .case-file__scene-label {
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--case-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--case-line);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.case-file .code-block,
+.case-file .command-block,
+.case-file .case-file__content table,
+.case-file .case-file__content dl {
+  border-width: 1px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.case-file .code-block figcaption {
+  border-bottom: 1px solid #3b4e59;
+  background: #172a36;
+  color: #cbd7d4;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.case-file .code-block pre,
+.case-file .command-block pre {
+  background: #09151e;
+  color: #dbe5e1;
+}
+
+.case-file a:focus-visible,
+.case-file button:focus-visible,
+.case-file summary:focus-visible {
+  outline: 2px solid var(--case-cyan);
+  outline-offset: 3px;
+}
+
+/* Calm reading surface: the lunar setting stays in the accents. */
+.case-file.case-file {
+  color: var(--case-ink);
+  background: linear-gradient(180deg, #f1efe8 0, #e8e8e2 100%);
+  background-size: auto;
+}
+
+.case-file.case-file .case-file__site-header {
+  border-bottom-color: #c6cecb;
+  background: rgb(247 245 239 / 96%);
+  color: var(--case-ink);
+}
+
+.case-file.case-file .case-file__brand-mark::after {
+  background: #f7f5ef;
+}
+
+.case-file.case-file .case-file__eyebrow {
+  color: #a5661c;
 }

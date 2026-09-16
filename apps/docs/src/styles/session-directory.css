@@ -25,8 +25,8 @@
   width: min(100%, 42rem);
   margin-bottom: 3rem;
   padding: clamp(1.25rem, 4vw, 1.75rem);
-  border-left: 0.5rem solid var(--case-coral);
-  background: var(--case-lemon);
+  border-left: 0.5rem solid var(--case-flare);
+  background: var(--case-sunrise);
 }
 
 .session-directory__setup-label {
@@ -62,8 +62,8 @@
 
 .session-directory__setup-link:hover,
 .session-directory__setup-link:focus-visible {
-  background: var(--case-mint);
-  outline: 3px solid var(--case-coral);
+  background: var(--case-regolith);
+  outline: 3px solid var(--case-flare);
   outline-offset: 3px;
 }
 
@@ -82,7 +82,7 @@
   padding: 1.5rem;
   border: 2px solid var(--case-line);
   background: var(--case-paper);
-  box-shadow: 0.4rem 0.4rem 0 var(--case-mint);
+  box-shadow: 0.4rem 0.4rem 0 var(--case-regolith);
   color: var(--case-ink);
   text-decoration: none;
   transition: translate 150ms ease, box-shadow 150ms ease;
@@ -90,7 +90,7 @@
 
 .session-directory__card:hover,
 .session-directory__card:focus-visible {
-  box-shadow: 0.65rem 0.65rem 0 var(--case-coral);
+  box-shadow: 0.65rem 0.65rem 0 var(--case-flare);
   outline: 3px solid var(--case-line);
   outline-offset: 3px;
   translate: -0.2rem -0.2rem;
@@ -105,9 +105,24 @@
   letter-spacing: 0.08em;
 }
 
-.session-directory__animal {
+.session-directory__scene {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin-top: 1.5rem;
-  font-size: 2.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.session-directory__scene > [aria-hidden="true"] {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 2px solid var(--case-line);
+  border-radius: 50%;
+  background: var(--case-sunrise);
+  font-size: 1.5rem;
 }
 
 .session-directory__card h2 {
@@ -138,4 +153,317 @@
   .session-directory__card {
     transition: none;
   }
+}
+
+/* Curriculum as an operations manifest. */
+.session-directory__main {
+  width: min(100% - 2rem, 82rem);
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.session-directory__hero {
+  position: relative;
+  max-width: 60rem;
+  margin-bottom: clamp(3rem, 7vw, 6rem);
+  padding-left: clamp(1rem, 3vw, 2rem);
+  border-left: 1px solid #607784;
+}
+
+.session-directory__hero::after {
+  position: absolute;
+  top: -1rem;
+  right: 0;
+  width: clamp(7rem, 18vw, 15rem);
+  height: clamp(7rem, 18vw, 15rem);
+  border: 1px solid rgb(120 198 204 / 18%);
+  border-radius: 50%;
+  box-shadow: inset 2rem -1rem 0 rgb(243 181 98 / 5%);
+  content: "";
+  pointer-events: none;
+}
+
+.session-directory__hero h1 {
+  max-width: 12ch;
+  color: #edf2ef;
+  font-size: clamp(3rem, 8vw, 6.8rem);
+  font-weight: 550;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.session-directory__hero > h1 + p {
+  max-width: 56rem;
+  margin-top: 1.75rem;
+  color: #a5b4ba;
+  font-size: 1rem;
+  line-height: 1.95;
+}
+
+.session-directory__setup {
+  position: relative;
+  width: min(100%, 58rem);
+  margin-bottom: 4rem;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  border: 1px solid #456071;
+  border-left: 0.25rem solid var(--case-sunrise);
+  background: rgb(13 27 39 / 88%);
+  color: #dce5e1;
+}
+
+.session-directory__setup::after {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #6f858f;
+  content: "PRE-FLIGHT CHECK";
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+
+.session-directory__setup-label {
+  color: var(--case-sunrise);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+}
+
+.session-directory__setup h2 {
+  margin-top: 0.7rem;
+  color: #edf2ef;
+  font-weight: 600;
+}
+
+.session-directory__setup h2 + p { color: #9fafb6; }
+
+.session-directory__setup-link {
+  border: 1px solid var(--case-sunrise);
+  background: var(--case-sunrise);
+  color: #18130d;
+}
+
+.session-directory__setup-link:hover,
+.session-directory__setup-link:focus-visible {
+  border-color: var(--case-cyan);
+  background: var(--case-cyan);
+  color: var(--case-space);
+  outline-color: var(--case-cyan);
+}
+
+.session-directory__list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #385465;
+  background: #385465;
+  counter-reset: mission-session;
+}
+
+.session-directory__list > li {
+  min-width: 0;
+  background: var(--case-space);
+  counter-increment: mission-session;
+}
+
+.session-directory__card {
+  position: relative;
+  min-height: 23rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border: 0;
+  background: rgb(13 27 39 / 94%);
+  box-shadow: none;
+  color: #e7eeea;
+  transition: background 160ms ease;
+}
+
+.session-directory__card::after {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.8rem;
+  color: rgb(120 198 204 / 16%);
+  content: counter(mission-session, decimal-leading-zero);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 500;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.session-directory__card:hover,
+.session-directory__card:focus-visible {
+  background: #142a38;
+  box-shadow: inset 0.2rem 0 0 var(--case-sunrise);
+  outline: 2px solid var(--case-sunrise);
+  outline-offset: -2px;
+  translate: 0;
+}
+
+.session-directory__meta {
+  color: var(--case-cyan);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.session-directory__scene {
+  margin-top: 2rem;
+  color: #8ea1aa;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.session-directory__scene > [aria-hidden="true"] {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid #4a6574;
+  border-radius: 0;
+  background: transparent;
+  color: var(--case-sunrise);
+  font-size: 0;
+}
+
+.session-directory__scene > [aria-hidden="true"]::after {
+  content: "LOG";
+  font-size: 0.55rem;
+}
+
+.session-directory__card h2 {
+  margin-top: 0.8rem;
+  color: #edf2ef;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 600;
+}
+
+.session-directory__card p {
+  position: relative;
+  z-index: 1;
+  color: #9fafb6;
+  font-size: 0.9rem;
+  line-height: 1.85;
+}
+
+.session-directory__open {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  color: var(--case-sunrise);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.session-directory__open::after {
+  margin-left: 0.6rem;
+  content: "→";
+}
+
+@media (max-width: 44rem) {
+  .session-directory__hero::after { opacity: 0.45; }
+  .session-directory__setup::after { display: none; }
+  .session-directory__list { grid-template-columns: 1fr; }
+  .session-directory__card { min-height: 20rem; }
+}
+
+/* Calm curriculum: ordinary reading first, MoonBase accents second. */
+.session-directory__main {
+  width: min(100% - 2rem, 74rem);
+  padding-block: clamp(3rem, 7vw, 5rem);
+}
+
+.session-directory__hero {
+  max-width: 52rem;
+  margin-bottom: 3rem;
+  border-left-color: #aeb9b7;
+}
+
+.session-directory__hero::after {
+  display: none;
+}
+
+.session-directory__hero h1 {
+  color: var(--case-ink);
+  font-size: clamp(2.75rem, 7vw, 5rem);
+}
+
+.session-directory__hero > h1 + p {
+  color: var(--case-muted);
+}
+
+.session-directory__setup {
+  width: min(100%, 48rem);
+  margin-bottom: 3rem;
+  border-color: #c9b892;
+  border-left-color: var(--case-sunrise);
+  background: #fbf3e4;
+  color: var(--case-ink);
+}
+
+.session-directory__setup::after {
+  display: none;
+}
+
+.session-directory__setup-label {
+  color: #925a18;
+}
+
+.session-directory__setup h2 {
+  color: var(--case-ink);
+}
+
+.session-directory__setup h2 + p {
+  color: var(--case-muted);
+}
+
+.session-directory__list {
+  gap: 1rem;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.session-directory__list > li {
+  background: transparent;
+}
+
+.session-directory__card {
+  min-height: 21rem;
+  border: 1px solid #b9c3c0;
+  background: #faf9f5;
+  color: var(--case-ink);
+}
+
+.session-directory__card::after {
+  color: rgb(34 98 112 / 8%);
+}
+
+.session-directory__card:hover,
+.session-directory__card:focus-visible {
+  background: #fffdf8;
+  box-shadow: inset 0.2rem 0 0 var(--case-sunrise);
+}
+
+.session-directory__meta {
+  color: #236f7d;
+}
+
+.session-directory__scene {
+  color: var(--case-muted);
+}
+
+.session-directory__scene > [aria-hidden="true"] {
+  border-color: #9eacab;
+  color: #9a621f;
+}
+
+.session-directory__card h2 {
+  color: var(--case-ink);
+}
+
+.session-directory__card p {
+  color: var(--case-muted);
+}
+
+.session-directory__open {
+  color: #1d6573;
 }

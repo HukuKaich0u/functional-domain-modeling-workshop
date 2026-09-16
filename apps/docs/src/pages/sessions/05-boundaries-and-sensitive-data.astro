@@ -52,7 +52,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-06",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  animal: { name: "PV07-LOCKED", type: "boundary", avatar: "📡" },
+  scene: { place: "医務室と地上管制の受信端末", role: "医務と地上管制", avatar: "📡" },
   summary: "地上管制の端末から届く許可番号と系統区間を検査し、型付きの開始承認の入力へ変換します。被ばく量は記録に出しません。",
   episode: [
     "月面日第1日 01:00、地上管制の旧端末から EVA-0412 の開始承認が届きました。",
@@ -373,8 +373,12 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">

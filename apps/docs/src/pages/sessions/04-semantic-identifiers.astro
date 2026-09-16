@@ -52,7 +52,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-05",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  animal: { name: "PV-07", type: "segment", avatar: "🏷️" },
+  scene: { place: "遮断盤の前", role: "電気主任", avatar: "⚡" },
   summary: "開始承認で使う作業区画の識別子と系統区間の識別子を、取り違えられない型にします。",
   episode: [
     "開始承認の入力で、作業区画の識別子と遮断した系統区間の識別子が入れ替わっていました。",
@@ -386,8 +386,12 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">

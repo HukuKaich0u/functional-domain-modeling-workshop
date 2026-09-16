@@ -72,7 +72,8 @@ type SessionSummaryBase = Readonly<{
   adv?: AdvBreakdown;
   delegationPrompt?: DelegationPrompt;
   peerReview?: PeerReview;
-  animal: Readonly<{ name: string; type: string; avatar: string }>;
+  /** その回の場面。日の出基地のどこで、どの役割の人が関わる出来事かを示す */
+  scene: Readonly<{ place: string; role: string; avatar: string }>;
   summary: string;
   episode: readonly [string, string, string];
   incident: string;

@@ -366,7 +366,7 @@ describe("session pages", () => {
   for (const slug of exerciseSlugs.slice(1)) {
     it(`${slug} preserves the hero avatar whitespace emitted by S3`, () => {
       expect(sourceFor(slug)).toContain(
-        `<p class="case-file__summary">\n          <span aria-hidden="true">{session.animal.avatar}</span>\n          {session.summary}\n        </p>`,
+        `<p class="case-file__summary">\n          <span aria-hidden="true">{session.scene.avatar}</span>\n          {session.summary}\n        </p>`,
       );
     });
   }

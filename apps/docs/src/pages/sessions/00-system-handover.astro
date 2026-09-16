@@ -13,7 +13,7 @@ export const session: SessionSummary = {
   title: "業務とシステムを引き継ぐ",
   durationMinutes: 10,
   timeBreakdown: { brief: 4, teach: 3, exercise: 0, review: 3 },
-  animal: { name: "EVA-0412", type: "handover", avatar: "🛰️" },
+  scene: { place: "管制室の引き継ぎ机", role: "前任者と後任の開発者", avatar: "🛰️" },
   summary: "MoonBase 日の出基地の現行業務、SQLite に残る現在の作業許可と作業記録、事故報告 第1号を確認します。",
   episode: [
     "補給便で着任した初日、前任者は同じ便で帰る支度をしながら、事故報告 第1号のプリントを手渡してきました。",
@@ -124,8 +124,12 @@ export const navigation = ({
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
   <section id="incident">

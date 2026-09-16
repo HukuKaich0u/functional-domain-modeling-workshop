@@ -53,7 +53,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-07",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  animal: { name: "EVA-0420", type: "failure", avatar: "⚠️" },
+  scene: { place: "地上管制の旧端末", role: "地上管制とシステム担当", avatar: "🖥️" },
   summary: "開始承認で地上管制や基地長が失敗理由に応じて操作を選ぶ失敗を、呼び出し側が扱える値として返します。",
   episode: [
     "古い許可番号が残っていた地上管制の端末から開始承認を送ると、システムは許可なしを「状態不正」と表示しました。",
@@ -520,8 +520,12 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">

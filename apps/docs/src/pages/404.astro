@@ -1,18 +1,20 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/mission-utility.css";
 ---
 
 <BaseLayout
   title="ページが見つかりません | MoonBase 日の出基地"
   description="指定されたページは見つかりませんでした。"
+  bodyClass="mission-utility-page"
 >
-  <main class="not-found-page">
-    <p>404</p>
+  <main class="not-found-page moonbase-not-found">
+    <p>MOONBASE / 404</p>
     <h1>ページが見つかりません</h1>
-    <p>URLを確認するか、トップページから目的のページを探してください。</p>
+    <p>指定された航路を確認できませんでした。URLを確認するか、基地の入口から目的のブリーフィングを探してください。</p>
     <nav aria-label="404ページの案内">
       <a href="/">トップページへ戻る</a>
-      <a href="/sessions/00-system-handover/">最初のSession 00を始める</a>
+      <a href="/sessions/00-system-handover/">着任ブリーフィングを始める</a>
     </nav>
   </main>
 </BaseLayout>

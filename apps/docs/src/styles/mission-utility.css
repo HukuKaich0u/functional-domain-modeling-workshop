@@ -1,0 +1,129 @@
+.mission-utility-page {
+  padding-block: 3rem;
+  background: #071019;
+}
+
+.moonbase-not-found {
+  --utility-space: #071019;
+  --utility-line: #3b5969;
+  --utility-ink: #eaf0ed;
+  --utility-muted: #9eafb6;
+  --utility-sun: #f3b562;
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - 6rem);
+  align-content: center;
+  margin-block: 0;
+  padding: clamp(2rem, 7vw, 5rem);
+  border: 1px solid var(--utility-line);
+  border-radius: 0;
+  background:
+    linear-gradient(rgb(59 89 105 / 10%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(59 89 105 / 10%) 1px, transparent 1px),
+    var(--utility-space);
+  background-size: 4rem 4rem;
+  box-shadow: 0 2rem 5rem rgb(0 0 0 / 35%);
+  color: var(--utility-ink);
+  font-family: "Avenir Next", "Hiragino Sans", "Yu Gothic", Meiryo, system-ui, sans-serif;
+}
+
+.moonbase-not-found::after {
+  position: absolute;
+  top: clamp(2rem, 8vw, 6rem);
+  right: clamp(2rem, 8vw, 6rem);
+  width: clamp(7rem, 20vw, 15rem);
+  height: clamp(7rem, 20vw, 15rem);
+  border: 1px solid var(--utility-line);
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 36%, #738086, #354b56 58%, #142832 74%, transparent 75%);
+  content: "";
+  opacity: 0.55;
+}
+
+.moonbase-not-found > * {
+  position: relative;
+  z-index: 1;
+  max-width: 42rem;
+}
+
+.moonbase-not-found > p:first-child {
+  margin-bottom: 1.5rem;
+  color: var(--utility-sun);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.moonbase-not-found h1 {
+  color: var(--utility-ink);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 550;
+  letter-spacing: -0.045em;
+}
+
+.moonbase-not-found h1 + p {
+  color: var(--utility-muted);
+  line-height: 1.9;
+}
+
+.moonbase-not-found nav a {
+  border: 1px solid var(--utility-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--utility-ink);
+}
+
+.moonbase-not-found nav a:first-child {
+  border-color: var(--utility-sun);
+  background: var(--utility-sun);
+  color: #17130d;
+}
+
+.moonbase-not-found nav a:hover,
+.moonbase-not-found nav a:focus-visible {
+  border-color: #79c3c8;
+  background: #79c3c8;
+  color: var(--utility-space);
+  outline: 2px solid #79c3c8;
+  outline-offset: 3px;
+}
+
+@media (max-width: 42rem) {
+  .moonbase-not-found { min-height: calc(100vh - 1.5rem); padding: 1.5rem; }
+  .moonbase-not-found::after { opacity: 0.25; }
+}
+
+/* Calm utility page. */
+.mission-utility-page {
+  background: #ecebe5;
+}
+
+.moonbase-not-found {
+  --utility-space: #f8f7f2;
+  --utility-line: #b6c0bd;
+  --utility-ink: #17252d;
+  --utility-muted: #5d6d72;
+  border-color: var(--utility-line);
+  background: #f8f7f2;
+  box-shadow: 0 1rem 2.5rem rgb(41 58 64 / 10%);
+  color: var(--utility-ink);
+}
+
+.moonbase-not-found::after {
+  border-color: #c4ccca;
+  background: #e0e2dd;
+  opacity: 0.65;
+}
+
+.moonbase-not-found h1 {
+  color: var(--utility-ink);
+}
+
+.moonbase-not-found h1 + p {
+  color: var(--utility-muted);
+}
+
+.moonbase-not-found nav a {
+  color: var(--utility-ink);
+}

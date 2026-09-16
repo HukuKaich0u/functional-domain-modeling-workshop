@@ -1,15 +1,17 @@
 .case-file.case-file--session {
-  --case-ink: #111116;
-  --case-paper: #fffefa;
-  --case-line: #17204d;
-  --case-blue: #2236b8;
-  --case-cream: #fff8ce;
-  --case-highlight: #12dbb1;
-  --case-pink: #ff4f93;
-  --case-yellow: #ffd21b;
-  --case-muted: #58596d;
-  --case-divider: #dedccf;
-  background: var(--case-cream);
+  --case-ink: #10131c;
+  --case-paper: #fbfaf6;
+  --case-line: #1b2a4a;
+  --case-navy: #1f3a93;
+  --case-dust: #efece4;
+  --case-glow: #ffc978;
+  --case-flare: #ff6b57;
+  --case-tag: #ffd60a;
+  --case-muted: #59627a;
+  --case-divider: #d9d6cc;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgb(255 201 120 / 35%) 0 18%, transparent 18.5%),
+    var(--case-dust);
 }
 
 .case-file--session .case-file__site-header {
@@ -33,7 +35,7 @@
   place-items: center;
   border: 2px solid var(--case-line);
   border-radius: 44% 56% 48% 52% / 42% 45% 55% 58%;
-  background: var(--case-blue);
+  background: var(--case-navy);
   box-shadow: 3px 3px 0 var(--case-line);
   font-size: 1.4rem;
 }
@@ -66,7 +68,7 @@
 }
 
 .case-file--session .case-file__location strong {
-  color: var(--case-blue);
+  color: var(--case-navy);
 }
 
 .case-file--session .case-file__sheet {
@@ -75,7 +77,7 @@
   border: 3px solid var(--case-line);
   border-radius: 1rem;
   background: var(--case-paper);
-  box-shadow: 6px 7px 0 rgb(34 54 184 / 16%);
+  box-shadow: 6px 7px 0 rgb(31 58 147 / 16%);
 }
 
 .case-file--session .case-file__hero {
@@ -91,7 +93,7 @@
   padding: 0.25rem 0.6rem;
   border: 2px solid var(--case-line);
   border-radius: 0.3rem;
-  background: var(--case-yellow);
+  background: var(--case-tag);
   box-shadow: 2px 2px 0 var(--case-line);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
@@ -100,12 +102,12 @@
 
 .case-file--session .case-file__hero h1 {
   max-width: 24ch;
-  color: var(--case-blue);
+  color: var(--case-navy);
   font-size: clamp(1.8rem, 3.3vw, 2.75rem);
   line-height: 1.35;
   font-weight: 950;
   text-decoration: underline;
-  text-decoration-color: var(--case-pink);
+  text-decoration-color: var(--case-flare);
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.16em;
 }
@@ -126,7 +128,7 @@
   place-items: center;
   border: 2px solid var(--case-line);
   border-radius: 55% 45% 48% 52% / 46% 48% 52% 54%;
-  background: var(--case-highlight);
+  background: var(--case-glow);
   box-shadow: 3px 3px 0 var(--case-line);
   font-size: 1.8rem;
   rotate: 7deg;
@@ -141,7 +143,7 @@
 }
 
 .case-file--session .case-file__content h2 {
-  color: var(--case-blue);
+  color: var(--case-navy);
   font-size: clamp(1.4rem, 2.4vw, 1.8rem);
   line-height: 1.45;
   font-weight: 900;
@@ -183,8 +185,8 @@
   padding: 1rem 1.25rem;
   border: 2px solid var(--case-line);
   border-radius: 0.65rem;
-  background: var(--case-cream);
-  color: var(--case-blue);
+  background: var(--case-dust);
+  color: var(--case-navy);
   font-weight: 800;
   line-height: 1.6;
   text-decoration: none;
@@ -192,13 +194,13 @@
 }
 
 .case-file--session .case-file__session-nav a[rel="next"] {
-  background: var(--case-blue);
+  background: var(--case-navy);
   color: var(--case-paper);
   box-shadow: 3px 4px 0 var(--case-line);
 }
 
 .case-file--session .case-file__session-nav a:hover {
-  background: var(--case-yellow);
+  background: var(--case-tag);
   color: var(--case-ink);
 }
 
@@ -248,8 +250,8 @@
 }
 
 .case-file--session .case-file__session-link:hover {
-  background: rgb(34 54 184 / 7%);
-  color: var(--case-blue);
+  background: rgb(31 58 147 / 7%);
+  color: var(--case-navy);
 }
 
 .case-file--session .case-file__session-number {
@@ -263,9 +265,9 @@
   margin-top: 0.4rem;
   padding: 0.7rem;
   border-color: var(--case-line);
-  background: var(--case-blue);
+  background: var(--case-navy);
   color: var(--case-paper);
-  box-shadow: 3px 3px 0 rgb(34 54 184 / 16%);
+  box-shadow: 3px 3px 0 rgb(31 58 147 / 16%);
 }
 
 .case-file--session [aria-current="page"] .case-file__session-name {
@@ -280,7 +282,7 @@
   justify-self: end;
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
-  background: var(--case-yellow);
+  background: var(--case-tag);
   color: var(--case-line);
   font-size: 0.7rem;
   white-space: nowrap;
@@ -304,8 +306,8 @@
 }
 
 .case-file--session .case-file__chapter-navigation a[aria-current="location"] {
-  background: rgb(34 54 184 / 7%);
-  color: var(--case-blue);
+  background: rgb(31 58 147 / 7%);
+  color: var(--case-navy);
   font-weight: 850;
 }
 
@@ -313,7 +315,7 @@
   display: block;
   border: 2px solid var(--case-line);
   border-radius: 0.6rem;
-  background: var(--case-blue);
+  background: var(--case-navy);
   color: var(--case-paper);
 }
 
@@ -333,7 +335,7 @@
 }
 
 .case-file--session .case-file__mobile-current > span {
-  color: var(--case-yellow);
+  color: var(--case-tag);
   font-size: 0.7rem;
 }
 
@@ -354,7 +356,7 @@
   border-radius: 0.6rem;
   background: var(--case-paper);
   color: var(--case-ink);
-  box-shadow: 4px 5px 0 rgb(34 54 184 / 16%);
+  box-shadow: 4px 5px 0 rgb(31 58 147 / 16%);
 }
 
 .case-file--session .case-file__mobile-menu nav {
@@ -410,5 +412,374 @@
 
   .case-file--session .case-file__content > section {
     scroll-margin-top: var(--case-scroll-offset, 1.5rem);
+  }
+}
+
+.case-file--session .case-file__scene {
+  color: var(--case-muted);
+  font-size: 0.85rem;
+}
+
+.case-file--session .case-file__scene-label {
+  border-color: var(--case-line);
+  background: var(--case-glow);
+  color: var(--case-ink);
+}
+
+/* Mission log layout: restrained navigation around a high-contrast field dossier. */
+.case-file.case-file--session {
+  --case-glow: var(--case-sunrise);
+  --case-tag: var(--case-sunrise);
+  --case-navy: #183d50;
+  --case-dust: var(--case-space);
+  background:
+    linear-gradient(90deg, transparent 0 65%, rgb(243 181 98 / 5%) 65% 100%),
+    radial-gradient(circle at 88% 6%, rgb(243 181 98 / 12%) 0 0.08rem, transparent 0.1rem),
+    linear-gradient(rgb(66 91 104 / 9%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(66 91 104 / 9%) 1px, transparent 1px),
+    var(--case-space);
+  background-size: auto, 19rem 19rem, 4rem 4rem, 4rem 4rem, auto;
+}
+
+.case-file--session .case-file__body {
+  width: min(100% - 2rem, 88rem);
+  gap: 1.5rem;
+  padding: 1.75rem 0 4rem;
+}
+
+.case-file--session .case-file__sheet {
+  position: relative;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 1px solid #617580;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, rgb(20 33 42 / 3%) 1px, transparent 1px),
+    linear-gradient(var(--case-paper), var(--case-paper));
+  background-size: 4rem 100%, auto;
+  box-shadow: 0 2rem 5rem rgb(0 0 0 / 34%);
+  color: var(--case-ink);
+}
+
+.case-file--session .case-file__sheet::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.22rem;
+  background: linear-gradient(90deg, var(--case-sunrise) 0 36%, var(--case-cyan) 36% 72%, var(--case-flare) 72%);
+  content: "";
+}
+
+.case-file--session .case-file__location {
+  margin: 0 0 1.5rem;
+  color: var(--case-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+}
+
+.case-file--session .case-file__location strong { color: var(--case-ink); }
+
+.case-file--session .case-file__hero {
+  padding: 0 0 2.25rem;
+  border-bottom: 1px solid var(--case-divider);
+}
+
+.case-file--session .case-file__eyebrow {
+  max-width: none;
+  margin: 0 0 1.3rem;
+}
+
+.case-file--session .case-file__hero h1 {
+  max-width: 23ch;
+  margin: 0;
+  color: var(--case-ink);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+  text-decoration: none;
+}
+
+.case-file--session .case-file__summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 1.75rem 0 0;
+  color: #3c4c53;
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.case-file--session .case-file__summary > [aria-hidden="true"] {
+  position: static;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid var(--case-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--case-line);
+  font-size: 0;
+  rotate: 0deg;
+}
+
+.case-file--session .case-file__summary > [aria-hidden="true"]::after {
+  content: "LOG";
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.case-file--session .case-file__scene {
+  color: var(--case-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.case-file--session .case-file__scene-label {
+  border-color: var(--case-line);
+  background: transparent;
+  color: var(--case-line);
+}
+
+.case-file--session .case-file__content h2 {
+  margin-top: 3.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--case-divider);
+  color: var(--case-ink);
+  font-size: clamp(1.55rem, 2.7vw, 2.15rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.case-file--session .case-file__content h2::before {
+  display: block;
+  width: 2.5rem;
+  height: 0.18rem;
+  margin: -1.12rem 0 1.2rem;
+  background: var(--case-sunrise);
+  content: "";
+}
+
+.case-file--session .case-file__content h3 {
+  color: #183d50;
+  font-weight: 650;
+}
+
+.case-file--session .case-file__episode {
+  position: relative;
+  margin-block: 1.5rem 2rem;
+  padding: 1.2rem 1.25rem 1.2rem 1.5rem;
+  border: 0;
+  border-left: 0.2rem solid var(--case-cyan);
+  background: #e5ece8;
+  color: #46585f;
+  font-size: 0.9rem;
+}
+
+.case-file--session .case-file__episode-label {
+  color: #183d50;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+}
+
+.case-file--session .case-file__rail-title {
+  padding: 0.4rem 0.55rem 1rem;
+  color: #dfe7e3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.case-file--session .case-file__rail-title > span {
+  color: #718690;
+  font-size: 0.61rem;
+}
+
+.case-file--session .case-file__session-link {
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.55rem;
+  padding: 0.65rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: #91a2a9;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.case-file--session .case-file__session-link:hover {
+  border-color: #385566;
+  background: rgb(120 198 204 / 6%);
+  color: #e9efeb;
+}
+
+.case-file--session .case-file__session-number {
+  color: var(--case-cyan);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+}
+
+.case-file--session .case-file__session-link[aria-current="page"] {
+  margin-top: 0.4rem;
+  padding: 0.75rem;
+  border-color: var(--case-sunrise);
+  background: rgb(243 181 98 / 8%);
+  box-shadow: none;
+  color: #edf2ef;
+}
+
+.case-file--session .case-file__session-link[aria-current="page"] .case-file__session-number {
+  color: var(--case-sunrise);
+}
+
+.case-file--session .case-file__current-label {
+  border-radius: 0;
+  background: var(--case-sunrise);
+  color: #17130d;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.57rem;
+}
+
+.case-file--session .case-file__chapter-navigation {
+  margin-left: 1rem;
+  border-left: 1px solid #385566;
+}
+
+.case-file--session .case-file__chapter-navigation a {
+  border-radius: 0;
+  color: #80939b;
+  font-size: 0.72rem;
+}
+
+.case-file--session .case-file__chapter-navigation a[aria-current="location"] {
+  background: transparent;
+  color: var(--case-cyan);
+}
+
+.case-file--session .case-file__session-nav {
+  gap: 0.75rem;
+  border-top: 1px solid var(--case-divider);
+}
+
+.case-file--session .case-file__session-nav a {
+  min-height: 4.5rem;
+  border: 1px solid var(--case-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--case-line);
+  box-shadow: none;
+}
+
+.case-file--session .case-file__session-nav a[rel="next"] {
+  border-color: #183d50;
+  background: #183d50;
+  color: var(--case-paper);
+  box-shadow: none;
+}
+
+.case-file--session .case-file__session-nav a:hover {
+  border-color: var(--case-sunrise);
+  background: var(--case-sunrise);
+  color: var(--case-ink);
+}
+
+.case-file--session .case-file__mobile-navigation {
+  border: 1px solid var(--case-sunrise);
+  border-radius: 0;
+  background: #0d1b27;
+  color: #e9efeb;
+}
+
+.case-file--session .case-file__mobile-current > span { color: var(--case-sunrise); }
+
+.case-file--session .case-file__mobile-menu-content {
+  border: 1px solid #617580;
+  border-radius: 0;
+  background: #0d1b27;
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 35%);
+  color: #e9efeb;
+}
+
+@media (min-width: 800px) {
+  .case-file--session .case-file__body {
+    grid-template-columns: 16.5rem minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+}
+
+@media (max-width: 799px) {
+  .case-file--session .case-file__body { padding-top: 1rem; }
+  .case-file--session .case-file__sheet { padding-inline: 1.15rem; }
+  .case-file--session .case-file__summary { grid-template-columns: 1fr; }
+  .case-file--session .case-file__summary > [aria-hidden="true"] { display: none; }
+}
+
+/* Calm mission log: a familiar document layout with restrained lunar accents. */
+.case-file.case-file--session {
+  background: linear-gradient(180deg, #eeece5 0, #e5e6e1 100%);
+  background-size: auto;
+}
+
+.case-file--session .case-file__body {
+  width: min(100% - 2rem, 82rem);
+}
+
+.case-file--session .case-file__sheet {
+  border-color: #aeb9b7;
+  background: #faf9f5;
+  box-shadow: 0 1rem 2.5rem rgb(41 58 64 / 10%);
+}
+
+.case-file--session .case-file__curriculum--desktop .case-file__rail-title {
+  color: var(--case-ink);
+}
+
+.case-file--session .case-file__rail-title > span {
+  color: var(--case-muted);
+}
+
+.case-file--session .case-file__session-link {
+  color: #55686f;
+}
+
+.case-file--session .case-file__session-link:hover {
+  border-color: #aeb9b7;
+  background: rgb(255 255 255 / 58%);
+  color: var(--case-ink);
+}
+
+.case-file--session .case-file__session-number {
+  color: #2d7180;
+}
+
+.case-file--session .case-file__session-link[aria-current="page"] {
+  border-color: #bd812e;
+  background: #fff8eb;
+  color: var(--case-ink);
+}
+
+.case-file--session .case-file__chapter-navigation {
+  border-left-color: #aeb9b7;
+}
+
+.case-file--session .case-file__chapter-navigation a {
+  color: #66787e;
+}
+
+.case-file--session .case-file__chapter-navigation a[aria-current="location"] {
+  color: #1b6070;
+}
+
+@media (min-width: 800px) {
+  .case-file--session .case-file__body {
+    grid-template-columns: 15.5rem minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
   }
 }

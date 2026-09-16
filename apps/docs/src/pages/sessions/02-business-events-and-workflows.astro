@@ -14,7 +14,7 @@ export const session: SessionSummary = {
   title: "EventStormingとROPで作業中止を設計する",
   durationMinutes: 15,
   timeBreakdown: { brief: 2, teach: 7, exercise: 4, review: 2 },
-  animal: { name: "EVA-0416", type: "abort", avatar: "🛑" },
+  scene: { place: "会議室（規程の読み直し）", role: "地上管制と基地長", avatar: "📋" },
   summary: "船外作業が中止された出来事からコマンドと確認する条件を逆算し、集約、ROP、イベント出力、ResolverとStoreへ写します。",
   episode: [
     "出発後の作業許可を、地上管制の担当者が誤って中止できました。",
@@ -71,8 +71,12 @@ export const navigation = ({
         <p class="case-file__eyebrow">SESSION {session.sequence} · {session.durationMinutes}分</p>
         <h1 id="session-title">{session.title}</h1>
         <p class="case-file__summary">
-          <span aria-hidden="true">{session.animal.avatar}</span>
+          <span aria-hidden="true">{session.scene.avatar}</span>
           {session.summary}
+        </p>
+        <p class="case-file__scene">
+          <span class="case-file__scene-label">場面</span>
+          {session.scene.place} · {session.scene.role}
         </p>
       </section>
           <section id="incident">
