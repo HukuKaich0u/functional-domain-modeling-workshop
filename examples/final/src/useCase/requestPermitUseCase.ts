@@ -13,7 +13,7 @@ import type {
   Requested,
   ZoneId,
 } from "../domain/permit/index.js";
-import type { SegmentByIdResolver, SegmentId } from "../domain/segment/index.js";
+import { segmentIdForZone, type SegmentByIdResolver } from "../domain/segment/index.js";
 import type { UserId } from "../domain/user/userId.js";
 import type { UserByIdResolver } from "../domain/user/userResolver.js";
 import type { WorkerByIdResolver, WorkerId } from "../domain/worker/index.js";
@@ -76,7 +76,7 @@ const validate =
         const worker = yield* dependencies.workerResolver.resolveById(workerId);
         yield* ensureWorkerFound(workerId)(worker);
       }
-      const segmentId = input.zoneId as string as SegmentId;
+      const segmentId = segmentIdForZone(input.zoneId);
       const segment = yield* dependencies.segmentResolver.resolveById(segmentId);
       yield* ensureSegmentFound(segmentId)(segment);
       const event = yield* createEvent(() => {

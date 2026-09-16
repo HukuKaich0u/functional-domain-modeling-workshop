@@ -9,6 +9,7 @@ import type {
 } from "../domain/equipmentCheck/index.js";
 import type { EvaPermit, PermitByIdResolver, PermitId } from "../domain/permit/index.js";
 import type { Segment, SegmentByIdResolver, SegmentId } from "../domain/segment/index.js";
+import { segmentIdForZone } from "../domain/segment/index.js";
 import type { UserId } from "../domain/user/userId.js";
 import type { UserByIdResolver } from "../domain/user/userResolver.js";
 import type { WorkerId } from "../domain/worker/index.js";
@@ -54,10 +55,9 @@ type Sources = Readonly<{
   segment: Segment | undefined;
 }>;
 
-/** 教材の簡略化。作業区画 PV-07 へ給電する系統区間は PV-07 */
-export const segmentIdForZone = (permit: EvaPermit): SegmentId =>
+const segmentIdForPermit = (permit: EvaPermit): SegmentId =>
   permit.kind === "Requested" || permit.kind === "Aborted"
-    ? (permit.zoneId as string as SegmentId)
+    ? segmentIdForZone(permit.zoneId)
     : permit.segmentId;
 
 export const toEquipmentCheckView = (check: EquipmentCheck): EquipmentCheckView => ({
@@ -77,7 +77,7 @@ const loadSources =
       const resolved = yield* dependencies.permitResolver.resolveById(input.permitId);
       const permit = yield* ensurePermitFound(input.permitId)(resolved);
       const checks = yield* dependencies.equipmentCheckResolver.resolveByPermitId(permit.permitId);
-      const segment = yield* dependencies.segmentResolver.resolveById(segmentIdForZone(permit));
+      const segment = yield* dependencies.segmentResolver.resolveById(segmentIdForPermit(permit));
       return ok({ permit, checks, segment });
     });
 

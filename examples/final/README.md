@@ -48,6 +48,8 @@ pnpm --filter @moonbase/final exec node dist/index.js
 
 承認から帰還までは遮断札を維持します。承認後、出発前に札を外す必要があれば、先に理由付きで許可を中止します。帰還後は完了の手続きで外します。承認と札の取り外しが競合しても、保存時の transaction で互いの現在状態を確認し、通電したまま承認が確定することを防ぎます。
 
+教材では作業区画と給電する系統区間を同じ番号で対応させます。この簡略化は `segmentIdForZone` にまとめ、`ZoneId` と `SegmentId` の用途の違いを保ちます。
+
 ## コードの責務
 
 - `src/domain`: 判別共用体の状態、branded ID、`Sensitive`（被ばく量）、純粋な遷移、typed domain event

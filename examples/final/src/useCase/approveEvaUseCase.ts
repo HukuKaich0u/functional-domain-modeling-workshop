@@ -18,7 +18,7 @@ import type {
   PermitId,
   Requested,
 } from "../domain/permit/index.js";
-import { Segment } from "../domain/segment/index.js";
+import { Segment, segmentIdForZone } from "../domain/segment/index.js";
 import type {
   LockedOutSegment,
   Segment as SegmentState,
@@ -192,9 +192,6 @@ const ensureDaytime =
       ? ok(lunarDay)
       : err({ kind: "NightTime", permitId: permit.permitId, lunarDay });
 
-/** 教材の簡略化。作業区画 PV-07 へ給電する系統区間は PV-07 */
-const segmentIdForZone = (permit: Requested): SegmentId => permit.zoneId as string as SegmentId;
-
 const validateApproval =
   (dependencies: Dependencies) =>
   (input: UseCaseInput): ResultAsync<EvaApproved, UseCaseError> =>
@@ -220,7 +217,7 @@ const validateApproval =
       const weather = yield* dependencies.spaceWeatherResolver.resolveCurrent();
       yield* ensureNoFlareAlert(permit)(weather);
 
-      const segmentId = segmentIdForZone(permit);
+      const segmentId = segmentIdForZone(permit.zoneId);
       const resolvedSegment = yield* dependencies.segmentResolver.resolveById(segmentId);
       const segment = yield* ensureSegmentFound(segmentId)(resolvedSegment);
       const lockedOut = yield* ensureLockedOutForPermit(permit)(segment);

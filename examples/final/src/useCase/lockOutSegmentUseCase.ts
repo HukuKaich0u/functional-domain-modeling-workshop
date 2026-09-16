@@ -3,7 +3,7 @@ import { err, ok, type Result, type ResultAsync as UseResultAsync } from "nevert
 import type { Clock } from "../domain/aggregate/clock.js";
 import type { EventIdGenerator } from "../domain/aggregate/eventIdGenerator.js";
 import type { PermitByIdResolver, PermitId, Requested } from "../domain/permit/index.js";
-import { Segment } from "../domain/segment/index.js";
+import { Segment, segmentIdForZone } from "../domain/segment/index.js";
 import type {
   EnergizedSegment,
   LockedOutSegment,
@@ -80,7 +80,7 @@ const ensureEnergized = (segment: SegmentState): Result<EnergizedSegment, Segmen
 const ensureZoneMatches =
   (segment: EnergizedSegment) =>
   (permit: Requested): Result<Requested, ZoneSegmentMismatch> =>
-    (permit.zoneId as string) === (segment.segmentId as string)
+    segmentIdForZone(permit.zoneId) === segment.segmentId
       ? ok(permit)
       : err({
           kind: "ZoneSegmentMismatch",
