@@ -86,11 +86,11 @@ describe("EvaPermit の状態遷移", () => {
     expect(invalid.kind).toBe("Requested");
   });
 
-  test("完了と中止以外は進行中、出発後は札を外せない", () => {
+  test("完了と中止以外は進行中、承認から帰還までは遮断を維持する", () => {
     const aborted = EvaPermit.abort(eventContext(13))(requested, AbortReason.schema.parse("x")).aggregateState;
     const closed = EvaPermit.close(eventContext(14))(returned).aggregateState;
     expect([requested, approved, outside, returned].map(EvaPermit.isActive)).toEqual([true, true, true, true]);
     expect([aborted, closed].map(EvaPermit.isActive)).toEqual([false, false]);
-    expect([requested, approved, outside, returned].map(EvaPermit.isOutside)).toEqual([false, false, true, true]);
+    expect([requested, approved, outside, returned, aborted, closed].map(EvaPermit.requiresLockout)).toEqual([false, true, true, true, false, false]);
   });
 });

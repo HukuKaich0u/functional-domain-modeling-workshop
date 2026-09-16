@@ -21,6 +21,7 @@ import {
   createLockoutTaggedStore,
   createSegmentDeletedStore,
   createSegmentRegisteredStore,
+  segmentRowValues,
 } from "../../src/adaptor/secondary/sqlite/store/segmentEventStore.js";
 import {
   createWorkerDeletedStore,
@@ -62,6 +63,7 @@ describe("permit event store", () => {
     const store = createPermitEventStore(db);
     const requestedEvent = EvaPermit.request(eventContext(1))(requested);
     unwrap(await store.store(requestedEvent));
+    db.insert(segmentsTable).values(segmentRowValues(lockedOutSegment)).run();
     const approvedEvent = EvaPermit.approve(eventContext(2))(requested, { segmentId: ids.segment });
     const egressedEvent = EvaPermit.egress(eventContext(3))(approvedEvent.aggregateState);
     const returnedEvent = EvaPermit.returnToBase(eventContext(4))(egressedEvent.aggregateState, {
@@ -93,6 +95,7 @@ describe("permit event store", () => {
     const db = freshDatabase();
     const store = createPermitEventStore(db);
     unwrap(await store.store(EvaPermit.request(eventContext(1))(requested)));
+    db.insert(segmentsTable).values(segmentRowValues(lockedOutSegment)).run();
     const firstApproval = EvaPermit.approve(eventContext(2))(requested, { segmentId: ids.segment });
     const secondApproval = EvaPermit.approve(eventContext(3))(requested, { segmentId: ids.segment });
     unwrap(await store.store(firstApproval));
@@ -205,6 +208,7 @@ describe("lockout release store", () => {
 describe("segment stores", () => {
   test("通電中の区間にだけ札を掛け、二重の札は SegmentConflict", async () => {
     const db = freshDatabase();
+    unwrap(await createPermitEventStore(db).store(EvaPermit.request(eventContext(10))(requested)));
     unwrap(await createSegmentRegisteredStore(db).store(Segment.register(eventContext(1))(energizedSegment)));
     const tagged = Segment.tagLockout(eventContext(2, { actorUserId: ids.electrician }))(energizedSegment, ids.permit);
     unwrap(await createLockoutTaggedStore(db).store(tagged));

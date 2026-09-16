@@ -38,9 +38,9 @@ export type LockoutTaggedByAnotherUser = Readonly<{
   segmentId: SegmentId;
   taggedBy: UserId;
 }>;
-/** 出発後は完了の手続きで外す。単独で外せるのは出発前か中止された許可の札だけ */
-export type PermitStillOutside = Readonly<{
-  kind: "PermitStillOutside";
+/** 承認後は遮断を維持する。出発前なら中止、帰還後なら完了の手続きで外す */
+export type PermitRequiresLockout = Readonly<{
+  kind: "PermitRequiresLockout";
   segmentId: SegmentId;
   permitId: PermitId;
 }>;
@@ -50,7 +50,7 @@ export type UseCaseError =
   | SegmentNotLockedOut
   | LockoutTaggedByAnotherUser
   | PermitNotFound
-  | PermitStillOutside
+  | PermitRequiresLockout
   | SegmentConflict
   | IdentityGenerationFailed;
 export type UseCaseOutput = UseResultAsync<UseCaseOk, UseCaseError>;
@@ -80,11 +80,11 @@ export const ensureTaggedBy =
           segmentId: segment.segmentId,
           taggedBy: segment.lockout.taggedBy,
         });
-const ensureNotOutside =
+const ensureCanReleaseLockout =
   (segment: LockedOutSegment) =>
-  (permit: PermitState): Result<PermitState, PermitStillOutside> =>
-    EvaPermit.isOutside(permit)
-      ? err({ kind: "PermitStillOutside", segmentId: segment.segmentId, permitId: permit.permitId })
+  (permit: PermitState): Result<PermitState, PermitRequiresLockout> =>
+    EvaPermit.requiresLockout(permit)
+      ? err({ kind: "PermitRequiresLockout", segmentId: segment.segmentId, permitId: permit.permitId })
       : ok(permit);
 
 const run =
@@ -105,7 +105,7 @@ const run =
         dependencies.permitResolver
           .resolveById(segment.lockout.permitId)
           .andThen(ensurePermitFound(segment.lockout.permitId))
-          .andThen(ensureNotOutside(segment))
+          .andThen(ensureCanReleaseLockout(segment))
           .map(() => segment),
       )
       .andThen((segment) =>

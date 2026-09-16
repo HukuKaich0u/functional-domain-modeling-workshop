@@ -37,6 +37,7 @@ import {
   lockedOutSegment,
   outside,
   requested,
+  returned,
   worker,
 } from "../support/fixtures.js";
 
@@ -111,7 +112,7 @@ describe("ReleaseLockoutUseCase", () => {
   });
   const input = { actorUserId: ids.electrician, segmentId: ids.segment } as const;
 
-  test("掛けた者が出発前の許可の札を外す", async () => {
+  test("掛けた者が申請済の許可の札を外す", async () => {
     const stored: LockoutRemoved[] = [];
     const result = await ReleaseLockoutUseCase.create(dependencies({}, stored)).run(input);
     expect(result._unsafeUnwrap().segment.lockout).toEqual({ kind: "Energized" });
@@ -120,8 +121,15 @@ describe("ReleaseLockoutUseCase", () => {
 
   test("別の電気主任、出発後の許可、札のない区間では外せない", async () => {
     expect((await ReleaseLockoutUseCase.create(dependencies({ userResolver: userResolverFor(electricianB) })).run({ ...input, actorUserId: ids.electricianB }))._unsafeUnwrapErr()).toEqual({ kind: "LockoutTaggedByAnotherUser", segmentId: ids.segment, taggedBy: ids.electrician });
-    expect((await ReleaseLockoutUseCase.create(dependencies({ permitResolver: permitResolverFor(outside) })).run(input))._unsafeUnwrapErr()).toEqual({ kind: "PermitStillOutside", segmentId: ids.segment, permitId: ids.permit });
+    expect((await ReleaseLockoutUseCase.create(dependencies({ permitResolver: permitResolverFor(outside) })).run(input))._unsafeUnwrapErr()).toEqual({ kind: "PermitRequiresLockout", segmentId: ids.segment, permitId: ids.permit });
     expect((await ReleaseLockoutUseCase.create(dependencies({ segmentResolver: segmentResolverFor(energizedSegment) })).run(input))._unsafeUnwrapErr()).toEqual({ kind: "SegmentNotLockedOut", segmentId: ids.segment });
+  });
+
+  test.each([approved, outside, returned])("$kind の札を単独で外すイベントは作らない", async (permit) => {
+    const stored: LockoutRemoved[] = [];
+    const result = await ReleaseLockoutUseCase.create(dependencies({ permitResolver: permitResolverFor(permit) }, stored)).run(input);
+    expect(result._unsafeUnwrapErr()).toEqual({ kind: "PermitRequiresLockout", segmentId: ids.segment, permitId: ids.permit });
+    expect(stored).toEqual([]);
   });
 });
 

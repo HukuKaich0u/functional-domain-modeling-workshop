@@ -36,7 +36,7 @@ const SegmentErrorSchema = z.enum([
   "invalid-permit-state",
   "zone-segment-mismatch",
   "lockout-tagged-by-another-user",
-  "permit-still-outside",
+  "permit-requires-lockout",
   "segment-conflict",
 ]);
 
@@ -109,8 +109,8 @@ const segmentErrors = (raw: string | undefined): FieldErrors => {
       return { permitId: "作業許可の作業区画と、この系統区間が一致しません。（事故報告 第3号）" };
     case "lockout-tagged-by-another-user":
       return { form: "遮断札は掛けた電気主任だけが外せます。（規程第3条）" };
-    case "permit-still-outside":
-      return { form: "隊員が出発した後の札は、帰還後に完了の手続きで外します。" };
+    case "permit-requires-lockout":
+      return { form: "承認済の札を外すには、先に作業許可を理由付きで中止してください。出発後の札は、帰還後に完了の手続きで外します。" };
     case "segment-conflict":
       return { form: "系統区間がほかの操作によって更新されました。最新の状態を確認してください。" };
     default:
@@ -355,8 +355,8 @@ export const registerSegmentRoutes = (
               return redirectWithError(context, segmentId.value, "lockout-tagged-by-another-user");
             case "PermitNotFound":
               return redirectWithError(context, segmentId.value, "permit-not-found");
-            case "PermitStillOutside":
-              return redirectWithError(context, segmentId.value, "permit-still-outside");
+            case "PermitRequiresLockout":
+              return redirectWithError(context, segmentId.value, "permit-requires-lockout");
             case "SegmentConflict":
               return redirectWithError(context, segmentId.value, "segment-conflict");
             case "IdentityGenerationFailed":

@@ -11,7 +11,7 @@ import { PermitId } from "../../../../domain/permit/index.js";
 import { assertNever } from "../../../../domain/shared/assertNever.js";
 import type { SqliteDatabase } from "../db.js";
 import { toEventRecord } from "../eventRecord.js";
-import { domainEventsTable, permitsTable } from "../schema.js";
+import { domainEventsTable, permitsTable, segmentsTable } from "../schema.js";
 
 /** 完了は遮断札の取り外しと同じ transaction で保存するため、この store では扱わない */
 export type PermitProjectionEvent = Exclude<PermitEvent, { kind: "PermitClosed" }>;
@@ -121,6 +121,18 @@ export const createPermitEventStore = (db: SqliteDatabase) => ({
       Promise.resolve().then(() =>
         db.transaction((tx) => {
           events.forEach((event) => {
+            // Resolver で確認した後に札が外されても、承認を確定させない。
+            if (event.kind === "EvaApproved") {
+              const lockout = tx.select({ segmentId: segmentsTable.segmentId }).from(segmentsTable)
+                .where(and(
+                  eq(segmentsTable.segmentId, event.aggregateState.segmentId),
+                  eq(segmentsTable.lockoutStatus, "LockedOut"),
+                  eq(segmentsTable.lockedOutPermitId, event.aggregateId),
+                )).get();
+              if (lockout === undefined) {
+                throw { kind: "PermitConflict", permitId: event.aggregateId } as const;
+              }
+            }
             const state = event.aggregateState;
             const values = permitRowValues(state);
             const changes = (() => {

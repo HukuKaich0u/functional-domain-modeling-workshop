@@ -110,7 +110,7 @@ describe("船外作業許可の業務フロー", () => {
     const abortAfterEgress = await post(harness, `${permitPath}/abort`, { reason: "遅すぎる中止" }, groundControlCookie);
     expect(abortAfterEgress.headers.get("location")).toBe(`${permitPath}?error=invalid-state`);
     const releaseWhileOutside = await post(harness, "/segments/PV-07/release", {}, electricianCookie);
-    expect(releaseWhileOutside.headers.get("location")).toBe("/segments/PV-07?error=permit-still-outside");
+    expect(releaseWhileOutside.headers.get("location")).toBe("/segments/PV-07?error=permit-requires-lockout");
 
     const emergencyWithoutReason = await post(harness, `${permitPath}/return`, { returnKind: "Emergency", reason: "" }, baseCommanderCookie);
     await expect(emergencyWithoutReason.json()).resolves.toMatchObject({

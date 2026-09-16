@@ -182,7 +182,7 @@ export default function SegmentForm({ actions, auth, errors, mode, segment }: Se
               ) : null}
               {actions.release ? (
                 <form aria-label="遮断札を外す" className="form-stack" onSubmit={submitRelease}>
-                  <p>出発前の許可の札だけをここで外せます。帰還後は作業許可の完了で外します。</p>
+                  <p>承認済の札を外すには、先に作業許可を理由付きで中止してください。帰還後は作業許可の完了で外します。</p>
                   <FieldError field="form" message={undefined} />
                   <div className="form-actions">
                     <button

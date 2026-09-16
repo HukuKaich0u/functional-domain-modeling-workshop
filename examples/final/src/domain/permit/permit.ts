@@ -262,6 +262,7 @@ export const EvaPermit = {
     permit.kind === "Approved" ||
     permit.kind === "Outside" ||
     permit.kind === "Returned",
-  /** 出発後（作業中・帰還済）は遮断札を外せない */
-  isOutside: (permit: EvaPermit) => permit.kind === "Outside" || permit.kind === "Returned",
+  /** 承認から完了まで遮断を維持する。出発前に外すなら、先に許可を中止する */
+  requiresLockout: (permit: EvaPermit) =>
+    permit.kind === "Approved" || permit.kind === "Outside" || permit.kind === "Returned",
 } as const;

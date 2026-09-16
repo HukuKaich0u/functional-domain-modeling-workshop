@@ -2,6 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { err, ok, ResultAsync } from "neverthrow";
 import { z } from "zod";
 
+import { EvaPermit } from "../../../../domain/permit/index.js";
 import type {
   LockoutRemoved,
   LockoutRemovedStore,
@@ -19,6 +20,7 @@ import type {
 import { SegmentId } from "../../../../domain/segment/index.js";
 import type { SqliteDatabase } from "../db.js";
 import { toEventRecord } from "../eventRecord.js";
+import { parsePermitRow } from "../resolver/permitResolver.js";
 import { domainEventsTable, permitsTable, segmentsTable } from "../schema.js";
 
 const activeStatuses = ["Requested", "Approved", "Outside", "Returned"] as const;
@@ -126,12 +128,17 @@ export const createLockoutTaggedStore = (db: SqliteDatabase): LockoutTaggedStore
     ),
 });
 
-/** 同じ許可の札が掛かっている区間だけを通電中へ戻す */
+/** 許可が遮断を必要としないことを同じ transaction で確認し、同じ許可の札だけを外す */
 export const createLockoutRemovedStore = (db: SqliteDatabase): LockoutRemovedStore => ({
   store: (event) =>
     ResultAsync.fromPromise<void, SegmentConflict>(
       Promise.resolve().then(() =>
         db.transaction((tx) => {
+          const permitRow = tx.select().from(permitsTable)
+            .where(eq(permitsTable.permitId, event.eventPayload.permitId)).get();
+          if (permitRow === undefined || EvaPermit.requiresLockout(parsePermitRow(permitRow))) {
+            throw { kind: "SegmentConflict", segmentId: event.aggregateId } as const;
+          }
           const changes = tx
             .update(segmentsTable)
             .set(segmentRowValues(event.aggregateState))
