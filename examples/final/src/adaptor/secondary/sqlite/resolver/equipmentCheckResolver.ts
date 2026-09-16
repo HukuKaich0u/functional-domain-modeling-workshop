@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { ResultAsync } from "neverthrow";
 import { z } from "zod";
 
@@ -50,13 +50,23 @@ export const createEquipmentCheckByPermitIdResolver = (
 ): EquipmentCheckByPermitIdResolver => ({
   resolveByPermitId: (permitId) =>
     ResultAsync.fromSafePromise(
-      Promise.resolve().then(() =>
-        db
+      Promise.resolve().then(() => {
+        const checks = db
           .select()
           .from(equipmentChecksTable)
           .where(eq(equipmentChecksTable.permitId, permitId))
+          // 点検は追記のみ。同じ点検時刻の記録は保存順で選ぶ。
+          .orderBy(sql`${equipmentChecksTable}.rowid`)
           .all()
-          .map(parseEquipmentCheckRow),
-      ),
+          .map(parseEquipmentCheckRow);
+        const latestByWorker = new Map<WorkerId, EquipmentCheck>();
+        for (const check of checks) {
+          const previous = latestByWorker.get(check.workerId);
+          if (previous === undefined || Date.parse(check.checkedAt) >= Date.parse(previous.checkedAt)) {
+            latestByWorker.set(check.workerId, check);
+          }
+        }
+        return [...latestByWorker.values()];
+      }),
     ),
 });

@@ -180,25 +180,20 @@ describe("船外作業許可の業務フロー", () => {
     const oxygen = await post(harness, `${permitPath}/approve`, {}, baseCommanderCookie);
     expect(oxygen.headers.get("location")).toBe(`${permitPath}?error=insufficient-oxygen`);
 
-    // 装備点検は申請済の間なら記録し直せる。最新の値ではなく、隊員ごとの最初の記録を使う教材の簡略化は避け、
-    // ここでは酸素の足りる別の許可で続きを確認する
-    await requestPermit(harness, groundControlCookie, "EVA-0413");
-    const releaseForNext = await post(harness, "/segments/PV-07/release", {}, electricianCookie);
-    expect(releaseForNext.status).toBe(303);
-    expect((await post(harness, "/segments/PV-07/lockout", { permitId: "EVA-0413" }, electricianCookie)).status).toBe(303);
-    await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0413", 200);
+    // 同じ許可で装備を再点検し、最新の酸素残時間で残りの承認条件を確認する
+    await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0412", 200);
 
-    const exposure = await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie);
-    expect(exposure.headers.get("location")).toBe("/permits/EVA-0413?error=exposure-limit-exceeded");
-    await expect((await page(harness, "/permits/EVA-0413?error=exposure-limit-exceeded", baseCommanderCookie)).json()).resolves.toMatchObject({
+    const exposure = await post(harness, `${permitPath}/approve`, {}, baseCommanderCookie);
+    expect(exposure.headers.get("location")).toBe(`${permitPath}?error=exposure-limit-exceeded`);
+    await expect((await page(harness, `${permitPath}?error=exposure-limit-exceeded`, baseCommanderCookie)).json()).resolves.toMatchObject({
       props: { errors: { form: expect.stringContaining("規程第8条") } },
     });
 
     expect(
       (await post(harness, "/workers/W-02", { qualification: "General", radiationExposureMicroSv: "8000" }, groundControlCookie)).status,
     ).toBe(303);
-    const flare = await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie);
-    expect(flare.headers.get("location")).toBe("/permits/EVA-0413?error=flare-alert-active");
+    const flare = await post(harness, `${permitPath}/approve`, {}, baseCommanderCookie);
+    expect(flare.headers.get("location")).toBe(`${permitPath}?error=flare-alert-active`);
     await expect((await page(harness, "/", baseCommanderCookie)).json()).resolves.toMatchObject({
       props: { flareAlert: { kind: "Active", level: "S2" } },
     });
@@ -221,7 +216,25 @@ describe("船外作業許可の業務フロー", () => {
       component: "SpaceWeather/Index",
       props: { errors: { issuedAt: expect.any(String), alertLevel: expect.any(String) } },
     });
-    expect((await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie)).headers.get("location")).toBe("/permits/EVA-0413");
+    expect((await post(harness, `${permitPath}/approve`, {}, baseCommanderCookie)).headers.get("location")).toBe(permitPath);
+  });
+
+  test.each([
+    { initialOxygen: 200, recheckedOxygen: 100, expectedState: "Requested", expectedLocation: `${permitPath}?error=insufficient-oxygen` },
+    { initialOxygen: 100, recheckedOxygen: 200, expectedState: "Approved", expectedLocation: permitPath },
+  ])("酸素残時間を $initialOxygen 分から $recheckedOxygen 分へ再点検したら最新の記録で承認を判断する", async ({ initialOxygen, recheckedOxygen, expectedState, expectedLocation }) => {
+    const { harness, groundControlCookie, baseCommanderCookie, electricianCookie } = await createStaffedHarness();
+    await registerOperations(harness, groundControlCookie);
+    await requestPermit(harness, groundControlCookie);
+    await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0412", initialOxygen);
+    expect((await post(harness, "/segments/PV-07/lockout", { permitId: "EVA-0412" }, electricianCookie)).status).toBe(303);
+
+    harness.setTime("2026-09-15T01:40:00.000Z");
+    await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0412", recheckedOxygen);
+    const response = await post(harness, `${permitPath}/approve`, {}, baseCommanderCookie);
+
+    expect(response.headers.get("location")).toBe(expectedLocation);
+    expect(harness.database.select().from(permitsTable).get()?.status).toBe(expectedState);
   });
 
   test("中止は出発前に理由付きでだけ行え、札は掛けた者が外して次の許可に備える", async () => {
