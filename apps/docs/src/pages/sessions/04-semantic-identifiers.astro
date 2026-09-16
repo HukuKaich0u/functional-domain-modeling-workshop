@@ -13,6 +13,7 @@ import type {
   ExerciseSessionSummary,
   SessionSummary,
 } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -52,7 +53,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-05",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  scene: { place: "遮断盤の前", role: "電気主任", avatar: "⚡" },
+  scene: { place: "遮断盤の前", role: "電気主任", avatar: "⚡", photo: "electrician" },
   summary: "開始承認で使う作業区画の識別子と系統区間の識別子を、取り違えられない型にします。",
   episode: [
     "開始承認の入力で、作業区画の識別子と遮断した系統区間の識別子が入れ替わっていました。",
@@ -393,6 +394,10 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>今回つくるもの</h2>

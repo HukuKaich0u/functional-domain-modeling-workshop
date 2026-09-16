@@ -1,16 +1,18 @@
 ---
 /**
  * MoonBase の線画アイコン。色は currentColor を継ぎ、装飾用なので aria-hidden にする。
+ * 線幅は隣の文字の太さに合わせる（400 なら 1.5、600 なら 2）。
  */
 import { moonbaseIconPaths, type MoonbaseIconName } from "./moonbaseIcons";
 
 interface Props {
   name: MoonbaseIconName;
   size?: number;
+  strokeWidth?: 1.5 | 2;
   class?: string;
 }
 
-const { name, size = 20, class: className } = Astro.props;
+const { name, size = 20, strokeWidth = 1.5, class: className } = Astro.props;
 ---
 
 <svg
@@ -20,7 +22,7 @@ const { name, size = 20, class: className } = Astro.props;
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
-  stroke-width="1.5"
+  stroke-width={strokeWidth}
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"

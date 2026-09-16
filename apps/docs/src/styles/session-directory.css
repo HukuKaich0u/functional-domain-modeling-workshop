@@ -467,3 +467,18 @@
 .session-directory__open {
   color: #1d6573;
 }
+
+/* 一覧カードの場面写真。絵文字の丸の代わりに、小さなプリントを置く */
+.session-directory__photo {
+  display: block;
+  flex: none;
+  width: 2.75rem;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--case-regolith);
+  outline: 1px solid rgb(255 255 255 / 10%);
+  outline-offset: -1px;
+  filter: sepia(0.12) saturate(0.9);
+}

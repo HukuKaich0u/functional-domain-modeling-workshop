@@ -13,6 +13,7 @@ import type {
   ExerciseSessionSummary,
   SessionSummary,
 } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -53,7 +54,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-07",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  scene: { place: "地上管制の旧端末", role: "地上管制とシステム担当", avatar: "🖥️" },
+  scene: { place: "地上管制の旧端末", role: "地上管制とシステム担当", avatar: "🖥️", photo: "robot-operator" },
   summary: "開始承認で地上管制や基地長が失敗理由に応じて操作を選ぶ失敗を、呼び出し側が扱える値として返します。",
   episode: [
     "古い許可番号が残っていた地上管制の端末から開始承認を送ると、システムは許可なしを「状態不正」と表示しました。",
@@ -527,6 +528,10 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>今回つくるもの</h2>

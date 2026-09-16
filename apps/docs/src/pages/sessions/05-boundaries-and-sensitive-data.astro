@@ -13,6 +13,7 @@ import type {
   ExerciseSessionSummary,
   SessionSummary,
 } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -52,7 +53,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-06",
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
-  scene: { place: "医務室と地上管制の受信端末", role: "医務と地上管制", avatar: "📡" },
+  scene: { place: "医務室と地上管制の受信端末", role: "医務と地上管制", avatar: "📡", photo: "medic" },
   summary: "地上管制の端末から届く許可番号と系統区間を検査し、型付きの開始承認の入力へ変換します。被ばく量は記録に出しません。",
   episode: [
     "月面日第1日 01:00、地上管制の旧端末から EVA-0412 の開始承認が届きました。",
@@ -380,6 +381,10 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>今回つくるもの</h2>

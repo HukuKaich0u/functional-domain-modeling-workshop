@@ -1,3 +1,5 @@
+import type { CrewId } from "./crew";
+
 export type SessionKind =
   | "orientation"
   | "comparison"
@@ -72,8 +74,8 @@ type SessionSummaryBase = Readonly<{
   adv?: AdvBreakdown;
   delegationPrompt?: DelegationPrompt;
   peerReview?: PeerReview;
-  /** その回の場面。日の出基地のどこで、どの役割の人が関わる出来事かを示す */
-  scene: Readonly<{ place: string; role: string; avatar: string }>;
+  /** その回の場面。日の出基地のどこで、どの役割の人が関わる出来事かを示す。photo は乗員名簿の写真 */
+  scene: Readonly<{ place: string; role: string; avatar: string; photo: CrewId }>;
   summary: string;
   episode: readonly [string, string, string];
   incident: string;

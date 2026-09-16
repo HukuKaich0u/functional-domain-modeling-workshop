@@ -13,6 +13,7 @@ import type {
   ExerciseSessionSummary,
   SessionSummary,
 } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -37,7 +38,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-08",
   solutionPresentation: "completed-file",
   peerReviewPromises: "reference",
-  scene: { place: "作業記録の保管庫", role: "基地長と開発者", avatar: "🕰️" },
+  scene: { place: "作業記録の保管庫", role: "基地長と開発者", avatar: "🕰️", photo: "eva-worker-b" },
   summary: "時刻や記録 ID など実行のたびに変わる値と保存を port に切り出し、状態と作業記録を一度に保存します。",
   episode: [
     "PV-07 の開始承認で、作業許可の状態だけが先に承認済になり、承認の作業記録はどこにも残りませんでした。",
@@ -295,6 +296,10 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>今回つくるもの</h2>

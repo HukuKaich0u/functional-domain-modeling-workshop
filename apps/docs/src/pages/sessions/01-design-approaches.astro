@@ -8,6 +8,7 @@ import { projectFilesForSnapshot } from "../../code-explorer/project-files";
 import type { SessionWorkspace } from "../../code-explorer/types";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import type { SessionNavigation, SessionSummary } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -19,7 +20,7 @@ export const session: SessionSummary = {
   title: "開始承認の7条件を10通りに書いて比べる",
   durationMinutes: 20,
   timeBreakdown: { brief: 2, teach: 10, exercise: 5, review: 3 },
-  scene: { place: "設計室のホワイトボード", role: "開発者", avatar: "📐" },
+  scene: { place: "設計室のホワイトボード", role: "開発者", avatar: "📐", photo: "base-commander" },
   summary:
     "船外作業規程の開始承認の7条件を、手続き型から Logic Programming まで10通りに書き、同じ入力で位置づけ、用途、長所、制約を比べます。",
   episode: [
@@ -256,6 +257,10 @@ export const navigation = ({
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
   <section id="conditions">
     <h2>同じ7条件を、同じ入力で</h2>

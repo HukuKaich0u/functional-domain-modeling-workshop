@@ -4,6 +4,7 @@ import RailwayOrientedProgramming from "../../components/RailwayOrientedProgramm
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import type { SessionSummary } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/sessions.css";
 
 export const session: SessionSummary = {
@@ -14,7 +15,7 @@ export const session: SessionSummary = {
   title: "EventStormingとROPで作業中止を設計する",
   durationMinutes: 15,
   timeBreakdown: { brief: 2, teach: 7, exercise: 4, review: 2 },
-  scene: { place: "会議室（規程の読み直し）", role: "地上管制と基地長", avatar: "📋" },
+  scene: { place: "会議室（規程の読み直し）", role: "地上管制と基地長", avatar: "📋", photo: "ground-control" },
   summary: "船外作業が中止された出来事からコマンドと確認する条件を逆算し、集約、ROP、イベント出力、ResolverとStoreへ写します。",
   episode: [
     "出発後の作業許可を、地上管制の担当者が誤って中止できました。",
@@ -78,6 +79,10 @@ export const navigation = ({
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>起きた出来事から業務を始める</h2>

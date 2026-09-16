@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { crewPhotoPath } from "../../sessions/crew";
 import type { SessionSummary } from "../../sessions/types";
 import "../../styles/sessions.css";
 import "../../styles/session-directory.css";
@@ -58,7 +59,7 @@ const sessions = Object.values(
                 <span>{session.durationMinutes}分</span>
               </span>
               <span class="session-directory__scene">
-                <span aria-hidden="true">{session.scene.avatar}</span>
+                <img class="session-directory__photo" src={crewPhotoPath(session.scene.photo)} alt="" width="1124" height="1408" loading="lazy" decoding="async" />
                 <span>{session.scene.place}</span>
               </span>
               <h2>{session.title}</h2>

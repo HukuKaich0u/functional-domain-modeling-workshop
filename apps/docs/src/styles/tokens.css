@@ -1,57 +1,82 @@
 /*
  * MoonBase 日の出基地の共通トークン。
- * 宇宙の深い青を地に、月の灰色と日の出の薄い黄色を差し色にする。
+ * 参照写真（退色したフィルム調の乗員写真）から採った配色。
+ * 夜空の深い青を地に、月の砂の灰色、宇宙服のクリーム、作業服のネイビー、
+ * 機材ケースの橙、計器灯の琥珀を差し色にする。純黒・純白は使わない。
  * 線は 1px の半透明を基本にして、人の目にきつい高コントラストを避ける。
  */
 :root {
-  /* 空間 — 深い青のグラデーション。数字が大きいほど深い */
-  --mb-space-950: #04071a;
-  --mb-space-900: #080d22;
-  --mb-space-800: #0d1530;
-  --mb-space-700: #131d3f;
-  --mb-space-600: #1b2952;
+  /* 空間 — 夜空。数字が大きいほど深い。青みは残すが彩度は低め */
+  --mb-space-950: #06080f;
+  --mb-space-900: #0b0f1a;
+  --mb-space-800: #121826;
+  --mb-space-700: #1a2233;
+  --mb-space-600: #232d43;
 
   /* 線 — 常に半透明。太さより濁りで強弱をつける */
-  --mb-line-faint: rgb(176 188 226 / 8%);
-  --mb-line-soft: rgb(176 188 226 / 14%);
-  --mb-line: rgb(176 188 226 / 24%);
-  --mb-line-strong: rgb(176 188 226 / 42%);
+  --mb-line-faint: rgb(214 208 190 / 7%);
+  --mb-line-soft: rgb(214 208 190 / 12%);
+  --mb-line: rgb(214 208 190 / 20%);
+  --mb-line-strong: rgb(214 208 190 / 36%);
 
-  /* 文字 — 純白は使わない */
-  --mb-ink: #e7eaf4;
-  --mb-ink-soft: #bcc3da;
-  --mb-muted: #8892b4;
-  --mb-faint: #5d678c;
+  /* 文字 — 宇宙服のクリームから月の砂の灰色へ */
+  --mb-ink: #ebe5d6;
+  --mb-ink-soft: #c9c2b3;
+  --mb-muted: #928e85;
+  --mb-faint: #625f5d;
 
-  /* 月 — レゴリスの灰色 */
-  --mb-moon: #d6d8df;
-  --mb-moon-shadow: #8f949f;
-  --mb-moon-deep: #4b5060;
+  /* 月 — レゴリス */
+  --mb-moon: #c9c7c0;
+  --mb-moon-shadow: #8a8985;
 
-  /* 日の出 — 薄い黄色。強調と主導線にだけ使う */
-  --mb-sun: #f0dc9c;
-  --mb-sun-strong: #ffd978;
-  --mb-sun-glow: rgb(240 220 156 / 18%);
+  /* 琥珀 — 管制室の計器灯。主導線と強調 */
+  --mb-amber: #e3a54a;
+  --mb-amber-strong: #f0b65b;
+  --mb-amber-soft: rgb(227 165 74 / 16%);
 
-  /* 遮断札の赤と承認の緑。警報・未確認・承認済みの状態表示に限る */
-  --mb-tag: #ff7a66;
-  --mb-tag-soft: rgb(255 122 102 / 14%);
-  --mb-ok: #8fd6b4;
-  --mb-ok-soft: rgb(143 214 180 / 12%);
+  /* 日の出の薄い黄色 — 小さなラベルと星 */
+  --mb-sun: #efd9a0;
 
-  /* 書体 — Web フォントは読み込まず、端末のゴシックと等幅を使う */
+  /* 橙 — 機材ケースと遮断札。警報・未確認にだけ使う */
+  --mb-hazard: #d3653c;
+  --mb-hazard-soft: rgb(211 101 60 / 16%);
+
+  /* 緑 — ブラウン管の表示。確認済みにだけ使う */
+  --mb-ok: #9cc7a6;
+  --mb-ok-soft: rgb(156 199 166 / 12%);
+
+  /* ネイビー — 作業服。フォームや帯の面色 */
+  --mb-navy: #2f4272;
+  --mb-navy-soft: rgb(47 66 114 / 35%);
+
+  /* 紙 — クリップボードの用紙。作業許可書などの文書面 */
+  --mb-paper: #efe7d3;
+  --mb-paper-shade: #e2d9c2;
+  --mb-paper-ink: #24252b;
+  --mb-paper-muted: #6b6a66;
+  --mb-paper-line: rgb(36 37 43 / 16%);
+  --mb-stamp: #b8382c;
+
+  /* 書体 — 1960年代の企業資料。欧文は幾何グロテスク、番号は等幅 */
   --mb-font-sans:
-    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", Meiryo,
-    system-ui, -apple-system, sans-serif;
-  --mb-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium",
+    "Yu Gothic", Meiryo, system-ui, -apple-system, sans-serif;
+  --mb-font-display: "Space Grotesk", var(--mb-font-sans);
+  --mb-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* 動き — 押した手応えと出入りだけ。飾りの動きは足さない */
-  --mb-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --mb-duration-press: 140ms;
-  --mb-duration-hover: 180ms;
+  /* 動き — 押した手応え、出入り、スクロールに追従する星だけ */
+  --mb-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --mb-duration-press: 150ms;
+  --mb-duration-hover: 150ms;
+  --mb-duration-enter: 600ms;
+
+  /* 影 — 暗い面では白の輪 1 本で縁を作る（better-ui: shadow as border） */
+  --mb-shadow-border: 0 0 0 1px rgb(255 255 255 / 8%);
+  --mb-shadow-border-hover: 0 0 0 1px rgb(255 255 255 / 13%);
+  --mb-image-outline: 1px solid rgb(255 255 255 / 10%);
 
   /* 寸法 */
-  --mb-content-width: 72rem;
+  --mb-content-width: 76rem;
   --mb-radius-sm: 0.25rem;
   --mb-radius: 0.5rem;
   --mb-radius-lg: 0.75rem;

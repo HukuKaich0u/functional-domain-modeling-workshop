@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import type { CodeGuide } from "../../code-explorer/code-guide";
 import SessionPageNavigation from "../../components/SessionPageNavigation.astro";
 import type { SessionNavigation, SessionSummary } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/sessions.css";
 
 export const finalAggregateTour = {
@@ -56,7 +57,7 @@ export const session: SessionSummary = {
   title: "参照実装で境界をたどる",
   durationMinutes: 5,
   timeBreakdown: { brief: 0, teach: 4, exercise: 0, review: 1 },
-  scene: { place: "作業状況ボードの前", role: "開発者", avatar: "🌙" },
+  scene: { place: "作業状況ボードの前", role: "開発者", avatar: "🌙", photo: "rover-mb-01" },
   summary: "ここまでの学習内容を、より大きな参照実装へ接続します。",
   episode: [
     "ここまで直した頃、隊員たちはとっくにエアロックの内側に戻り、開発者だけが参照実装の前に残っていました。",
@@ -103,6 +104,10 @@ export const navigation = ({
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
   <section id="incident">
     <h2>何が起きたか</h2>

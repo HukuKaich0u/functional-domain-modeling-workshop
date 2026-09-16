@@ -13,6 +13,7 @@ import type {
   ExerciseSessionSummary,
   SessionSummary,
 } from "../../sessions/types";
+import { crewById, crewPhotoPath } from "../../sessions/crew";
 import "../../styles/code-playground.css";
 import "../../styles/sessions.css";
 
@@ -52,7 +53,7 @@ export const session: SessionSummary = {
   solutionSnapshot: "session-04",
   solutionPresentation: "excerpt",
   peerReviewPromises: "inline",
-  scene: { place: "エアロックの前", role: "基地長と電気主任", avatar: "🚪" },
+  scene: { place: "エアロックの前", role: "基地長と電気主任", avatar: "🚪", photo: "eva-worker-a" },
   summary: "作業許可の6状態を Discriminated Union で表し、許可されていない状態遷移を型で拒否します。",
   episode: [
     "月面日第13日、装備点検の記録がないまま、PV-06 補修の作業許可が承認済になりました。",
@@ -494,6 +495,10 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
           <span class="case-file__scene-label">場面</span>
           {session.scene.place} · {session.scene.role}
         </p>
+        <figure class="case-file__photo">
+          <img src={crewPhotoPath(session.scene.photo)} alt={crewById(session.scene.photo).alt} width="1124" height="1408" loading="eager" decoding="async" />
+          <figcaption>No. {crewById(session.scene.photo).no} · {crewById(session.scene.photo).role}</figcaption>
+        </figure>
       </section>
           <section id="incident">
             <h2>今回つくるもの</h2>
