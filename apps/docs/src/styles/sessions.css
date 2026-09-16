@@ -215,7 +215,7 @@
 }
 
 .case-file__content {
-  width: min(100%, 70ch);
+  width: 100%;
   min-width: 0;
   line-height: 1.85;
 }
@@ -918,24 +918,6 @@
   .onboarding-story__line,
   .onboarding-story__bubble {
     max-width: 100%;
-  }
-}
-
-@media (min-width: 768px) {
-  .case-file__content {
-    width: 100%;
-  }
-
-  .case-file__content > section {
-    width: min(100%, 70ch);
-  }
-
-  .case-file__content > #refactor {
-    width: 100%;
-  }
-
-  .case-file__content > #refactor > :not(.session-code-playground) {
-    max-width: 70ch;
   }
 }
 

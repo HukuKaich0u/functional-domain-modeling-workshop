@@ -136,6 +136,8 @@
 
 .case-file--session .case-file__content {
   width: 100%;
+  font-size: 0.9375rem;
+  line-height: 1.8;
 }
 
 .case-file--session .case-file__content > section {
@@ -507,8 +509,8 @@
   align-items: start;
   margin: 1.75rem 0 0;
   color: #3c4c53;
-  font-size: 1rem;
-  line-height: 1.9;
+  font-size: 0.95rem;
+  line-height: 1.85;
 }
 
 .case-file--session .case-file__summary > [aria-hidden="true"] {
@@ -551,7 +553,7 @@
   padding-top: 1rem;
   border-top: 1px solid var(--case-divider);
   color: var(--case-ink);
-  font-size: clamp(1.55rem, 2.7vw, 2.15rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
   font-weight: 650;
   letter-spacing: -0.02em;
 }
@@ -567,6 +569,7 @@
 
 .case-file--session .case-file__content h3 {
   color: #183d50;
+  font-size: 1.1rem;
   font-weight: 650;
 }
 
@@ -578,7 +581,7 @@
   border-left: 0.2rem solid var(--case-cyan);
   background: #e5ece8;
   color: #46585f;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .case-file--session .case-file__episode-label {
@@ -728,7 +731,7 @@
 }
 
 .case-file--session .case-file__body {
-  width: min(100% - 2rem, 82rem);
+  width: min(100% - 2rem, 74rem);
 }
 
 .case-file--session .case-file__sheet {
