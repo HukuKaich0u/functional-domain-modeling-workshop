@@ -4,7 +4,7 @@ import { FlareAlert } from "../../src/domain/spaceWeather/index.js";
 import { SegmentId } from "../../src/domain/lockout/index.js";
 import type { Approved, EvaPermit, Requested } from "../../src/domain/permit/index.js";
 import { PermitId, ZoneId } from "../../src/domain/permit/index.js";
-import { CumulativeDose, WorkerId } from "../../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../../src/domain/worker/index.js";
 import type { Dependencies } from "../../src/useCase/dependencies.js";
 import { ensurePermitFound, ensureRequested } from "../../src/useCase/errors.js";
 import { approveEva } from "../../src/useCase/approveEva.js";
@@ -93,16 +93,16 @@ describe("S6 Step 3 regression: andThen pipeline が失敗理由を運ぶ", () =
     expect(observer).toEqual({ saveCalls: 0 });
   });
 
-  it("線量上限を超える作業員がいれば、誰かだけを返して保存しない", () => {
+  it("作業後の被ばく量が安全上限を超える作業員がいれば、誰かだけを返して保存しない", () => {
     const observer = { saveCalls: 0 };
     const result = approveEva(
       createDependencies(requested, observer, {
-        doses: { "W-03": 31_500, "W-04": 49_900 },
+        exposures: { "W-03": 31_500, "W-04": 49_900 },
       }),
     )(input);
 
     expect(result.isErr() && result.error).toEqual({
-      kind: "DoseLimitExceeded",
+      kind: "ExposureLimitExceeded",
       workerId: crew[1],
     });
     expect(observer).toEqual({ saveCalls: 0 });
@@ -146,15 +146,15 @@ const createDependencies = (
     saveError?: Error;
   },
   options: Readonly<{
-    doses?: Readonly<Record<string, number>>;
+    exposures?: Readonly<Record<string, number>>;
     alert?: FlareAlert;
   }> = {},
 ): Dependencies => ({
   resolver: { resolveById: () => resolved },
-  doses: {
+  exposures: {
     resolve: (workerId) =>
-      CumulativeDose.of(
-        (options.doses ?? moonbaseFixture.crewDoseMicroSv)[workerId] ?? 0,
+      RadiationExposure.of(
+        (options.exposures ?? moonbaseFixture.crewExposureMicroSv)[workerId] ?? 0,
       ),
   },
   spaceWeather: { currentAlert: () => options.alert ?? FlareAlert.clear },

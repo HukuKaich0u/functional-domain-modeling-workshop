@@ -16,7 +16,7 @@ import {
 import { WorkerId } from "../domain/worker/index.js";
 import { approveEvaWithEffects } from "../useCase/approveEva.js";
 import type {
-  CrewDoseResolver,
+  CrewExposureResolver,
   EventContextDependencies,
   SpaceWeather,
 } from "../useCase/dependencies.js";
@@ -30,7 +30,7 @@ type ApproveEvaNoticeCode =
   | "not-found"
   | "invalid-state"
   | "oxygen"
-  | "dose-limit"
+  | "exposure-limit"
   | "flare-alert"
   | "night";
 
@@ -46,8 +46,8 @@ const toApproveEvaNoticeCode = (error: ApproveEvaError): ApproveEvaNoticeCode =>
       return "invalid-state";
     case "InsufficientOxygen":
       return "oxygen";
-    case "DoseLimitExceeded":
-      return "dose-limit";
+    case "ExposureLimitExceeded":
+      return "exposure-limit";
     case "FlareAlertActive":
       return "flare-alert";
     case "NightTime":
@@ -65,7 +65,7 @@ const toApproveEvaWithEffectsNoticeCode = (
   error.kind === "PermitConflict" ? "conflict" : toApproveEvaNoticeCode(error);
 
 export type Environment = Readonly<{
-  doses: CrewDoseResolver;
+  exposures: CrewExposureResolver;
   spaceWeather: SpaceWeather;
 }>;
 
@@ -126,7 +126,7 @@ export const registerMoonbaseRoutes = (
     const result = await approveEvaWithEffects({
       resolver: store,
       store,
-      doses: environment.doses,
+      exposures: environment.exposures,
       spaceWeather: environment.spaceWeather,
       ...effects,
     })(input);

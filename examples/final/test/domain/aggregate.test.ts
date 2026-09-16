@@ -5,7 +5,7 @@ import { describe, expect, test } from "vitest";
 import { LunarDay, LAST_DAYLIGHT_LUNAR_DAY } from "../../src/domain/aggregate/lunarDay.js";
 import { Timestamp } from "../../src/domain/aggregate/timestamp.js";
 import { Sensitive } from "../../src/domain/shared/sensitive.js";
-import { CumulativeDose, isWithinDoseLimit, predictedDoseMicroSv, DOSE_LIMIT_MICRO_SV } from "../../src/domain/worker/index.js";
+import { RadiationExposure, isExposureWithinLimit, expectedExposureIncreaseMicroSv, EXPOSURE_LIMIT_MICRO_SV } from "../../src/domain/worker/index.js";
 import { PermitId, ZoneId } from "../../src/domain/permit/index.js";
 import { SegmentId } from "../../src/domain/segment/index.js";
 
@@ -33,25 +33,25 @@ describe("Timestamp", () => {
 
 describe("Sensitive", () => {
   test("JSON、文字列化、inspect のどれでも値を出さない", () => {
-    const dose = CumulativeDose.schema.parse(12_345);
-    expect(JSON.stringify({ dose })).toBe('{"dose":"[REDACTED]"}');
-    expect(String(dose)).toBe("[REDACTED]");
-    expect(inspect(dose)).toBe("[REDACTED]");
+    const exposure = RadiationExposure.schema.parse(12_345);
+    expect(JSON.stringify({ exposure })).toBe('{"exposure":"[REDACTED]"}');
+    expect(String(exposure)).toBe("[REDACTED]");
+    expect(inspect(exposure)).toBe("[REDACTED]");
     expect(`${Sensitive.of("secret")}`).toBe("[REDACTED]");
-    expect(dose.unwrap()).toBe(12_345);
+    expect(exposure.unwrap()).toBe(12_345);
   });
 });
 
-describe("CumulativeDose", () => {
-  test("予測線量は月面の線量率から切り上げで求める", () => {
-    expect(predictedDoseMicroSv(60)).toBe(60);
-    expect(predictedDoseMicroSv(120)).toBe(120);
-    expect(predictedDoseMicroSv(1)).toBe(1);
+describe("RadiationExposure", () => {
+  test("今回の作業で増える被ばく量を作業時間から切り上げで求める", () => {
+    expect(expectedExposureIncreaseMicroSv(60)).toBe(60);
+    expect(expectedExposureIncreaseMicroSv(120)).toBe(120);
+    expect(expectedExposureIncreaseMicroSv(1)).toBe(1);
   });
 
-  test("累積と予測の合計が上限以内のときだけ承認できる（規程第8条）", () => {
-    expect(isWithinDoseLimit(CumulativeDose.schema.parse(DOSE_LIMIT_MICRO_SV - 120), 120)).toBe(true);
-    expect(isWithinDoseLimit(CumulativeDose.schema.parse(DOSE_LIMIT_MICRO_SV - 119), 120)).toBe(false);
+  test("作業後の被ばく量が安全上限以内のときだけ承認できる（規程第8条）", () => {
+    expect(isExposureWithinLimit(RadiationExposure.schema.parse(EXPOSURE_LIMIT_MICRO_SV - 120), 120)).toBe(true);
+    expect(isExposureWithinLimit(RadiationExposure.schema.parse(EXPOSURE_LIMIT_MICRO_SV - 119), 120)).toBe(false);
   });
 });
 

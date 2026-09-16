@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { ResultAsync } from "neverthrow";
 import { z } from "zod";
 
-import { CumulativeDose, WorkerId, WorkerQualification } from "../../../../domain/worker/index.js";
+import { RadiationExposure, WorkerId, WorkerQualification } from "../../../../domain/worker/index.js";
 import type {
   Worker,
   WorkerByIdResolver,
@@ -14,10 +14,10 @@ import { workersTable } from "../schema.js";
 const WorkerRowSchema = z.object({
   workerId: WorkerId.schema,
   qualification: WorkerQualification.schema,
-  cumulativeDoseMicroSv: CumulativeDose.schema,
+  radiationExposureMicroSv: RadiationExposure.schema,
 });
 
-/** 行から隊員を組み立てる。累積線量はこの時点で Sensitive に包まれる */
+/** 行から隊員を組み立てる。被ばく量はこの時点で Sensitive に包まれる */
 export const parseWorkerRow = (raw: unknown): Worker => WorkerRowSchema.parse(raw);
 
 export const createWorkerByIdResolver = (db: SqliteDatabase): WorkerByIdResolver => ({

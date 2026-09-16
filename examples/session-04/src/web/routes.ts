@@ -22,14 +22,14 @@ import {
 } from "../domain/permit/index.js";
 import {
   hasEnoughOxygen,
-  isWithinDoseLimit,
+  isExposureWithinLimit,
   WorkerId,
-  type CrewDoseResolver,
+  type CrewExposureResolver,
 } from "../domain/worker/index.js";
 import { toPageProps } from "./permitView.js";
 
 export type Environment = Readonly<{
-  doses: CrewDoseResolver;
+  exposures: CrewExposureResolver;
   spaceWeather: SpaceWeather;
 }>;
 
@@ -46,7 +46,7 @@ export const session04InitialPermit: Requested = {
 };
 
 export const session04PersistenceContext: PersistenceContext = {
-  crewDoseMicroSv: moonbaseFixture.crewDoseMicroSv,
+  crewExposureMicroSv: moonbaseFixture.crewExposureMicroSv,
 };
 
 const permitOrThrow = (
@@ -124,8 +124,8 @@ export const registerMoonbaseRoutes = (
       }
     }
     for (const workerId of current.crew) {
-      if (!isWithinDoseLimit(environment.doses.resolve(workerId), current.plannedMinutes)) {
-        throw new Error(`Dose limit exceeded for ${workerId}`);
+      if (!isExposureWithinLimit(environment.exposures.resolve(workerId), current.plannedMinutes)) {
+        throw new Error(`Exposure limit exceeded for ${workerId}`);
       }
     }
     saveAndAppendWorkLog(

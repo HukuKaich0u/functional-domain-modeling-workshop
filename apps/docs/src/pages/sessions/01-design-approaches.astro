@@ -54,7 +54,7 @@ export const guides = ([
     currentDesign:
       "parseCandidate が装備点検2名分、相方、遮断済みの区間を型の構造へ写し、approve はその型だけを受け取ります。",
     futureRisk:
-      "型で表せない条件は残るため、酸素、線量、警報、夜間は approve の中で実行時に判定します。S3〜S5 で同じ手を使います。",
+      "型で表せない条件は残るため、酸素、被ばく量、警報、夜間は approve の中で実行時に判定します。S3〜S5 で同じ手を使います。",
     path: "src/approaches/04-type-driven.ts",
     highlights: [
       { startLineNumber: 91, endLineNumber: 91 },
@@ -103,7 +103,7 @@ const projectFiles = projectFilesForSnapshot(session.snapshot);
 const conditions = [
   { number: 1, text: "2名分の装備点検が記録済み", article: "第2条", representation: "型（長さ2のタプル）", reason: "EquipmentCheckMissing" },
   { number: 2, text: "酸素残時間が予定作業時間と予備60分の合計以上", article: "第2条", representation: "実行時の判定", reason: "InsufficientOxygen" },
-  { number: 3, text: "各作業員の累積線量と予測線量の合計が上限以内", article: "第2条・第8条", representation: "実行時の判定（医務の値）", reason: "DoseLimitExceeded" },
+  { number: 3, text: "今回の作業後も各作業員の被ばく量が安全上限以内", article: "第2条・第8条", representation: "実行時の判定（医務の値）", reason: "ExposureLimitExceeded" },
   { number: 4, text: "フレア警報が出ていない", article: "第5条", representation: "実行時の判定（地上管制の値）", reason: "FlareAlertActive" },
   { number: 5, text: "相方が同じ許可に登録されている", article: "第4条", representation: "型（長さ2のタプル）", reason: "BuddyMissing" },
   { number: 6, text: "作業区画に対応する系統区間に遮断札が掛かっている", article: "第3条", representation: "型（遮断済みの区間だけを受け取る）", reason: "SegmentNotLockedOut" },
@@ -281,8 +281,8 @@ export const navigation = ({
     </table>
     <p>
       10通りの実装はすべて同じ入力 <code>ApprovalRequest</code> を受け取り、同じ判定結果 <code>Verdict</code> を返します。
-      入力には作業許可、2名の乗員、装備点検、医務が渡す累積線量、フレア警報、電気主任が遮断札を掛けた系統区間、月面日が入っています。
-      累積線量は判定にだけ使い、記録には出しません（第8条）。
+      入力には作業許可、2名の乗員、装備点検、医務が渡す被ばく量、フレア警報、電気主任が遮断札を掛けた系統区間、月面日が入っています。
+      被ばく量は判定にだけ使い、記録には出しません（第8条）。
     </p>
   </section>
 

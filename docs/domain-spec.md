@@ -109,7 +109,7 @@ type Aborted = Readonly<{
 }>;
 ```
 
-累積線量は状態に持たない。承認の判定にだけ使う。
+被ばく量は状態に持たない。承認の判定にだけ使う。
 
 ## 遷移
 
@@ -133,7 +133,7 @@ type Aborted = Readonly<{
 | --- | --- | --- |
 | 1 | 2名分の装備点検が記録済み | `equipmentChecks` を長さ2のタプルで受け取る |
 | 2 | 酸素残時間が予定作業時間 + 60分以上 | 判定。失敗は `InsufficientOxygen` |
-| 3 | 累積線量 + 予測線量が上限以内 | 判定。`Sensitive<number>` を unwrap して比較。失敗は `DoseLimitExceeded` |
+| 3 | 作業後の被ばく量が安全上限以内 | 現在の被ばく量と今回の作業で増える量を比較。`Sensitive<number>` を unwrap する。失敗は `ExposureLimitExceeded` |
 | 4 | フレア警報なし | 判定。失敗は `FlareAlertActive` |
 | 5 | 相方が同じ許可に登録 | `crew` を長さ2のタプルで持つ |
 | 6 | 系統区間に遮断札が掛かっている | `segmentId` を必須の入力にする。区画との対応は判定 |
@@ -141,7 +141,7 @@ type Aborted = Readonly<{
 
 S1 の設計アプローチ比較では、この7条件を一つの関数として10通りに書く。
 S6 の演習で参加者が扱う失敗は `PermitNotFound`、`InvalidPermitState`、
-`DoseLimitExceeded`、`FlareAlertActive` の4つに絞り、残りは配布済みにする。
+`ExposureLimitExceeded`、`FlareAlertActive` の4つに絞り、残りは配布済みにする。
 
 ## 中心のユースケース
 
@@ -156,7 +156,7 @@ type ApproveEvaInput = Readonly<{
 type ApproveEvaError =
   | PermitNotFound
   | InvalidPermitState
-  | DoseLimitExceeded
+  | ExposureLimitExceeded
   | FlareAlertActive
   | InsufficientOxygen
   | NightTime;
@@ -188,7 +188,7 @@ type EvaApproved = Readonly<{
 ```
 
 作業記録（`WorkLog`）は追記のみ。payload には `permitId`、`segmentId`、
-`approvedAt`、`approvedBy` だけを入れ、累積線量と装備点検の生データは
+`approvedAt`、`approvedBy` だけを入れ、被ばく量と装備点検の生データは
 入れない。状態の保存と作業記録の追記は同じトランザクションで行い、
 どちらか一方だけが残る状態を作らない。
 
@@ -197,7 +197,7 @@ type EvaApproved = Readonly<{
 | port | 役割 |
 | --- | --- |
 | `PermitResolver.resolveById` | 作業許可の現在状態を返す |
-| `CrewDoseResolver.resolve(workerId)` | 医務の累積線量を `Sensitive<number>` で返す |
+| `CrewExposureResolver.resolve(workerId)` | 医務の被ばく量を `Sensitive<number>` で返す |
 | `SpaceWeather.currentAlert()` | フレア警報の有無 |
 | `Clock.now()` / `Clock.lunarDay()` | 地球時と月面日 |
 | `EventIdGenerator.generate()` | 記録ID |
@@ -205,7 +205,7 @@ type EvaApproved = Readonly<{
 
 ## 機微情報
 
-累積線量は `Sensitive<number>` で包む。`toJSON`、`toString`、`inspect` は
+被ばく量は `Sensitive<number>` で包む。`toJSON`、`toString`、`inspect` は
 `[REDACTED]` を返し、値を取り出すには `unwrap()` を明示的に呼ぶ。承認の
 判定は unwrap した値で行い、状態、イベント、ログには載せない。
 
@@ -217,7 +217,7 @@ type EvaApproved = Readonly<{
 - `permitId`、`zoneId`、`segmentId`、`crew` の要素はすべて `string`
 - `approveEva(repository)(input)` は、許可が見つからないと例外を投げ、
   状態を確認せずに `status: "approved"` へ更新する
-- 医務の累積線量を `crewDose: number[]` として許可の状態へ書き込み、その
+- 医務の被ばく量を `crewExposure: number[]` として許可の状態へ書き込み、その
   状態を丸ごと作業記録の payload に保存する
 - `new Date()` と `randomUUID()` を処理の中で呼ぶ
 - 状態の保存と作業記録の追記が別々の `repository.save` と
@@ -229,10 +229,11 @@ type EvaApproved = Readonly<{
 
 ## フィクスチャ
 
-`examples/fixtures/moonbase.ts`。累積線量の単位は µSv で、上限は滞在1回あたり
-50,000 µSv（50 mSv）、月面の線量率は 60 µSv/h とする。予定作業180分の予測線量は
-180 µSv なので、既定の2名はどちらも上限内に収まる。上限超過を試すときは
-`W-04` を 49,900 µSv にする。
+`examples/fixtures/moonbase.ts`。被ばく量は、今回の滞在で隊員がこれまでに
+浴びた放射線の量を表す。システム内部の単位は µSv で、安全上限は滞在1回
+あたり50,000 µSv（50 mSv）とする。月面では1時間の船外作業につき60 µSv
+増えるものとし、予定作業180分では180 µSv増える。既定の2名は作業後も
+安全上限内に収まる。超過を試すときは `W-04` を49,900 µSvにする。
 
 ```ts
 export const moonbaseFixture = {
@@ -243,8 +244,8 @@ export const moonbaseFixture = {
   crew: ["W-03", "W-04"],
   plannedMinutes: 180,
   oxygenMinutes: 300,
-  doseLimitMicroSv: 50_000,
-  crewDoseMicroSv: { "W-03": 31_500, "W-04": 44_000 },
+  exposureLimitMicroSv: 50_000,
+  crewExposureMicroSv: { "W-03": 31_500, "W-04": 44_000 },
   requestedAt: "2026-09-15T00:00:00.000Z",
   checkedAt: "2026-09-15T00:40:00.000Z",
   approvedAt: "2026-09-15T01:00:00.000Z",
@@ -269,13 +270,13 @@ export const moonbaseFixture = {
 | `domain/aggregate/` | `Clock`（`now` と `lunarDay`）、`EventContext`、`EventId`、`EventIdGenerator` |
 | `domain/permit/` | 6状態、遷移関数、`EvaPermit.approve`（イベントを返す）、`EvaApproved`、`PermitId`、`ZoneId`、`toStatusLabel` |
 | `domain/lockout/` | `SegmentId` |
-| `domain/worker/` | `WorkerId`、`EquipmentCheck`（酸素残時間を含む）、`CumulativeDose`（`Sensitive<number>`）、`CrewDoseResolver` の port |
+| `domain/worker/` | `WorkerId`、`EquipmentCheck`（酸素残時間を含む）、`RadiationExposure`（`Sensitive<number>`）、`CrewExposureResolver` の port |
 | `domain/spaceWeather/` | `FlareAlert` |
 | `shared/` | `Sensitive`、`schemaResult` |
 | `boundary/` | `ApproveEvaInput`、`SpaceWeatherReport`（外部JSONの検証例） |
 | `useCase/` | `approveEva`、`approveEvaWithEffects`、失敗の型と `ensure*`、port の集合 |
 
-`CrewDoseResolver` を worker 概念に置くのは、`useCase/errors.ts` と
+`CrewExposureResolver` を worker 概念に置くのは、`useCase/errors.ts` と
 `useCase/dependencies.ts` が互いを import する循環を避けるため。
 
 ## セッションごとの変更対象

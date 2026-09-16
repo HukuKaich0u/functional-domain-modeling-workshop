@@ -2,13 +2,13 @@ import { err } from "neverthrow";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { createApp } from "../src/app.js";
-import { createFixtureCrewDoseResolver } from "../src/adaptor/fixtureCrewDoseResolver.js";
+import { createFixtureCrewExposureResolver } from "../src/adaptor/fixtureCrewExposureResolver.js";
 import { createStaticSpaceWeather } from "../src/adaptor/staticSpaceWeather.js";
 import { SegmentId } from "../src/domain/lockout/index.js";
 import type { Approved, EvaPermit, Requested } from "../src/domain/permit/index.js";
 import { PermitId, ZoneId } from "../src/domain/permit/index.js";
 import { FlareAlert } from "../src/domain/spaceWeather/index.js";
-import { CumulativeDose, WorkerId } from "../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../src/domain/worker/index.js";
 import type { Dependencies } from "../src/useCase/dependencies.js";
 import { ensurePermitFound, ensureRequested } from "../src/useCase/errors.js";
 import type { ApproveEvaError } from "../src/useCase/errors.js"; // 要件: 許可なしと状態不正を、kindで区別できる開始承認エラーとして定義してください。
@@ -119,17 +119,17 @@ describe("Step 3: andThen pipeline が失敗理由を運ぶ", () => {
     }
   });
 
-  it("線量上限超過を Result のまま運び、保存しない", () => {
+  it("作業後の被ばく量が安全上限を超える失敗を Result のまま運び、保存しない", () => {
     let saveCalls = 0;
     const deps = createDependencies(requested, {
       onSave: () => {
         saveCalls += 1;
       },
-      doses: { "W-03": 31_500, "W-04": 49_900 },
+      exposures: { "W-03": 31_500, "W-04": 49_900 },
     });
     try {
       const result = approveEva(deps)(input);
-      expect(result).toEqual(err({ kind: "DoseLimitExceeded", workerId: crew[1] }));
+      expect(result).toEqual(err({ kind: "ExposureLimitExceeded", workerId: crew[1] }));
       expect(saveCalls).toBe(0);
     } catch {
       throw new Error("要件未達: 配布済みの判定が返す Err を例外に変換せず、そのまま運んでください。");
@@ -165,10 +165,10 @@ describe("Step 4: 呼び出し側が業務エラーを漏れなく処理する",
     expect(response.headers.get("location")).toBe("/?notice=not-found");
   });
 
-  it("線量上限超過とフレア警報を専用noticeへ変換する", async () => {
-    const doseResponse = await post(
+  it("被ばく量が安全上限を超えた場合とフレア警報を専用noticeへ変換する", async () => {
+    const exposureResponse = await post(
       createApp({
-        doses: createFixtureCrewDoseResolver({ "W-03": 31_500, "W-04": 49_900 }),
+        exposures: createFixtureCrewExposureResolver({ "W-03": 31_500, "W-04": 49_900 }),
       }),
       `/permits/${moonbaseFixture.permitId}/approve`,
     );
@@ -183,8 +183,8 @@ describe("Step 4: 呼び出し側が業務エラーを漏れなく処理する",
       `/permits/${moonbaseFixture.permitId}/approve`,
     );
 
-    if (doseResponse.headers.get("location") !== "/?notice=dose-limit") {
-      throw new Error("要件未達: 線量上限超過を専用のお知らせへ変換してください。");
+    if (exposureResponse.headers.get("location") !== "/?notice=exposure-limit") {
+      throw new Error("要件未達: 被ばく量が安全上限を超えた場合を専用のお知らせへ変換してください。");
     }
     if (flareResponse.headers.get("location") !== "/?notice=flare-alert") {
       throw new Error("要件未達: フレア警報中を専用のお知らせへ変換してください。");
@@ -206,14 +206,14 @@ const createDependencies = (
   resolved: EvaPermit | undefined,
   observer: Readonly<{
     onSave?: () => void;
-    doses?: Readonly<Record<string, number>>;
+    exposures?: Readonly<Record<string, number>>;
   }> = {},
 ): Dependencies => ({
   resolver: { resolveById: () => resolved },
-  doses: {
+  exposures: {
     resolve: (workerId) =>
-      CumulativeDose.of(
-        (observer.doses ?? moonbaseFixture.crewDoseMicroSv)[workerId] ?? 0,
+      RadiationExposure.of(
+        (observer.exposures ?? moonbaseFixture.crewExposureMicroSv)[workerId] ?? 0,
       ),
   },
   spaceWeather: { currentAlert: () => FlareAlert.clear },

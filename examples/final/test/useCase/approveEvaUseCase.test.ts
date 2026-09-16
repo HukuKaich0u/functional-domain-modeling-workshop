@@ -158,12 +158,12 @@ describe("ApproveEvaUseCase", () => {
     });
   });
 
-  test("条件3: 累積線量と予測線量の合計が上限を超えると止まる。線量の値は返さない", async () => {
+  test("条件3: 作業後の被ばく量が安全上限を超えると止まる。被ばく量の値は返さない", async () => {
     const result = await runWith({
       workerResolver: workerResolverFor([worker(ids.workerA), worker(ids.workerB, 49_900)]),
     });
     expect(result._unsafeUnwrapErr()).toEqual({
-      kind: "DoseLimitExceeded",
+      kind: "ExposureLimitExceeded",
       permitId: ids.permit,
       workerId: ids.workerB,
     });

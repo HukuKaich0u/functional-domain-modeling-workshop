@@ -165,7 +165,7 @@ const exerciseContracts = {
         "src/domain/permit/zoneId.ts",
         "src/domain/lockout/segmentId.ts",
         "src/domain/worker/workerId.ts",
-        "src/domain/worker/cumulativeDose.ts",
+        "src/domain/worker/radiationExposure.ts",
         "src/shared/sensitive.ts",
         "src/useCase/errors.ts",
         "src/useCase/approveEva.ts",

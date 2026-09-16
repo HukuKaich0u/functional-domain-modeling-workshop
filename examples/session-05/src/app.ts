@@ -3,7 +3,7 @@ import { inertia } from "@hono/inertia";
 import { Hono } from "hono";
 
 import { moonbaseFixture } from "../../fixtures/moonbase.js";
-import { createFixtureCrewDoseResolver } from "./adaptor/fixtureCrewDoseResolver.js";
+import { createFixtureCrewExposureResolver } from "./adaptor/fixtureCrewExposureResolver.js";
 import { createPermitRepository } from "./adaptor/secondary/sqlite/permitRepository.js";
 import {
   createSqliteDatabase,
@@ -28,7 +28,7 @@ type DatabaseBackedAppOptions = Readonly<{
 export type DatabaseBackedApp = Hono & Readonly<{ close: () => void }>;
 
 const defaultEnvironment: Environment = {
-  doses: createFixtureCrewDoseResolver(moonbaseFixture.crewDoseMicroSv),
+  exposures: createFixtureCrewExposureResolver(moonbaseFixture.crewExposureMicroSv),
   spaceWeather: createStaticSpaceWeather(),
 };
 

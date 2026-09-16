@@ -83,7 +83,7 @@ const PermitErrorSchema = z.enum([
   "equipment-check-missing",
   "insufficient-oxygen",
   "worker-not-found",
-  "dose-limit-exceeded",
+  "exposure-limit-exceeded",
   "space-weather-unknown",
   "flare-alert-active",
   "buddy-missing",
@@ -162,8 +162,8 @@ const detailErrors = (raw: string | undefined): FieldErrors => {
       return { form: "酸素残時間が、予定作業時間と予備60分の合計に足りません。（規程第2条）" };
     case "worker-not-found":
       return { form: "登録されていない隊員が含まれています。" };
-    case "dose-limit-exceeded":
-      return { form: "累積線量と予測線量の合計が上限を超えるため承認できません。（規程第8条）" };
+    case "exposure-limit-exceeded":
+      return { form: "作業後の被ばく量が安全上限を超えるため承認できません。（規程第8条）" };
     case "space-weather-unknown":
       return { form: "宇宙天気の報告がありません。地上管制の報告を待ってください。（規程第5条）" };
     case "flare-alert-active":
@@ -255,7 +255,7 @@ const loadRequestOptions = async (
         zoneId: segment.segmentId as string,
         label: segment.label as string,
       })),
-      /** 累積線量は申請画面に出さない。資格だけを選択肢の補助にする */
+      /** 被ばく量は申請画面に出さない。資格だけを選択肢の補助にする */
       workers: values.map((worker) => ({
         workerId: worker.workerId as string,
         qualification: worker.qualification as string,
@@ -405,8 +405,8 @@ export const registerPermitRoutes = (
               return redirectWithError(context, permitId.value, "insufficient-oxygen");
             case "WorkerNotFound":
               return redirectWithError(context, permitId.value, "worker-not-found");
-            case "DoseLimitExceeded":
-              return redirectWithError(context, permitId.value, "dose-limit-exceeded");
+            case "ExposureLimitExceeded":
+              return redirectWithError(context, permitId.value, "exposure-limit-exceeded");
             case "SpaceWeatherUnknown":
               return redirectWithError(context, permitId.value, "space-weather-unknown");
             case "FlareAlertActive":

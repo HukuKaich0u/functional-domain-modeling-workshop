@@ -68,7 +68,7 @@ describe("SQLite resolvers", () => {
 
     expect(unwrap(await createSegmentListResolver(db).resolveAll())).toEqual([energizedSegment]);
     const workers = unwrap(await createWorkerListResolver(db).resolveAll());
-    expect(workers[0]?.cumulativeDoseMicroSv.unwrap()).toBe(4_321);
+    expect(workers[0]?.radiationExposureMicroSv.unwrap()).toBe(4_321);
     const checks = unwrap(await createEquipmentCheckByPermitIdResolver(db).resolveByPermitId(ids.permit));
     expect(checks[0]?.note.unwrap()).toBe("左グローブのシールを交換済み");
     expect(checks[0]?.oxygenMinutes).toBe(200);

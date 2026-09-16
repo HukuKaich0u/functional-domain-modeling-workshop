@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { OXYGEN_RESERVE_MINUTES, hasEnoughOxygen } from "../../src/domain/equipmentCheck/index.js";
 import { Segment } from "../../src/domain/segment/index.js";
 import { toFlareAlert } from "../../src/domain/spaceWeather/index.js";
-import { Worker, CumulativeDose } from "../../src/domain/worker/index.js";
+import { Worker, RadiationExposure } from "../../src/domain/worker/index.js";
 import {
   energizedSegment,
   equipmentCheck,
@@ -56,13 +56,13 @@ describe("Segment の遮断札", () => {
 });
 
 describe("Worker と装備点検", () => {
-  test("隊員の更新は累積線量を Sensitive のまま状態に入れる", () => {
+  test("隊員の更新は被ばく量を Sensitive のまま状態に入れる", () => {
     const event = Worker.update(eventContext(6))(worker(ids.workerA), {
       qualification: "Electrician",
-      cumulativeDoseMicroSv: CumulativeDose.schema.parse(20_000),
+      radiationExposureMicroSv: RadiationExposure.schema.parse(20_000),
     });
     expect(event.aggregateState.qualification).toBe("Electrician");
-    expect(event.aggregateState.cumulativeDoseMicroSv.unwrap()).toBe(20_000);
+    expect(event.aggregateState.radiationExposureMicroSv.unwrap()).toBe(20_000);
     expect(JSON.stringify(event.aggregateState)).not.toContain("20000");
     expect(event.eventPayload).toEqual({ workerId: ids.workerA });
   });

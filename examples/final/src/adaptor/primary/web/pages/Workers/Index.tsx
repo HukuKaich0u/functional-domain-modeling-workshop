@@ -23,12 +23,12 @@ export default function WorkersIndex({ auth, errors, workers }: Props) {
         </Link>
       }
       activeNavigation="workers"
-      title="隊員と累積線量"
+      title="隊員と被ばく量"
       user={auth.user}
     >
       <ErrorSummary errors={errors} />
       <InlineAlert>
-        累積線量は医務の値です。この画面と承認の判定にだけ使い、作業許可の画面と作業記録には出しません（規程第8条）。
+        被ばく量は、今回の滞在で隊員がこれまでに浴びた放射線の量です。個人の健康に関わるため、この画面と承認の判定にだけ使い、作業許可の画面と作業記録には出しません（規程第8条）。
       </InlineAlert>
       {workers.length === 0 ? (
         <EmptyState>隊員は登録されていません。</EmptyState>
@@ -38,7 +38,7 @@ export default function WorkersIndex({ auth, errors, workers }: Props) {
             <tr>
               <th scope="col">隊員番号</th>
               <th scope="col">資格</th>
-              <th scope="col">累積線量（µSv）</th>
+              <th scope="col">被ばく量（µSv）</th>
               <th scope="col">操作</th>
             </tr>
           </thead>
@@ -47,7 +47,7 @@ export default function WorkersIndex({ auth, errors, workers }: Props) {
               <tr key={worker.workerId}>
                 <td><Link href={`/workers/${worker.workerId}`}>{worker.workerId}</Link></td>
                 <td>{worker.qualification}</td>
-                <td>{worker.cumulativeDoseMicroSv.toLocaleString("ja-JP")}</td>
+                <td>{worker.radiationExposureMicroSv.toLocaleString("ja-JP")}</td>
                 <td>
                   <div className="table-actions">
                     <Link className={buttonClassName("secondary")} href={`/workers/${worker.workerId}`}>編集</Link>

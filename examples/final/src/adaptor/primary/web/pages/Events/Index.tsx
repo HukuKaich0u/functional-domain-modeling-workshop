@@ -29,7 +29,7 @@ export default function EventsIndex({ auth, events }: Props) {
   return (
     <Layout activeNavigation="events" title="作業記録" user={auth.user}>
       <InlineAlert>
-        作業記録には累積線量、作業内容、中止や緊急帰還の理由、点検所見を表示しません。伏せた値は [REDACTED] と出ます。地球時と月面日を併記します（規程第9条）。
+        作業記録には被ばく量、作業内容、中止や緊急帰還の理由、点検所見を表示しません。伏せた値は [REDACTED] と出ます。地球時と月面日を併記します（規程第9条）。
       </InlineAlert>
       {events.length === 0 ? (
         <EmptyState>作業記録はありません。</EmptyState>

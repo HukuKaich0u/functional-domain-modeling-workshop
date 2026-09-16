@@ -23,8 +23,8 @@ export const initialPermit: EvaPermit = requestPermit({
   requestedAt: moonbaseFixture.requestedAt,
 });
 
-const crewDose = moonbaseFixture.crew.map(
-  (workerId) => moonbaseFixture.crewDoseMicroSv[workerId] ?? 0,
+const crewExposure = moonbaseFixture.crew.map(
+  (workerId) => moonbaseFixture.crewExposureMicroSv[workerId] ?? 0,
 );
 
 const permitOrThrow = (
@@ -82,7 +82,7 @@ export const registerMoonbaseRoutes = (
     approveEva(repository)({
       permitId: context.req.param("permitId"),
       segmentId: moonbaseFixture.segmentId,
-      crewDose,
+      crewExposure,
     });
     return redirectToRoot(context);
   });
@@ -187,7 +187,7 @@ export const registerMoonbaseRoutes = (
       approveEva(repository)({
         permitId: "EVA-9999",
         segmentId: moonbaseFixture.segmentId,
-        crewDose,
+        crewExposure,
       });
     } catch (error: any) {
       if (error.message.includes("Permit not found")) {
@@ -203,7 +203,7 @@ export const registerMoonbaseRoutes = (
     const input = {
       permitId: moonbaseFixture.permitId,
       segmentId: moonbaseFixture.segmentId,
-      crewDose,
+      crewExposure,
     };
     const first = approveEva(repository)(input);
     if (first.approvedAt === undefined) {

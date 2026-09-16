@@ -15,7 +15,7 @@ import type { User } from "../../src/domain/user/user.js";
 import { UserEmail } from "../../src/domain/user/userEmail.js";
 import { UserId } from "../../src/domain/user/userId.js";
 import { UserName } from "../../src/domain/user/userName.js";
-import { CumulativeDose, WorkerId } from "../../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../../src/domain/worker/index.js";
 import type { Worker } from "../../src/domain/worker/index.js";
 
 /** テスト用の固定値。個人名は出さず、役割と番号で呼ぶ */
@@ -117,10 +117,10 @@ export const lockedOutSegment: LockedOutSegment = {
   },
 };
 
-export const worker = (workerId: WorkerId, doseMicroSv = 10_000): Worker => ({
+export const worker = (workerId: WorkerId, exposureMicroSv = 10_000): Worker => ({
   workerId,
   qualification: "General",
-  cumulativeDoseMicroSv: CumulativeDose.schema.parse(doseMicroSv),
+  radiationExposureMicroSv: RadiationExposure.schema.parse(exposureMicroSv),
 });
 
 export const equipmentCheck = (

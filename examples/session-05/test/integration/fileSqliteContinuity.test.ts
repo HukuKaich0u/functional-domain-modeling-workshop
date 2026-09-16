@@ -81,7 +81,7 @@ test("file SQLite reopens the Session 05 approved state and leaking work log con
     expect(workLog.event_name).toBe("EvaApproved");
     expect(JSON.parse(workLog.payload)).toMatchObject({
       permit: { kind: "Approved" },
-      crewDose: moonbaseFixture.crewDoseMicroSv,
+      crewExposure: moonbaseFixture.crewExposureMicroSv,
     });
   } finally {
     database.close();

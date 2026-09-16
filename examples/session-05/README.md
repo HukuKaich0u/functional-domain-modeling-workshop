@@ -17,4 +17,4 @@ pnpm exercise:05
 
 ## 時間外の補足
 
-`src/boundary/spaceWeatherReport.ts` と `src/domain/worker/cumulativeDose.ts` は時間内の変更対象ではありません。宇宙天気の外部 JSON の検証と、累積線量を `Sensitive` で包む方法を比較したい場合は、解答側の session-06 と読み比べます。
+`src/boundary/spaceWeatherReport.ts` と `src/domain/worker/radiationExposure.ts` は時間内の変更対象ではありません。宇宙天気の外部 JSON の検証と、被ばく量を `Sensitive` で包む方法を比較したい場合は、解答側の session-06 と読み比べます。

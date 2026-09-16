@@ -1,5 +1,5 @@
 import type { EventContext } from "../aggregate/eventContext.js";
-import type { CumulativeDose } from "./cumulativeDose.js";
+import type { RadiationExposure } from "./radiationExposure.js";
 import {
   createWorkerDeleted,
   createWorkerRegistered,
@@ -14,7 +14,7 @@ import type { WorkerQualification } from "./workerQualification.js";
 export type Worker = Readonly<{
   workerId: WorkerId;
   qualification: WorkerQualification;
-  cumulativeDoseMicroSv: CumulativeDose;
+  radiationExposureMicroSv: RadiationExposure;
 }>;
 
 export type WorkerProfile = Readonly<Omit<Worker, "workerId">>;
@@ -22,7 +22,7 @@ export type WorkerProfile = Readonly<Omit<Worker, "workerId">>;
 const register = (context: EventContext) => (worker: Worker): WorkerRegistered =>
   createWorkerRegistered(context, worker);
 
-/** 医務が累積線量を更新する。値は Sensitive のまま状態に入る */
+/** 医務が被ばく量を更新する。値は Sensitive のまま状態に入る */
 const update =
   (context: EventContext) =>
   (worker: Worker, profile: WorkerProfile): WorkerUpdated =>

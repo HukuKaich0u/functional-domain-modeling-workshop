@@ -3,7 +3,7 @@ import { inertia } from "@hono/inertia";
 import { Hono } from "hono";
 
 import { moonbaseFixture } from "../../fixtures/moonbase.js";
-import { createFixtureCrewDoseResolver } from "./adaptor/fixtureCrewDoseResolver.js";
+import { createFixtureCrewExposureResolver } from "./adaptor/fixtureCrewExposureResolver.js";
 import { createPermitStore } from "./adaptor/secondary/sqlite/permitStore.js";
 import {
   createSqliteDatabase,
@@ -11,7 +11,7 @@ import {
   type SqliteDatabase,
 } from "./adaptor/secondary/sqlite/db.js";
 import { createStaticSpaceWeather } from "./adaptor/staticSpaceWeather.js";
-import type { CrewDoseResolver, SpaceWeather } from "./useCase/dependencies.js";
+import type { CrewExposureResolver, SpaceWeather } from "./useCase/dependencies.js";
 import {
   registerMoonbaseRoutes,
   session07InitialPermit,
@@ -19,14 +19,14 @@ import {
 } from "./web/routes.js";
 
 export type CreateAppOptions = Readonly<{
-  doses?: CrewDoseResolver;
+  exposures?: CrewExposureResolver;
   isProduction?: boolean;
   spaceWeather?: SpaceWeather;
 }>;
 
 type DatabaseBackedAppOptions = Readonly<{
   databasePath: string;
-  doses?: CrewDoseResolver;
+  exposures?: CrewExposureResolver;
   isProduction: boolean;
   migrationsFolder: string;
   spaceWeather?: SpaceWeather;
@@ -35,15 +35,15 @@ type DatabaseBackedAppOptions = Readonly<{
 export type DatabaseBackedApp = Hono & Readonly<{ close: () => void }>;
 
 const defaultEnvironment: Environment = {
-  doses: createFixtureCrewDoseResolver(moonbaseFixture.crewDoseMicroSv),
+  exposures: createFixtureCrewExposureResolver(moonbaseFixture.crewExposureMicroSv),
   spaceWeather: createStaticSpaceWeather(),
 };
 
 const mergeEnvironment = (
-  doses: CrewDoseResolver | undefined,
+  exposures: CrewExposureResolver | undefined,
   spaceWeather: SpaceWeather | undefined,
 ): Environment => ({
-  doses: doses ?? defaultEnvironment.doses,
+  exposures: exposures ?? defaultEnvironment.exposures,
   spaceWeather: spaceWeather ?? defaultEnvironment.spaceWeather,
 });
 
@@ -87,7 +87,7 @@ export const createApp = (options: CreateAppOptions = {}): DatabaseBackedApp => 
     migrateDatabase(database);
     return createDatabaseBackedAppFromDatabase(
       database,
-      mergeEnvironment(options.doses, options.spaceWeather),
+      mergeEnvironment(options.exposures, options.spaceWeather),
       options.isProduction === true,
     );
   } catch (error) {
@@ -98,7 +98,7 @@ export const createApp = (options: CreateAppOptions = {}): DatabaseBackedApp => 
 
 export const createDatabaseBackedApp = ({
   databasePath,
-  doses,
+  exposures,
   isProduction,
   migrationsFolder,
   spaceWeather,
@@ -109,7 +109,7 @@ export const createDatabaseBackedApp = ({
     migrateDatabase(database, migrationsFolder);
     return createDatabaseBackedAppFromDatabase(
       database,
-      mergeEnvironment(doses, spaceWeather),
+      mergeEnvironment(exposures, spaceWeather),
       isProduction,
     );
   } catch (error) {

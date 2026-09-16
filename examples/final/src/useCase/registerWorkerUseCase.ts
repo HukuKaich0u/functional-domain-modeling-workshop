@@ -6,7 +6,7 @@ import type { UserId } from "../domain/user/userId.js";
 import type { UserByIdResolver } from "../domain/user/userResolver.js";
 import { Worker } from "../domain/worker/index.js";
 import type {
-  CumulativeDose,
+  RadiationExposure,
   WorkerAlreadyExists,
   WorkerId,
   WorkerQualification,
@@ -25,7 +25,7 @@ export type UseCaseInput = Readonly<{
   actorUserId: UserId;
   workerId: WorkerId;
   qualification: WorkerQualification;
-  cumulativeDoseMicroSv: CumulativeDose;
+  radiationExposureMicroSv: RadiationExposure;
 }>;
 export type UseCaseOk = Readonly<{ worker: WorkerView }>;
 export type UseCaseError = UnauthorizedError | WorkerAlreadyExists | IdentityGenerationFailed;
@@ -52,7 +52,7 @@ const run =
           Worker.register(createEventContext(dependencies, input.actorUserId))({
             workerId: input.workerId,
             qualification: input.qualification,
-            cumulativeDoseMicroSv: input.cumulativeDoseMicroSv,
+            radiationExposureMicroSv: input.radiationExposureMicroSv,
           }),
         ),
       )

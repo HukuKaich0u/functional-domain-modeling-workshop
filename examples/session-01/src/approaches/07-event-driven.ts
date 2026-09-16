@@ -19,7 +19,7 @@ export type DomainEvent =
   | Readonly<{ kind: "ApprovalRequested"; permitId: string; zoneId: string; plannedMinutes: number }>
   | Readonly<{ kind: "CrewAssigned"; permitId: string; workerId: string }>
   | Readonly<{ kind: "EquipmentChecked"; workerId: string; oxygenMinutes: number; checkedAt: string }>
-  | Readonly<{ kind: "DoseReported"; workerId: string; microSv: number }>
+  | Readonly<{ kind: "ExposureReported"; workerId: string; microSv: number }>
   | Readonly<{ kind: "FlareAlertIssued" }>
   | Readonly<{ kind: "FlareAlertCleared" }>
   | Readonly<{ kind: "LockoutTagHung"; segmentId: string }>
@@ -32,7 +32,7 @@ export type ApprovalState = Readonly<{
   plannedMinutes: number;
   crew: readonly string[];
   equipmentChecks: Readonly<Record<string, EquipmentCheck>>;
-  crewDoseMicroSv: Readonly<Record<string, number>>;
+  crewExposureMicroSv: Readonly<Record<string, number>>;
   flareAlert: FlareAlert;
   lockedOutSegmentIds: readonly string[];
   lunarDay: number;
@@ -44,7 +44,7 @@ export const initialState: ApprovalState = {
   plannedMinutes: 0,
   crew: [],
   equipmentChecks: {},
-  crewDoseMicroSv: {},
+  crewExposureMicroSv: {},
   flareAlert: "Clear",
   lockedOutSegmentIds: [],
   lunarDay: 1,
@@ -74,10 +74,10 @@ export const apply = (state: ApprovalState, event: DomainEvent): ApprovalState =
           },
         },
       };
-    case "DoseReported":
+    case "ExposureReported":
       return {
         ...state,
-        crewDoseMicroSv: { ...state.crewDoseMicroSv, [event.workerId]: event.microSv },
+        crewExposureMicroSv: { ...state.crewExposureMicroSv, [event.workerId]: event.microSv },
       };
     case "FlareAlertIssued":
       return { ...state, flareAlert: "Warning" };
@@ -113,7 +113,7 @@ export const decideFromState = (state: ApprovalState): ApprovalDecided => {
     crew: state.crew,
     plannedMinutes: state.plannedMinutes,
     equipmentChecks: Object.values(state.equipmentChecks),
-    crewDoseMicroSv: state.crewDoseMicroSv,
+    crewExposureMicroSv: state.crewExposureMicroSv,
     flareAlert: state.flareAlert,
     lockedOutSegmentIds: state.lockedOutSegmentIds,
     lunarDay: state.lunarDay,
@@ -140,8 +140,8 @@ export const toEvents = (request: ApprovalRequest): readonly DomainEvent[] => [
   ...request.equipmentChecks.map(
     (check): DomainEvent => ({ kind: "EquipmentChecked", ...check }),
   ),
-  ...Object.entries(request.crewDoseMicroSv).map(
-    ([workerId, microSv]): DomainEvent => ({ kind: "DoseReported", workerId, microSv }),
+  ...Object.entries(request.crewExposureMicroSv).map(
+    ([workerId, microSv]): DomainEvent => ({ kind: "ExposureReported", workerId, microSv }),
   ),
   ...(request.flareAlert === "Clear" ? [] : [{ kind: "FlareAlertIssued" } as const]),
   ...request.lockedOutSegmentIds.map(

@@ -56,11 +56,11 @@ describe("MoonbaseDashboard", () => {
 
   it("既知の業務失敗を固定メッセージへ変換する", () => {
     const html = renderToStaticMarkup(
-      <MoonbaseDashboard {...props} notice={{ kind: "DoseLimitExceeded" }} />,
+      <MoonbaseDashboard {...props} notice={{ kind: "ExposureLimitExceeded" }} />,
     );
 
     expect(html).toContain('<dialog class="notice-dialog" open="">');
-    expect(html).toContain("累積線量が上限を超えるため承認できません");
+    expect(html).toContain("作業後の被ばく量が安全上限を超えるため承認できません");
   });
 
   it("事故再現用propsがあると作業許可と作業記録の内容を表示する", () => {

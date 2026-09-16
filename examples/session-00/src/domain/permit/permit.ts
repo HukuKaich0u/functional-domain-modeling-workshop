@@ -7,7 +7,7 @@ export type EvaPermit = Readonly<{
   status: string;
   segmentId?: string;
   equipmentChecks?: unknown;
-  crewDose?: unknown;
+  crewExposure?: unknown;
   spaceWeather?: unknown;
   approvedAt?: string;
   approvedBy?: string;

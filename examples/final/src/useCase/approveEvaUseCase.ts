@@ -33,7 +33,7 @@ import type {
 } from "../domain/spaceWeather/index.js";
 import type { UserId } from "../domain/user/userId.js";
 import type { UserByIdResolver } from "../domain/user/userResolver.js";
-import { isWithinDoseLimit } from "../domain/worker/index.js";
+import { isExposureWithinLimit } from "../domain/worker/index.js";
 import type { Worker, WorkerByIdResolver, WorkerId } from "../domain/worker/index.js";
 import { ensureCanApproveEva } from "./authorization.js";
 import {
@@ -68,8 +68,8 @@ export type InsufficientOxygen = Readonly<{
   permitId: PermitId;
   workerId: WorkerId;
 }>;
-export type DoseLimitExceeded = Readonly<{
-  kind: "DoseLimitExceeded";
+export type ExposureLimitExceeded = Readonly<{
+  kind: "ExposureLimitExceeded";
   permitId: PermitId;
   workerId: WorkerId;
 }>;
@@ -100,7 +100,7 @@ export type UseCaseError =
   | EquipmentCheckMissing
   | InsufficientOxygen
   | WorkerNotFound
-  | DoseLimitExceeded
+  | ExposureLimitExceeded
   | SpaceWeatherUnknown
   | FlareAlertActive
   | BuddyMissing
@@ -146,13 +146,13 @@ const ensureOxygen =
     hasEnoughOxygen(check, permit.plannedMinutes)
       ? ok(check)
       : err({ kind: "InsufficientOxygen", permitId: permit.permitId, workerId: check.workerId });
-/** 3. 累積線量と予測線量の合計が上限以内。医務の値はここでだけ unwrap される */
-const ensureDose =
+/** 3. 作業後の被ばく量が安全上限以内。医務の値はここでだけ unwrap される */
+const ensureExposure =
   (permit: Requested) =>
-  (worker: Worker): Result<Worker, DoseLimitExceeded> =>
-    isWithinDoseLimit(worker.cumulativeDoseMicroSv, permit.plannedMinutes)
+  (worker: Worker): Result<Worker, ExposureLimitExceeded> =>
+    isExposureWithinLimit(worker.radiationExposureMicroSv, permit.plannedMinutes)
       ? ok(worker)
-      : err({ kind: "DoseLimitExceeded", permitId: permit.permitId, workerId: worker.workerId });
+      : err({ kind: "ExposureLimitExceeded", permitId: permit.permitId, workerId: worker.workerId });
 /** 4. フレア警報が出ていない。報告がなければ承認しない */
 const ensureNoFlareAlert =
   (permit: Requested) =>
@@ -214,7 +214,7 @@ const validateApproval =
         yield* ensureOxygen(permit)(check);
         const resolvedWorker = yield* dependencies.workerResolver.resolveById(workerId);
         const worker = yield* ensureWorkerFound(workerId)(resolvedWorker);
-        yield* ensureDose(permit)(worker);
+        yield* ensureExposure(permit)(worker);
       }
 
       const weather = yield* dependencies.spaceWeatherResolver.resolveCurrent();

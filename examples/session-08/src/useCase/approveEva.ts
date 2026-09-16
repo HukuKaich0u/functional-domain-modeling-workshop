@@ -17,7 +17,7 @@ import type {
 } from "./dependencies.js";
 import {
   ensureDaytime,
-  ensureDoseWithinLimit,
+  ensureExposureWithinLimit,
   ensureNoFlareAlert,
   ensureOxygen,
   ensurePermitFound,
@@ -50,7 +50,7 @@ export const approveEva =
         ensureNoFlareAlert(permit, deps.spaceWeather.currentAlert()),
       )
       .andThen((permit) => ensureOxygen(permit, input.equipmentChecks))
-      .andThen((permit) => ensureDoseWithinLimit(permit, deps.doses))
+      .andThen((permit) => ensureExposureWithinLimit(permit, deps.exposures))
       .map((permit) =>
         approve(
           permit,
@@ -93,7 +93,7 @@ export const approveEvaWithEffects =
         ensureNoFlareAlert(permit, deps.spaceWeather.currentAlert()),
       )
       .andThen((permit) => ensureOxygen(permit, input.equipmentChecks))
-      .andThen((permit) => ensureDoseWithinLimit(permit, deps.doses))
+      .andThen((permit) => ensureExposureWithinLimit(permit, deps.exposures))
       .map((permit) =>
         EvaPermit.approve(context)(permit, {
           segmentId: input.segmentId,

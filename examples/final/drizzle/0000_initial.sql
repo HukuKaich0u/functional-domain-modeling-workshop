@@ -33,7 +33,7 @@ CREATE TABLE `segments` (
 CREATE TABLE `workers` (
 	`worker_id` text PRIMARY KEY NOT NULL,
 	`qualification` text NOT NULL,
-	`cumulative_dose_micro_sv` integer NOT NULL
+	`radiation_exposure_micro_sv` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `permits` (

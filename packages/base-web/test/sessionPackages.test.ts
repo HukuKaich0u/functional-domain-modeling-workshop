@@ -98,9 +98,9 @@ const moonbaseContract: ConceptContract = {
     { concept: "permit", module: "evaApproved", symbol: "EvaApproved", typeOnly: true, sessions: ["07", "08"] },
     { concept: "lockout", module: "segmentId", symbol: "SegmentId" },
     { concept: "worker", module: "workerId", symbol: "WorkerId" },
-    { concept: "worker", module: "cumulativeDose", symbol: "CumulativeDose" },
+    { concept: "worker", module: "radiationExposure", symbol: "RadiationExposure" },
     { concept: "worker", module: "equipmentCheck", symbol: "EquipmentCheck" },
-    { concept: "worker", module: "crewDoseResolver", symbol: "CrewDoseResolver", typeOnly: true },
+    { concept: "worker", module: "crewExposureResolver", symbol: "CrewExposureResolver", typeOnly: true },
     { concept: "spaceWeather", module: "flareAlert", symbol: "FlareAlert" },
   ],
 };

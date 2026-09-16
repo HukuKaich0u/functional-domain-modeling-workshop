@@ -20,7 +20,7 @@ export type ListWorkersUseCase = Readonly<{
   run: (input: UseCaseInput) => UseCaseOutput;
 }>;
 
-/** 累積線量を含むため、地上管制（医務の窓口）と Admin だけが一覧を見る */
+/** 被ばく量を含むため、地上管制（医務の窓口）と Admin だけが一覧を見る */
 const run =
   (dependencies: Dependencies) =>
   (input: UseCaseInput): UseCaseOutput =>

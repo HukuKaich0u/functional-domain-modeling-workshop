@@ -9,7 +9,7 @@ import {
 type Input = Readonly<{
   permitId: string;
   segmentId: string;
-  crewDose: readonly number[];
+  crewExposure: readonly number[];
 }>;
 
 export const approveEva =
@@ -24,7 +24,7 @@ export const approveEva =
     const occurredAt = new Date().toISOString();
     const updated = updateStatus(current, "approved", {
       segmentId: input.segmentId,
-      crewDose: input.crewDose,
+      crewExposure: input.crewExposure,
       approvedAt: occurredAt,
       approvedBy: "base-commander",
     });

@@ -128,14 +128,14 @@ describe("Session 02 Web application", () => {
     expect(repeatedLogs[0]?.occurredAt).not.toBe(repeatedLogs[1]?.occurredAt);
   });
 
-  it("作業記録 payload に作業員の累積線量を表示してしまう", async () => {
+  it("作業記録 payload に作業員の被ばく量を表示してしまう", async () => {
     await post(app, `${permitUrl}/approve`);
     const currentPage = await page(app);
     const workLogJson = currentPage.props.incidentLab.inspection.workLogJson;
 
     expect(workLogJson).toContain("44000");
     expect(currentPage.props.incidentLab.inspection.warnings).toContain(
-      "作業記録に作業員の累積線量が含まれています",
+      "作業記録に作業員の被ばく量が含まれています",
     );
   });
 

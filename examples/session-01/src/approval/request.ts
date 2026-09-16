@@ -21,8 +21,8 @@ export type ApprovalRequest = Readonly<{
   crew: readonly WorkerId[];
   plannedMinutes: number;
   equipmentChecks: readonly EquipmentCheck[];
-  /** 医務から渡された累積線量（µSv）。判定にだけ使い、記録には出さない */
-  crewDoseMicroSv: Readonly<Record<WorkerId, number>>;
+  /** 医務から渡された被ばく量（µSv）。判定にだけ使い、記録には出さない */
+  crewExposureMicroSv: Readonly<Record<WorkerId, number>>;
   flareAlert: FlareAlert;
   /** 電気主任が遮断札を掛けた系統区間 */
   lockedOutSegmentIds: readonly SegmentId[];
@@ -33,7 +33,7 @@ export type ApprovalRequest = Readonly<{
 export const rejectionReasons = [
   "EquipmentCheckMissing",
   "InsufficientOxygen",
-  "DoseLimitExceeded",
+  "ExposureLimitExceeded",
   "FlareAlertActive",
   "BuddyMissing",
   "SegmentNotLockedOut",
@@ -47,16 +47,16 @@ export type Verdict =
   | Readonly<{ kind: "Rejected"; reasons: readonly RejectionReason[] }>;
 
 export const OXYGEN_RESERVE_MINUTES = 60;
-export const DOSE_LIMIT_MICRO_SV = 50_000;
-export const DOSE_RATE_MICRO_SV_PER_HOUR = 60;
+export const EXPOSURE_LIMIT_MICRO_SV = 50_000;
+export const EXPOSURE_RATE_MICRO_SV_PER_HOUR = 60;
 export const LAST_DAYLIGHT_LUNAR_DAY = 14;
 export const CREW_SIZE = 2;
 
 export const requiredOxygenMinutes = (plannedMinutes: number): number =>
   plannedMinutes + OXYGEN_RESERVE_MINUTES;
 
-export const predictedDoseMicroSv = (plannedMinutes: number): number =>
-  Math.ceil((plannedMinutes / 60) * DOSE_RATE_MICRO_SV_PER_HOUR);
+export const expectedExposureIncreaseMicroSv = (plannedMinutes: number): number =>
+  Math.ceil((plannedMinutes / 60) * EXPOSURE_RATE_MICRO_SV_PER_HOUR);
 
 /** 教材の簡略化。作業区画 PV-07 へ給電する系統区間は PV-07 とする */
 export const segmentFor = (zoneId: ZoneId): SegmentId => zoneId;
@@ -94,7 +94,7 @@ export const violatedConditions = (
     const check = checkFor(request, workerId);
     return check === undefined ? [] : [check];
   });
-  const predicted = predictedDoseMicroSv(request.plannedMinutes);
+  const expectedIncrease = expectedExposureIncreaseMicroSv(request.plannedMinutes);
 
   if (crewChecks.length !== request.crew.length) reasons.push("EquipmentCheckMissing");
   if (
@@ -106,11 +106,11 @@ export const violatedConditions = (
   }
   if (
     !request.crew.every((workerId) => {
-      const dose = request.crewDoseMicroSv[workerId];
-      return dose !== undefined && dose + predicted <= DOSE_LIMIT_MICRO_SV;
+      const exposure = request.crewExposureMicroSv[workerId];
+      return exposure !== undefined && exposure + expectedIncrease <= EXPOSURE_LIMIT_MICRO_SV;
     })
   ) {
-    reasons.push("DoseLimitExceeded");
+    reasons.push("ExposureLimitExceeded");
   }
   if (request.flareAlert !== "Clear") reasons.push("FlareAlertActive");
   if (new Set(request.crew).size !== CREW_SIZE) reasons.push("BuddyMissing");
@@ -132,7 +132,7 @@ export const sampleRequest: ApprovalRequest = {
     oxygenMinutes: moonbaseFixture.oxygenMinutes,
     checkedAt: moonbaseFixture.checkedAt,
   })),
-  crewDoseMicroSv: moonbaseFixture.crewDoseMicroSv,
+  crewExposureMicroSv: moonbaseFixture.crewExposureMicroSv,
   flareAlert: "Clear",
   lockedOutSegmentIds: [moonbaseFixture.segmentId],
   lunarDay: moonbaseFixture.lunarDay,

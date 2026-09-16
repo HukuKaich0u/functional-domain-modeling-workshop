@@ -53,7 +53,7 @@ export const session: SessionSummary = {
   solutionPresentation: "excerpt",
   peerReviewPromises: "reference",
   animal: { name: "PV07-LOCKED", type: "boundary", avatar: "📡" },
-  summary: "地上管制の端末から届く許可番号と系統区間を検査し、型付きの開始承認の入力へ変換します。累積線量は記録に出しません。",
+  summary: "地上管制の端末から届く許可番号と系統区間を検査し、型付きの開始承認の入力へ変換します。被ばく量は記録に出しません。",
   episode: [
     "月面日第1日 01:00、地上管制の旧端末から EVA-0412 の開始承認が届きました。",
     "端末の送信処理は、系統区間の識別子ではなく遮断盤の表示ラベル「PV07-LOCKED」をsegmentIdへ入れました。",
@@ -200,21 +200,21 @@ const supplementary: readonly TeachingTopic[] = [
     why: "項目の欠落や不正な警報レベルを境界で止める考え方は、ApproveEvaInputと同じです。事故報告 第4号の事象2では、発令時刻が数値、観測局が配列ではない報告がそのまま保存されました。",
   },
   {
-    name: "Sensitive を実装して、デフォルトで累積線量がログに出力されないようにする",
+    name: "Sensitive を実装して、デフォルトで被ばく量がログに出力されないようにする",
     definition:
       "機微情報を wrap する型です。toJSON と toString をオーバーライドし [REDACTED] を返すようにします。中身を取り出すためには unwrap を呼び出す必要があります。",
     before: {
-      sources: ["examples/session-05/src/domain/worker/cumulativeDose.ts"],
-      code: `export type CumulativeDose = number;
+      sources: ["examples/session-05/src/domain/worker/radiationExposure.ts"],
+      code: `export type RadiationExposure = number;
 
-export const CumulativeDose = {
-  of: (microSv: number): CumulativeDose => microSv,
+export const RadiationExposure = {
+  of: (microSv: number): RadiationExposure => microSv,
 } as const;`,
     },
     after: {
       sources: [
         "examples/session-06/src/shared/sensitive.ts",
-        "examples/session-06/src/domain/worker/cumulativeDose.ts",
+        "examples/session-06/src/domain/worker/radiationExposure.ts",
       ],
       code: `export const Sensitive = {
   of: <T>(value: T): Sensitive<T> => ({
@@ -225,20 +225,20 @@ export const CumulativeDose = {
   }),
 } as const;
 
-export type CumulativeDose = Sensitive<number>;
+export type RadiationExposure = Sensitive<number>;
 
-export const CumulativeDose = {
-  of: (microSv: number): CumulativeDose => Sensitive.of(microSv),
+export const RadiationExposure = {
+  of: (microSv: number): RadiationExposure => Sensitive.of(microSv),
 } as const;
 
-export const isWithinDoseLimit = (
-  cumulative: CumulativeDose,
+export const isExposureWithinLimit = (
+  exposure: RadiationExposure,
   plannedMinutes: number,
 ): boolean =>
-  cumulative.unwrap() + predictedDoseMicroSv(plannedMinutes) <=
-  DOSE_LIMIT_MICRO_SV;`,
+  exposure.unwrap() + expectedExposureIncreaseMicroSv(plannedMinutes) <=
+  EXPOSURE_LIMIT_MICRO_SV;`,
     },
-    why: "累積線量を平文の number で持つと、JSON.stringify や console.log で簡単に作業記録や共有ログへ出てしまいます。これをレビューで守り続けることは困難でしょう。Sensitive で wrap するとデフォルトで値が表示されないようになり、値を取り出すには unwrap を明示的に呼び出さなければなりません。unwrap で検索すれば、線量が平文として取り出されている箇所を簡単に調べられます。規程第8条の「承認の判定にのみ用いる」は、isWithinDoseLimit の中だけで unwrap するという形でコードに残ります。",
+    why: "被ばく量を平文の number で持つと、JSON.stringify や console.log で簡単に作業記録や共有ログへ出てしまいます。これをレビューで守り続けることは困難でしょう。Sensitive で wrap するとデフォルトで値が表示されないようになり、値を取り出すには unwrap を明示的に呼び出さなければなりません。unwrap で検索すれば、被ばく量が平文として取り出されている箇所を簡単に調べられます。規程第8条の「承認の判定にのみ用いる」は、isExposureWithinLimit の中だけで unwrap するという形でコードに残ります。",
   },
 ];
 
@@ -383,7 +383,7 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
               <p class="case-file__episode-label">日の出基地のひと幕</p>
               {session.episode.map((line) => <p data-episode-line>{line}</p>)}
             </aside>
-            <p>事故報告 第4号が破った条文は、第2条、第3条、第8条です。外部の文字列を検査し、S4で区別した2種類の識別子を持つ入力へ変換します。累積線量を記録に出さない Sensitive は補足で扱います。</p>
+            <p>事故報告 第4号が破った条文は、第2条、第3条、第8条です。外部の文字列を検査し、S4で区別した2種類の識別子を持つ入力へ変換します。被ばく量を記録に出さない Sensitive は補足で扱います。</p>
             <h3>実際に届いた入力</h3>
             <p>
               URLの許可番号はrouteが<code>permitId</code>へ入れます。request bodyには、
@@ -509,9 +509,9 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
               </article>
             ))}
             <aside class="decision-card">
-              <h3>時間外の補足: 宇宙天気の報告と累積線量</h3>
+              <h3>時間外の補足: 宇宙天気の報告と被ばく量</h3>
               <p>
-                <code>SpaceWeatherReport</code> のschemaと、累積線量を既定で伏せる
+                <code>SpaceWeatherReport</code> のschemaと、被ばく量を既定で伏せる
                 <code>Sensitive</code> は、時間内のexerciseとレビューには含めません。必要な場合だけ次を開きます。
               </p>
               {supplementary.map((topic) => (

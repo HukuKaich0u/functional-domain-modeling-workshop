@@ -16,7 +16,7 @@ export default function WorkerForm({ auth, errors, mode, worker }: WorkerFormPro
   const form = useForm({
     workerId: worker?.workerId ?? "",
     qualification: worker?.qualification ?? "General",
-    cumulativeDoseMicroSv: worker === null ? "0" : String(worker.cumulativeDoseMicroSv),
+    radiationExposureMicroSv: worker === null ? "0" : String(worker.radiationExposureMicroSv),
   });
   const setQualification = (value: string) => {
     switch (value) {
@@ -83,21 +83,21 @@ export default function WorkerForm({ auth, errors, mode, worker }: WorkerFormPro
             </select>
           </FormField>
           <FormField
-            {...(errors.cumulativeDoseMicroSv === undefined ? {} : { error: errors.cumulativeDoseMicroSv })}
-            description="医務が管理する値（µSv）。上限は 50,000 µSv"
-            field="cumulativeDoseMicroSv"
-            label="累積線量（µSv）"
+            {...(errors.radiationExposureMicroSv === undefined ? {} : { error: errors.radiationExposureMicroSv })}
+            description="今回の滞在でこれまでに浴びた量。医務が管理し、安全上限は50,000 µSv"
+            field="radiationExposureMicroSv"
+            label="被ばく量（µSv）"
           >
             <input
-              aria-describedby={errors.cumulativeDoseMicroSv === undefined ? undefined : "cumulativeDoseMicroSv-error"}
-              aria-invalid={errors.cumulativeDoseMicroSv === undefined ? undefined : true}
-              id="cumulativeDoseMicroSv"
+              aria-describedby={errors.radiationExposureMicroSv === undefined ? undefined : "radiationExposureMicroSv-error"}
+              aria-invalid={errors.radiationExposureMicroSv === undefined ? undefined : true}
+              id="radiationExposureMicroSv"
               min={0}
-              name="cumulativeDoseMicroSv"
-              onChange={(event) => form.setData("cumulativeDoseMicroSv", event.target.value)}
+              name="radiationExposureMicroSv"
+              onChange={(event) => form.setData("radiationExposureMicroSv", event.target.value)}
               required
               type="number"
-              value={form.data.cumulativeDoseMicroSv}
+              value={form.data.radiationExposureMicroSv}
             />
           </FormField>
           <div className="form-actions">

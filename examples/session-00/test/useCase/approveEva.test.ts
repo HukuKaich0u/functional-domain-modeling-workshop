@@ -20,7 +20,7 @@ const initialPermit = {
 const input = {
   permitId: initialPermit.permitId,
   segmentId: "PV-07",
-  crewDose: [31_500, 44_000],
+  crewExposure: [31_500, 44_000],
 };
 
 const createRepository = () => {

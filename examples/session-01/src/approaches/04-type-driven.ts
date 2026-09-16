@@ -1,9 +1,9 @@
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   requiredOxygenMinutes,
   segmentFor,
   verdictFrom,
@@ -16,7 +16,7 @@ import {
 /**
  * 型駆動。「承認を判定できる形」を型で定義し、その形へ変換（parse）できた入力だけを判定関数へ渡す。
  * 2名分の装備点検（1）、相方（5）、遮断済みの系統区間（6）は型の構造で表す。
- * 酸素（2）、線量（3）、フレア警報（4）、夜間（7）は値に依存するため実行時に判定する。
+ * 酸素（2）、被ばく量（3）、フレア警報（4）、夜間（7）は値に依存するため実行時に判定する。
  */
 declare const brand: unique symbol;
 type Brand<T, Name extends string> = T & { readonly [brand]: Name };
@@ -39,7 +39,7 @@ export type ApprovalCandidate = Readonly<{
 }>;
 
 export type Environment = Readonly<{
-  cumulativeDoseOf: (workerId: WorkerId) => number | undefined;
+  radiationExposureOf: (workerId: WorkerId) => number | undefined;
   flareAlert: FlareAlert;
   lunarDay: number;
 }>;
@@ -51,7 +51,7 @@ export type StructuralReason =
 
 export type RuntimeReason =
   | "InsufficientOxygen"
-  | "DoseLimitExceeded"
+  | "ExposureLimitExceeded"
   | "FlareAlertActive"
   | "NightTime";
 
@@ -127,18 +127,18 @@ export const approve = (
 ): Verdict => {
   const reasons: RuntimeReason[] = [];
   const required = requiredOxygenMinutes(candidate.plannedMinutes);
-  const predicted = predictedDoseMicroSv(candidate.plannedMinutes);
+  const expectedIncrease = expectedExposureIncreaseMicroSv(candidate.plannedMinutes);
 
   if (!candidate.equipmentChecks.every((check) => check.oxygenMinutes >= required)) {
     reasons.push("InsufficientOxygen");
   }
   if (
     !candidate.crew.every((workerId) => {
-      const dose = environment.cumulativeDoseOf(workerId);
-      return dose !== undefined && dose + predicted <= DOSE_LIMIT_MICRO_SV;
+      const exposure = environment.radiationExposureOf(workerId);
+      return exposure !== undefined && exposure + expectedIncrease <= EXPOSURE_LIMIT_MICRO_SV;
     })
   ) {
-    reasons.push("DoseLimitExceeded");
+    reasons.push("ExposureLimitExceeded");
   }
   if (environment.flareAlert !== "Clear") reasons.push("FlareAlertActive");
   if (environment.lunarDay > LAST_DAYLIGHT_LUNAR_DAY) reasons.push("NightTime");
@@ -159,7 +159,7 @@ export const typeDriven: Approach = {
     const parsed = parseCandidate(request);
     if (!parsed.ok) return verdictFrom(parsed.reasons);
     return approve(parsed.candidate, {
-      cumulativeDoseOf: (workerId) => request.crewDoseMicroSv[workerId],
+      radiationExposureOf: (workerId) => request.crewExposureMicroSv[workerId],
       flareAlert: request.flareAlert,
       lunarDay: request.lunarDay,
     });

@@ -29,12 +29,12 @@ const createRepository = () => {
 };
 
 describe("未改善 SQLite 作業許可 repository", () => {
-  test("作業許可を更新すると作業記録 payload に累積線量を残してしまう", () => {
+  test("作業許可を更新すると作業記録 payload に被ばく量を残してしまう", () => {
     const { repository } = createRepository();
 
     repository.reset(initialPermit);
     const updated = updateStatus(repository.find(initialPermit.permitId)!, "approved", {
-      crewDose: [31_500, 44_000],
+      crewExposure: [31_500, 44_000],
     });
     repository.save(updated);
     repository.appendWorkLog({

@@ -7,7 +7,7 @@ import { SegmentId } from "../src/domain/lockout/index.js";
 import type { EvaApproved, EvaPermit, Requested } from "../src/domain/permit/index.js";
 import { PermitId, ZoneId } from "../src/domain/permit/index.js";
 import { FlareAlert } from "../src/domain/spaceWeather/index.js";
-import { CumulativeDose, WorkerId } from "../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../src/domain/worker/index.js";
 import { approveEvaWithEffects as approveEva } from "../src/useCase/approveEva.js";
 import { moonbaseFixture } from "../../fixtures/moonbase.js";
 
@@ -40,7 +40,7 @@ const input = {
 } as const;
 const diagnosticCause = {
   workerId: "W-04",
-  cumulativeDoseMicroSv: 49_900,
+  radiationExposureMicroSv: 49_900,
   message: "S7 storage unavailable while approving EVA-0412",
   stack: "S7DiagnosticError: storage unavailable\n    at EvaApprovedStore.store",
   error: new Error("S7 storage unavailable while approving EVA-0412"),
@@ -162,9 +162,9 @@ const createHarness = (outcome: HarnessOutcome = { kind: "success" }) => {
           return requested;
         },
       },
-      doses: {
+      exposures: {
         resolve: (workerId: WorkerId) =>
-          CumulativeDose.of(moonbaseFixture.crewDoseMicroSv[workerId] ?? 0),
+          RadiationExposure.of(moonbaseFixture.crewExposureMicroSv[workerId] ?? 0),
       },
       spaceWeather: { currentAlert: () => FlareAlert.clear },
       clock: { now: () => FIXED_OCCURRED_AT, lunarDay: () => FIXED_LUNAR_DAY },

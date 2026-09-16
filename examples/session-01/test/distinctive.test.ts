@@ -90,7 +90,7 @@ describe("型駆動", () => {
     const soloCrew: Crew = ["W-03" as WorkerId];
     // @ts-expect-error ApprovalRequest は parse を通さないと ApprovalCandidate にならない
     const verdict: Verdict = approve(sampleRequest, {
-      cumulativeDoseOf: () => 0,
+      radiationExposureOf: () => 0,
       flareAlert: "Clear",
       lunarDay: 1,
     });
@@ -146,10 +146,10 @@ describe("メッセージ指向・Actor Model", () => {
     expect(verdict).toEqual({ kind: "Approved" });
     expect(log.map(({ to, message }) => `${message.kind} -> ${to}`)).toEqual([
       "ApprovalRequested -> base-commander",
-      "DoseQuery -> medical-officer",
+      "ExposureQuery -> medical-officer",
       "SpaceWeatherQuery -> ground-control",
       "LockoutQuery -> electrician",
-      "DoseReply -> base-commander",
+      "ExposureReply -> base-commander",
       "SpaceWeatherReply -> base-commander",
       "LockoutReply -> base-commander",
       "ApprovalDecided -> requester",

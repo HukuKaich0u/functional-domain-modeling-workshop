@@ -5,7 +5,7 @@ import {
   SpaceWeatherReport,
   toFlareAlert,
 } from "../../src/boundary/spaceWeatherReport.js";
-import { CumulativeDose } from "../../src/domain/worker/index.js";
+import { RadiationExposure } from "../../src/domain/worker/index.js";
 import { compileTypeFixture } from "./compileTypeFixture.js";
 import { moonbaseFixture } from "../../../fixtures/moonbase.js";
 
@@ -37,12 +37,12 @@ describe("S5 regression: 外部境界と機微情報", () => {
     });
   });
 
-  it("累積線量はログへ出ない", () => {
-    const dose = CumulativeDose.of(44_000);
-    expect(JSON.stringify({ dose })).not.toContain("44000");
-    expect(inspect(dose)).not.toContain("44000");
-    expect(String(dose)).toBe("[REDACTED]");
-    expect(dose.unwrap()).toBe(44_000);
+  it("被ばく量はログへ出ない", () => {
+    const exposure = RadiationExposure.of(44_000);
+    expect(JSON.stringify({ exposure })).not.toContain("44000");
+    expect(inspect(exposure)).not.toContain("44000");
+    expect(String(exposure)).toBe("[REDACTED]");
+    expect(exposure.unwrap()).toBe(44_000);
   });
 
   it("境界値と配列は読み取り専用", () => {

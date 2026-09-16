@@ -1,9 +1,9 @@
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   rejectionReasons,
   requiredOxygenMinutes,
   segmentFor,
@@ -106,16 +106,16 @@ export const violationRules: readonly Rule[] = [
     },
   },
   {
-    head: "violation(P, DoseLimitExceeded)",
-    body: "permit(P, _, Minutes), crew(P, W), (not dose(W, _) ; dose(W, D), D + predicted(Minutes) > 50000)",
+    head: "violation(P, ExposureLimitExceeded)",
+    body: "permit(P, _, Minutes), crew(P, W), (not exposure(W, _) ; exposure(W, D), D + expectedIncrease(Minutes) > 50000)",
     *derive(db) {
       for (const { permitId, plannedMinutes } of permits(db)) {
         for (const workerId of crewOf(db, permitId)) {
-          const doses = db.query("dose", workerId, "_");
-          if (doses.length === 0) yield ["violation", permitId, "DoseLimitExceeded"];
-          for (const dose of doses) {
-            if (asNumber(dose[2]) + predictedDoseMicroSv(plannedMinutes) > DOSE_LIMIT_MICRO_SV) {
-              yield ["violation", permitId, "DoseLimitExceeded"];
+          const exposures = db.query("exposure", workerId, "_");
+          if (exposures.length === 0) yield ["violation", permitId, "ExposureLimitExceeded"];
+          for (const exposure of exposures) {
+            if (asNumber(exposure[2]) + expectedExposureIncreaseMicroSv(plannedMinutes) > EXPOSURE_LIMIT_MICRO_SV) {
+              yield ["violation", permitId, "ExposureLimitExceeded"];
             }
           }
         }
@@ -199,7 +199,7 @@ export const factsFrom = (request: ApprovalRequest): readonly Fact[] => [
   ["permit", request.permitId, request.zoneId, request.plannedMinutes],
   ...request.crew.map((workerId): Fact => ["crew", request.permitId, workerId]),
   ...request.equipmentChecks.map((check): Fact => ["checked", check.workerId, check.oxygenMinutes]),
-  ...Object.entries(request.crewDoseMicroSv).map(([workerId, dose]): Fact => ["dose", workerId, dose]),
+  ...Object.entries(request.crewExposureMicroSv).map(([workerId, exposure]): Fact => ["exposure", workerId, exposure]),
   ["flareAlert", request.flareAlert],
   ["feeds", segmentFor(request.zoneId), request.zoneId],
   ...request.lockedOutSegmentIds.map((segmentId): Fact => ["lockedOut", segmentId]),

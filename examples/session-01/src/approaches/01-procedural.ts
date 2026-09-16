@@ -35,11 +35,11 @@ export const checkApproval = (request: ApprovalRequest): CheckResult => {
     }
   }
 
-  const predicted = Math.ceil((request.plannedMinutes / 60) * 60);
+  const expectedIncrease = Math.ceil((request.plannedMinutes / 60) * 60);
   for (const workerId of request.crew) {
-    const dose = request.crewDoseMicroSv[workerId];
-    if (dose === undefined || dose + predicted > 50000) {
-      return { ok: false, message: `dose limit exceeded for ${workerId}` };
+    const exposure = request.crewExposureMicroSv[workerId];
+    if (exposure === undefined || exposure + expectedIncrease > 50000) {
+      return { ok: false, message: `exposure limit exceeded for ${workerId}` };
     }
   }
 
@@ -81,7 +81,7 @@ export const checkApproval = (request: ApprovalRequest): CheckResult => {
 export const reasonFromMessage = (message: string): RejectionReason => {
   if (message.includes("equipment check")) return "EquipmentCheckMissing";
   if (message.includes("oxygen")) return "InsufficientOxygen";
-  if (message.includes("dose")) return "DoseLimitExceeded";
+  if (message.includes("exposure")) return "ExposureLimitExceeded";
   if (message.includes("flare")) return "FlareAlertActive";
   if (message.includes("buddy")) return "BuddyMissing";
   if (message.includes("locked out")) return "SegmentNotLockedOut";

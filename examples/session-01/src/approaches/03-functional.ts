@@ -1,9 +1,9 @@
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   requiredOxygenMinutes,
   segmentFor,
   verdictFrom,
@@ -50,13 +50,13 @@ export const enoughOxygen: Condition = (request) =>
     ),
   );
 
-export const withinDoseLimit: Condition = (request) =>
-  violates("DoseLimitExceeded")(
+export const withinExposureLimit: Condition = (request) =>
+  violates("ExposureLimitExceeded")(
     request.crew.every((workerId) => {
-      const dose = request.crewDoseMicroSv[workerId];
+      const exposure = request.crewExposureMicroSv[workerId];
       return (
-        dose !== undefined &&
-        dose + predictedDoseMicroSv(request.plannedMinutes) <= DOSE_LIMIT_MICRO_SV
+        exposure !== undefined &&
+        exposure + expectedExposureIncreaseMicroSv(request.plannedMinutes) <= EXPOSURE_LIMIT_MICRO_SV
       );
     }),
   );
@@ -84,7 +84,7 @@ export const all =
 export const approvalConditions: Condition = all(
   equipmentChecked,
   enoughOxygen,
-  withinDoseLimit,
+  withinExposureLimit,
   noFlareAlert,
   buddyRegistered,
   segmentLockedOut,

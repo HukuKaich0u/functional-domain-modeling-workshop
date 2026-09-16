@@ -11,7 +11,7 @@ import {
 } from "../support/webHarness.js";
 
 describe("系統区間と隊員の管理", () => {
-  test("隊員の一覧と累積線量は地上管制と Admin だけが見る", async () => {
+  test("隊員の一覧と被ばく量は地上管制と Admin だけが見る", async () => {
     const { harness, adminCookie, groundControlCookie, baseCommanderCookie, electricianCookie } = await createStaffedHarness();
     await registerOperations(harness, groundControlCookie);
 
@@ -19,29 +19,29 @@ describe("系統区間と隊員の管理", () => {
       component: "Workers/Index",
       props: {
         workers: [
-          { workerId: "W-01", qualification: "Electrician", cumulativeDoseMicroSv: 12_000 },
-          { workerId: "W-02", qualification: "General", cumulativeDoseMicroSv: 8_000 },
+          { workerId: "W-01", qualification: "Electrician", radiationExposureMicroSv: 12_000 },
+          { workerId: "W-02", qualification: "General", radiationExposureMicroSv: 8_000 },
         ],
       },
     });
     expect((await page(harness, "/workers", adminCookie)).status).toBe(200);
     expect((await page(harness, "/workers", baseCommanderCookie)).status).toBe(403);
     expect((await page(harness, "/workers/W-01", electricianCookie)).status).toBe(403);
-    expect((await post(harness, "/workers", { workerId: "W-03", qualification: "General", cumulativeDoseMicroSv: "0" }, baseCommanderCookie)).status).toBe(403);
+    expect((await post(harness, "/workers", { workerId: "W-03", qualification: "General", radiationExposureMicroSv: "0" }, baseCommanderCookie)).status).toBe(403);
   });
 
   test("隊員番号の重複と書式の不備はフォームに戻し、進行中の許可がある隊員は削除できない", async () => {
     const { harness, groundControlCookie } = await createStaffedHarness();
     await registerOperations(harness, groundControlCookie);
 
-    const duplicate = await post(harness, "/workers", { workerId: "W-01", qualification: "General", cumulativeDoseMicroSv: "0" }, groundControlCookie);
+    const duplicate = await post(harness, "/workers", { workerId: "W-01", qualification: "General", radiationExposureMicroSv: "0" }, groundControlCookie);
     await expect(duplicate.json()).resolves.toMatchObject({
       component: "Workers/Form",
       props: { mode: "create", errors: { workerId: expect.stringContaining("既に登録") } },
     });
-    const malformed = await post(harness, "/workers", { workerId: "worker-3", qualification: "Pilot", cumulativeDoseMicroSv: "-5" }, groundControlCookie);
+    const malformed = await post(harness, "/workers", { workerId: "worker-3", qualification: "Pilot", radiationExposureMicroSv: "-5" }, groundControlCookie);
     await expect(malformed.json()).resolves.toMatchObject({
-      props: { errors: { workerId: expect.any(String), qualification: expect.any(String), cumulativeDoseMicroSv: expect.any(String) } },
+      props: { errors: { workerId: expect.any(String), qualification: expect.any(String), radiationExposureMicroSv: expect.any(String) } },
     });
     expect(harness.database.select().from(workersTable).all()).toHaveLength(2);
 

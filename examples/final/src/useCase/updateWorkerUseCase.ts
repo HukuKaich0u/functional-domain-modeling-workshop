@@ -6,7 +6,7 @@ import type { UserId } from "../domain/user/userId.js";
 import type { UserByIdResolver } from "../domain/user/userResolver.js";
 import { Worker } from "../domain/worker/index.js";
 import type {
-  CumulativeDose,
+  RadiationExposure,
   WorkerByIdResolver,
   WorkerId,
   WorkerQualification,
@@ -27,7 +27,7 @@ export type UseCaseInput = Readonly<{
   actorUserId: UserId;
   workerId: WorkerId;
   qualification: WorkerQualification;
-  cumulativeDoseMicroSv: CumulativeDose;
+  radiationExposureMicroSv: RadiationExposure;
 }>;
 export type UseCaseOk = Readonly<{ worker: WorkerView }>;
 export type UseCaseError = UnauthorizedError | WorkerNotFound | IdentityGenerationFailed;
@@ -43,7 +43,7 @@ export type UpdateWorkerUseCase = Readonly<{
   run: (input: UseCaseInput) => UseCaseOutput;
 }>;
 
-/** 医務が累積線量を更新する。値は Sensitive のまま状態に入り、作業記録には出ない */
+/** 医務が被ばく量を更新する。値は Sensitive のまま状態に入り、作業記録には出ない */
 const run =
   (dependencies: Dependencies) =>
   (input: UseCaseInput): UseCaseOutput =>
@@ -57,7 +57,7 @@ const run =
         createEvent(() =>
           Worker.update(createEventContext(dependencies, input.actorUserId))(worker, {
             qualification: input.qualification,
-            cumulativeDoseMicroSv: input.cumulativeDoseMicroSv,
+            radiationExposureMicroSv: input.radiationExposureMicroSv,
           }),
         ),
       )

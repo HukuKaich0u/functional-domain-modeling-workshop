@@ -41,7 +41,7 @@ const toPermitRow = (permit: EvaPermitState) => ({
 });
 
 // 作業記録の payload には点呼に必要な最小限だけを残す。
-// 装備点検の生データと累積線量は入れない（規程第8条）。
+// 装備点検の生データと被ばく量は入れない（規程第8条）。
 const toWorkLogRow = (event: EvaApproved) => ({
   permitId: event.permitId,
   eventId: event.eventId,

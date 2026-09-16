@@ -6,7 +6,7 @@ import { SegmentId } from "../src/domain/lockout/index.js";
 import type { Requested } from "../src/domain/permit/index.js";
 import { EvaPermit, PermitId, ZoneId } from "../src/domain/permit/index.js";
 import { FlareAlert } from "../src/domain/spaceWeather/index.js";
-import { CumulativeDose, WorkerId } from "../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../src/domain/worker/index.js";
 import { approveEvaWithEffects } from "../src/useCase/approveEva.js";
 import { moonbaseFixture } from "../../fixtures/moonbase.js";
 
@@ -40,9 +40,9 @@ const context = {
   lunarDay: moonbaseFixture.lunarDay,
 } as const;
 const environment = {
-  doses: {
+  exposures: {
     resolve: (workerId: WorkerId) =>
-      CumulativeDose.of(moonbaseFixture.crewDoseMicroSv[workerId] ?? 0),
+      RadiationExposure.of(moonbaseFixture.crewExposureMicroSv[workerId] ?? 0),
   },
   spaceWeather: { currentAlert: () => FlareAlert.clear },
   clock: {
@@ -103,7 +103,7 @@ describe("in-memory EvaApproved store", () => {
   it("use case も保存例外を捕捉せず、commit 前の値を保つ", async () => {
     const privateDetails = {
       workerId: "W-04",
-      cumulativeDoseMicroSv: 49_900,
+      radiationExposureMicroSv: 49_900,
       message: "S7 storage unavailable while approving EVA-0412",
       stack: "S7DiagnosticError: storage unavailable\n    at EvaApprovedStore.store",
       error: new Error("S7 storage unavailable while approving EVA-0412"),

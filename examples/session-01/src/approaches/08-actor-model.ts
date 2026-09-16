@@ -22,8 +22,8 @@ export type Address =
 
 export type Message =
   | Readonly<{ kind: "ApprovalRequested"; request: ApprovalRequest; replyTo: Address }>
-  | Readonly<{ kind: "DoseQuery"; permitId: string; workerIds: readonly string[]; replyTo: Address }>
-  | Readonly<{ kind: "DoseReply"; permitId: string; doses: Readonly<Record<string, number>> }>
+  | Readonly<{ kind: "ExposureQuery"; permitId: string; workerIds: readonly string[]; replyTo: Address }>
+  | Readonly<{ kind: "ExposureReply"; permitId: string; exposures: Readonly<Record<string, number>> }>
   | Readonly<{ kind: "SpaceWeatherQuery"; permitId: string; replyTo: Address }>
   | Readonly<{ kind: "SpaceWeatherReply"; permitId: string; alert: FlareAlert; lunarDay: number }>
   | Readonly<{ kind: "LockoutQuery"; permitId: string; segmentId: string; replyTo: Address }>
@@ -66,16 +66,16 @@ export class ActorSystem {
 }
 
 export const medicalOfficer =
-  (doses: Readonly<Record<string, number>>): Actor =>
+  (exposures: Readonly<Record<string, number>>): Actor =>
   (message, context) => {
-    if (message.kind !== "DoseQuery") return;
+    if (message.kind !== "ExposureQuery") return;
     context.send(message.replyTo, {
-      kind: "DoseReply",
+      kind: "ExposureReply",
       permitId: message.permitId,
-      doses: Object.fromEntries(
+      exposures: Object.fromEntries(
         message.workerIds.flatMap((workerId) => {
-          const dose = doses[workerId];
-          return dose === undefined ? [] : [[workerId, dose] as const];
+          const exposure = exposures[workerId];
+          return exposure === undefined ? [] : [[workerId, exposure] as const];
         }),
       ),
     });
@@ -107,7 +107,7 @@ export const electrician =
 type PendingApproval = Readonly<{
   request: ApprovalRequest;
   replyTo: Address;
-  doses: Readonly<Record<string, number>> | undefined;
+  exposures: Readonly<Record<string, number>> | undefined;
   weather: Readonly<{ alert: FlareAlert; lunarDay: number }> | undefined;
   lockedOut: boolean | undefined;
 }>;
@@ -116,7 +116,7 @@ const decidePending = (pending: PendingApproval): Verdict =>
   verdictFrom(
     violatedConditions({
       ...pending.request,
-      crewDoseMicroSv: pending.doses ?? {},
+      crewExposureMicroSv: pending.exposures ?? {},
       flareAlert: pending.weather?.alert ?? "Warning",
       lunarDay: pending.weather?.lunarDay ?? Number.POSITIVE_INFINITY,
       lockedOutSegmentIds:
@@ -134,12 +134,12 @@ export const baseCommander = (): Actor => {
       pendingApprovals.set(request.permitId, {
         request,
         replyTo: message.replyTo,
-        doses: undefined,
+        exposures: undefined,
         weather: undefined,
         lockedOut: undefined,
       });
       context.send("medical-officer", {
-        kind: "DoseQuery",
+        kind: "ExposureQuery",
         permitId: request.permitId,
         workerIds: request.crew,
         replyTo: "base-commander",
@@ -159,7 +159,7 @@ export const baseCommander = (): Actor => {
     }
 
     if (
-      message.kind !== "DoseReply" &&
+      message.kind !== "ExposureReply" &&
       message.kind !== "SpaceWeatherReply" &&
       message.kind !== "LockoutReply"
     ) {
@@ -169,14 +169,14 @@ export const baseCommander = (): Actor => {
     const pending = pendingApprovals.get(message.permitId);
     if (pending === undefined) return;
     const updated: PendingApproval =
-      message.kind === "DoseReply"
-        ? { ...pending, doses: message.doses }
+      message.kind === "ExposureReply"
+        ? { ...pending, exposures: message.exposures }
         : message.kind === "SpaceWeatherReply"
           ? { ...pending, weather: { alert: message.alert, lunarDay: message.lunarDay } }
           : { ...pending, lockedOut: message.lockedOut };
     pendingApprovals.set(message.permitId, updated);
 
-    if (updated.doses === undefined || updated.weather === undefined || updated.lockedOut === undefined) {
+    if (updated.exposures === undefined || updated.weather === undefined || updated.lockedOut === undefined) {
       return;
     }
     pendingApprovals.delete(message.permitId);
@@ -194,7 +194,7 @@ export const runApproval = (request: ApprovalRequest): ApprovalRun => {
   const reply: { verdict: Verdict | undefined } = { verdict: undefined };
   const system = new ActorSystem()
     .register("base-commander", baseCommander())
-    .register("medical-officer", medicalOfficer(request.crewDoseMicroSv))
+    .register("medical-officer", medicalOfficer(request.crewExposureMicroSv))
     .register("ground-control", groundControl(request.flareAlert, request.lunarDay))
     .register("electrician", electrician(request.lockedOutSegmentIds))
     .register("requester", (message) => {

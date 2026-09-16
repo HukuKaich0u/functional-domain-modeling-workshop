@@ -3,9 +3,9 @@ import { z } from "zod";
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   requiredOxygenMinutes,
   segmentFor,
   verdictFrom,
@@ -32,7 +32,7 @@ export const ApprovalRequestSchema = z
         checkedAt: z.string(),
       }),
     ),
-    crewDoseMicroSv: z.record(z.string(), z.number().nonnegative()),
+    crewExposureMicroSv: z.record(z.string(), z.number().nonnegative()),
     flareAlert: z.enum(["Clear", "Warning"]),
     lockedOutSegmentIds: z.array(z.string()),
     lunarDay: z.number().int().min(1).max(29),
@@ -49,10 +49,10 @@ export const deriveFacts = (data: ApprovalData): Facts => {
     const check = data.equipmentChecks.find((candidate) => candidate.workerId === workerId);
     return check === undefined ? [] : [check];
   });
-  const projectedDoses = data.crew.map(
+  const afterWorkExposures = data.crew.map(
     (workerId) =>
-      (data.crewDoseMicroSv[workerId] ?? Number.POSITIVE_INFINITY) +
-      predictedDoseMicroSv(data.plannedMinutes),
+      (data.crewExposureMicroSv[workerId] ?? Number.POSITIVE_INFINITY) +
+      expectedExposureIncreaseMicroSv(data.plannedMinutes),
   );
 
   return Object.freeze({
@@ -62,8 +62,8 @@ export const deriveFacts = (data: ApprovalData): Facts => {
     "equipment.requiredCount": data.crew.length,
     "oxygen.minMinutes": Math.min(...checks.map((check) => check.oxygenMinutes)),
     "oxygen.requiredMinutes": requiredOxygenMinutes(data.plannedMinutes),
-    "dose.maxProjectedMicroSv": Math.max(...projectedDoses),
-    "dose.limitMicroSv": DOSE_LIMIT_MICRO_SV,
+    "exposure.maxAfterWorkMicroSv": Math.max(...afterWorkExposures),
+    "exposure.limitMicroSv": EXPOSURE_LIMIT_MICRO_SV,
     "spaceWeather.clear": data.flareAlert === "Clear",
     "lockout.segmentLockedOut": data.lockedOutSegmentIds.includes(segmentFor(data.zoneId)),
     "calendar.lunarDay": data.lunarDay,
@@ -82,7 +82,7 @@ export type Constraint = Readonly<{
 export const constraints: readonly Constraint[] = [
   { reason: "EquipmentCheckMissing", left: "equipment.checkedCount", operator: "==", right: "equipment.requiredCount" },
   { reason: "InsufficientOxygen", left: "oxygen.minMinutes", operator: ">=", right: "oxygen.requiredMinutes" },
-  { reason: "DoseLimitExceeded", left: "dose.maxProjectedMicroSv", operator: "<=", right: "dose.limitMicroSv" },
+  { reason: "ExposureLimitExceeded", left: "exposure.maxAfterWorkMicroSv", operator: "<=", right: "exposure.limitMicroSv" },
   { reason: "FlareAlertActive", left: "spaceWeather.clear", operator: "==", right: true },
   { reason: "BuddyMissing", left: "crew.distinctCount", operator: "==", right: "crew.requiredCount" },
   { reason: "SegmentNotLockedOut", left: "lockout.segmentLockedOut", operator: "==", right: true },

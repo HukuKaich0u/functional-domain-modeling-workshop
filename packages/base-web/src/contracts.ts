@@ -107,7 +107,7 @@ export type MoonbaseNotice =
   | Readonly<{ kind: "InvalidPermitState" }>
   | Readonly<{ kind: "PermitNotFound" }>
   | Readonly<{ kind: "PermitConflict" }>
-  | Readonly<{ kind: "DoseLimitExceeded" }>
+  | Readonly<{ kind: "ExposureLimitExceeded" }>
   | Readonly<{ kind: "FlareAlertActive" }>
   | Readonly<{ kind: "InsufficientOxygen" }>
   | Readonly<{ kind: "NightTime" }>

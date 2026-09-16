@@ -19,7 +19,7 @@ import type { EventIdGenerator } from "../../src/domain/aggregate/eventIdGenerat
 import { SegmentId } from "../../src/domain/lockout/index.js";
 import { EvaPermit, PermitId } from "../../src/domain/permit/index.js";
 import { FlareAlert } from "../../src/domain/spaceWeather/index.js";
-import { CumulativeDose } from "../../src/domain/worker/index.js";
+import { RadiationExposure } from "../../src/domain/worker/index.js";
 import { approveEvaWithEffects } from "../../src/useCase/approveEva.js";
 import { session08InitialPermit } from "../../src/web/routes.js";
 
@@ -70,10 +70,10 @@ const approveInput = {
   approvedBy: "base-commander",
 } as const;
 const environment = {
-  doses: {
+  exposures: {
     resolve: (workerId: string) =>
-      CumulativeDose.of(
-        (moonbaseFixture.crewDoseMicroSv as Record<string, number>)[workerId] ?? 0,
+      RadiationExposure.of(
+        (moonbaseFixture.crewExposureMicroSv as Record<string, number>)[workerId] ?? 0,
       ),
   },
   spaceWeather: { currentAlert: () => FlareAlert.clear },
@@ -159,7 +159,7 @@ test("file SQLite persists the injected event ID, clock value, and lunar day", a
 
 test("SQLite work log payload excludes equipment checks and anything outside the work log DTO", async () => {
   const options = createOptions();
-  const checkSentinel = "dose: 44000 microSv";
+  const checkSentinel = "exposure: 44000 microSv";
   const app = createDatabaseBackedApp(options);
   app.close();
 

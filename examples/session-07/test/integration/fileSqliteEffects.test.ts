@@ -17,7 +17,7 @@ import { EventId } from "../../src/domain/aggregate/eventId.js";
 import { SegmentId } from "../../src/domain/lockout/index.js";
 import { EvaPermit, PermitId } from "../../src/domain/permit/index.js";
 import { FlareAlert } from "../../src/domain/spaceWeather/index.js";
-import { CumulativeDose } from "../../src/domain/worker/index.js";
+import { RadiationExposure } from "../../src/domain/worker/index.js";
 import { approveEvaWithEffects } from "../../src/useCase/approveEva.js";
 import { session07InitialPermit } from "../../src/web/routes.js";
 
@@ -63,9 +63,9 @@ const approveInput = {
   approvedBy: "base-commander",
 } as const;
 const environment = {
-  doses: {
+  exposures: {
     resolve: (workerId: string) =>
-      CumulativeDose.of(moonbaseFixture.crewDoseMicroSv[workerId] ?? 0),
+      RadiationExposure.of(moonbaseFixture.crewExposureMicroSv[workerId] ?? 0),
   },
   spaceWeather: { currentAlert: () => FlareAlert.clear },
 } as const;

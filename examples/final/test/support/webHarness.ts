@@ -129,15 +129,15 @@ export const createStaffedHarness = async () => {
 export const registerOperations = async (
   harness: Harness,
   groundControlCookie: string,
-  options: Readonly<{ doseB?: number; alertLevel?: string }> = {},
+  options: Readonly<{ exposureB?: number; alertLevel?: string }> = {},
 ) => {
   expect((await post(harness, "/segments", { segmentId: "PV-07", label: "PV-07 給電区間" }, groundControlCookie)).status).toBe(303);
-  expect((await post(harness, "/workers", { workerId: "W-01", qualification: "Electrician", cumulativeDoseMicroSv: "12000" }, groundControlCookie)).status).toBe(303);
+  expect((await post(harness, "/workers", { workerId: "W-01", qualification: "Electrician", radiationExposureMicroSv: "12000" }, groundControlCookie)).status).toBe(303);
   expect(
     (await post(
       harness,
       "/workers",
-      { workerId: "W-02", qualification: "General", cumulativeDoseMicroSv: String(options.doseB ?? 8_000) },
+      { workerId: "W-02", qualification: "General", radiationExposureMicroSv: String(options.exposureB ?? 8_000) },
       groundControlCookie,
     )).status,
   ).toBe(303);

@@ -6,10 +6,10 @@ import { permitsTable, workLogsTable } from "./schema.js";
 
 export const INITIAL_WORK_LOG_EVENT_ID = "00000000-0000-4000-8000-000000000000";
 
-export type CrewDoseContext = Readonly<Record<string, number>>;
+export type CrewExposureContext = Readonly<Record<string, number>>;
 
 export type PersistenceContext = Readonly<{
-  crewDoseMicroSv: CrewDoseContext;
+  crewExposureMicroSv: CrewExposureContext;
 }>;
 
 export type WorkLogEvent = Readonly<{
@@ -38,30 +38,30 @@ export type PermitRepository = Readonly<{
   seedIfEmpty: (initialPermit: EvaPermit, context: PersistenceContext) => void;
 }>;
 
-const toPermitRow = (permit: EvaPermit, crewDose: CrewDoseContext) => ({
+const toPermitRow = (permit: EvaPermit, crewExposure: CrewExposureContext) => ({
   permitId: permit.permitId,
   zoneId: permit.zoneId,
   status: permit.kind,
   state: permit,
-  crewDose,
+  crewExposure,
 });
 
 export const createPermitRepository = (
   database: SqliteDatabase,
 ): PermitRepository => {
-  const crewDoseFor = (permitId: string): CrewDoseContext => {
+  const crewExposureFor = (permitId: string): CrewExposureContext => {
     const row = database
-      .select({ crewDose: permitsTable.crewDose })
+      .select({ crewExposure: permitsTable.crewExposure })
       .from(permitsTable)
       .where(sql`${permitsTable.permitId} = ${permitId}`)
       .get();
 
     if (row === undefined) throw new Error("Permit not found");
-    return row.crewDose as CrewDoseContext;
+    return row.crewExposure as CrewExposureContext;
   };
 
   const save = (permit: EvaPermit): void => {
-    const row = toPermitRow(permit, crewDoseFor(permit.permitId));
+    const row = toPermitRow(permit, crewExposureFor(permit.permitId));
 
     database
       .insert(permitsTable)
@@ -80,7 +80,7 @@ export const createPermitRepository = (
         payload: {
           ...payload,
           permit,
-          crewDose: crewDoseFor(permit.permitId),
+          crewExposure: crewExposureFor(permit.permitId),
         },
       })
       .run();
@@ -92,7 +92,7 @@ export const createPermitRepository = (
       transaction.delete(permitsTable).run();
       transaction
         .insert(permitsTable)
-        .values(toPermitRow(initialPermit, context.crewDoseMicroSv))
+        .values(toPermitRow(initialPermit, context.crewExposureMicroSv))
         .run();
       transaction
         .insert(workLogsTable)
@@ -104,7 +104,7 @@ export const createPermitRepository = (
           lunarDay: 1,
           payload: {
             permit: initialPermit,
-            crewDose: context.crewDoseMicroSv,
+            crewExposure: context.crewExposureMicroSv,
           },
         })
         .run();

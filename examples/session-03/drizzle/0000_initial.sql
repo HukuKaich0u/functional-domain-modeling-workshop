@@ -3,7 +3,7 @@ CREATE TABLE `permits` (
   `zone_id` text NOT NULL,
   `status` text NOT NULL,
   `state` text NOT NULL,
-  `crew_dose` text NOT NULL
+  `crew_exposure` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `work_logs` (

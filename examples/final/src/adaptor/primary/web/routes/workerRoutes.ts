@@ -2,7 +2,7 @@ import type { Context, Hono } from "hono";
 import { z } from "zod";
 
 import {
-  CumulativeDose,
+  RadiationExposure,
   WorkerId,
   WorkerQualification,
 } from "../../../../domain/worker/index.js";
@@ -19,7 +19,7 @@ import type { FieldErrors, WebEnvironment } from "../pageProps.js";
 
 const WorkerProfileShape = {
   qualification: WorkerQualification.schema,
-  cumulativeDoseMicroSv: z.coerce.number().pipe(CumulativeDose.schema),
+  radiationExposureMicroSv: z.coerce.number().pipe(RadiationExposure.schema),
 };
 const RegisterWorkerFormSchema = z.object({
   workerId: WorkerId.schema,
@@ -38,18 +38,18 @@ type WorkerRouteDependencies = Readonly<{
 
 /**
  * 医務の窓口（地上管制と Admin）だけが開く画面の表現。
- * 累積線量はここで明示的に unwrap する。作業許可の画面や作業記録には出ない。
+ * 被ばく量はここで明示的に unwrap する。作業許可の画面や作業記録には出ない。
  */
 export type WorkerPageView = Readonly<{
   workerId: WorkerIdType;
   qualification: Worker["qualification"];
-  cumulativeDoseMicroSv: number;
+  radiationExposureMicroSv: number;
 }>;
 
 const toPageView = (worker: Worker): WorkerPageView => ({
   workerId: worker.workerId,
   qualification: worker.qualification,
-  cumulativeDoseMicroSv: worker.cumulativeDoseMicroSv.unwrap(),
+  radiationExposureMicroSv: worker.radiationExposureMicroSv.unwrap(),
 });
 
 const parseWorkerId = (context: Context<WebEnvironment>, raw: string) =>

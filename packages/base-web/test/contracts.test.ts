@@ -36,7 +36,7 @@ describe("moonbaseNoticeFromCode", () => {
     });
     expect(moonbaseNoticeFromCode("not-found")).toEqual({ kind: "PermitNotFound" });
     expect(moonbaseNoticeFromCode("conflict")).toEqual({ kind: "PermitConflict" });
-    expect(moonbaseNoticeFromCode("dose-limit")).toEqual({ kind: "DoseLimitExceeded" });
+    expect(moonbaseNoticeFromCode("exposure-limit")).toEqual({ kind: "ExposureLimitExceeded" });
     expect(moonbaseNoticeFromCode("flare-alert")).toEqual({ kind: "FlareAlertActive" });
     expect(moonbaseNoticeFromCode("oxygen")).toEqual({ kind: "InsufficientOxygen" });
     expect(moonbaseNoticeFromCode("night")).toEqual({ kind: "NightTime" });

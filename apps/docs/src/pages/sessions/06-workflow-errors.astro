@@ -168,7 +168,7 @@ const teaching: readonly TeachingTopic[] = [
       "このプロジェクトでは neverthrow の Result を使います。Result<T, E> の T は成功値、E は呼び出し側が扱う業務上の失敗です。ok(value) は成功側の Ok、err(error) は失敗側の Err を作り、どちらも Result<T, E> として扱えます。",
     guidance: [
       "Result に含める失敗は、先に呼び出し側の対応から選びます。失敗理由に応じて呼び出し側が次の操作を選べる業務エラーを E として返します。",
-      "たとえば、作業許可が見つからなければ許可番号を探し直し、まだ申請済でなければ状態を確認します。フレア警報中なら解除を待ち、線量上限を超えていれば作業員の配置を変えます。呼び出し側が理由ごとに異なる対応を選ぶ必要があるため、これらは Err で返します。",
+      "たとえば、作業許可が見つからなければ許可番号を探し直し、まだ申請済でなければ状態を確認します。フレア警報中なら解除を待ち、作業後の被ばく量が安全上限を超えるなら作業員の配置を変えます。呼び出し側が理由ごとに異なる対応を選ぶ必要があるため、これらは Err で返します。",
       "一方、呼び出し側に理由別の対応がなく、要求された処理を完了できない異常はシステムエラーとして扱います。このような異常はResultに変換せず、例外として外側へ伝えます。",
       "たとえば、SQLite への保存中に接続が切れ、保存が完了したか確認できない場合です。保存が完了したか確認できないまま作業記録の追記や地上管制への通知を行うと、状態は保存されていないのに、記録や通知だけが送られる可能性があります。そのため、記録の追記や通知は実行せず、保存時の例外をそのまま外側へ伝えます。",
       "外側の例外境界では、例外をログへ記録し、必要なロールバックや接続の解放を行ったうえで、500などのエラー応答へ変換します。",
@@ -221,9 +221,9 @@ const approveEva =
     if (clear.isErr()) {
       throw new Error("Approval blocked: flare alert is active");
     }
-    const dose = ensureDoseWithinLimit(requested, deps.doses);
-    if (dose.isErr()) {
-      throw new Error(\`Approval blocked: dose limit exceeded for \${dose.error.workerId}\`);
+    const exposure = ensureExposureWithinLimit(requested, deps.exposures);
+    if (exposure.isErr()) {
+      throw new Error(\`Approval blocked: exposure limit exceeded for \${exposure.error.workerId}\`);
     }
 
     const next = approve(requested, input, input.approvedAt);
@@ -256,7 +256,7 @@ type ApproveEvaError =
   | PermitNotFound
   | InvalidPermitState
   | InsufficientOxygen
-  | DoseLimitExceeded
+  | ExposureLimitExceeded
   | FlareAlertActive
   | NightTime;
 
@@ -270,7 +270,7 @@ const approveEva =
         ensureNoFlareAlert(permit, deps.spaceWeather.currentAlert()),
       )
       .andThen((permit) => ensureOxygen(permit, input.equipmentChecks))
-      .andThen((permit) => ensureDoseWithinLimit(permit, deps.doses))
+      .andThen((permit) => ensureExposureWithinLimit(permit, deps.exposures))
       .map((permit) =>
         approve(
           permit,
@@ -287,7 +287,7 @@ const approveEva =
         return approved;
       });`,
     },
-    why: "before は実行時には例外で処理が止まりますが、どの行が何をthrowするかは型に現れません。夜間、フレア警報、酸素、線量の4つの判定はすでに Result を返していますが、ユースケースが Err を例外へ変換し直しています。after は成功時に Approved のどの情報が得られるかと、6種類のどの理由で失敗するかを定義から確認できます。Err になった時点で後続の andThen と map は呼ばれません。resolver、spaceWeather、doses、store は外部境界として deps から受け取りますが、状態遷移はドメイン知識なので直接呼びます。store.save が投げる保存障害は、呼び出し側が理由別の対応を選ぶ業務エラーではなく、要求された保存処理を完了できないシステムエラーとして例外を伝播させます。",
+    why: "before は実行時には例外で処理が止まりますが、どの行が何をthrowするかは型に現れません。夜間、フレア警報、酸素、被ばく量の4つの判定はすでに Result を返していますが、ユースケースが Err を例外へ変換し直しています。after は成功時に Approved のどの情報が得られるかと、6種類のどの理由で失敗するかを定義から確認できます。Err になった時点で後続の andThen と map は呼ばれません。resolver、spaceWeather、exposures、store は外部境界として deps から受け取りますが、状態遷移はドメイン知識なので直接呼びます。store.save が投げる保存障害は、呼び出し側が理由別の対応を選ぶ業務エラーではなく、要求された保存処理を完了できないシステムエラーとして例外を伝播させます。",
   },
   {
     name: "match と switch で呼び出し側の処理漏れを型エラーにする",
@@ -324,8 +324,8 @@ const toNoticeCode = (error: ApproveEvaError) => {
       return "invalid-state";
     case "InsufficientOxygen":
       return "oxygen";
-    case "DoseLimitExceeded":
-      return "dose-limit";
+    case "ExposureLimitExceeded":
+      return "exposure-limit";
     case "FlareAlertActive":
       return "flare-alert";
     case "NightTime":
@@ -355,7 +355,7 @@ type ApproveEvaError =
   | PermitNotFound
   | InvalidPermitState
   | InsufficientOxygen
-  | DoseLimitExceeded
+  | ExposureLimitExceeded
   | FlareAlertActive
   | NightTime
   | PermitConflict;
@@ -366,7 +366,7 @@ const toNoticeCode = (error: ApproveEvaError): string => {
       return "not-found";
     case "InvalidPermitState":
       return "invalid-state";
-    // ...酸素、線量、警報、夜間の case...
+    // ...酸素、被ばく量、警報、夜間の case...
     default:
       // errorはPermitConflictなので、neverへ渡せない。
       return assertNever(error);
@@ -403,7 +403,7 @@ const approveEva = (
 const narrative = {
   requirement: "開始承認で地上管制や基地長が失敗理由に応じて操作を選ぶ失敗を型付きの値として返し、端末側が次の操作を選べるようにする。",
   currentRisk: "ユースケースは成功値だけを返す型のまま複数の Error をthrowします。端末側は許可なしの文言だけをcatchしているため、後から追加された状態不正やフレア警報中を処理できず500にしています。",
-  design: "許可なしと状態不正をkindを持つDiscriminated Unionにし、配布済みの酸素、線量、警報、夜間の失敗と合わせてResultで返す。andThenで失敗後の状態遷移とStore呼び出しを止める。状態遷移はドメイン関数を直接呼び、外部境界のResolver、SpaceWeather、CrewDoseResolver、Storeだけを依存として受け取る。端末側はmatchとswitchでResultに含めた失敗を網羅してnoticeへ変換する。",
+  design: "許可なしと状態不正をkindを持つDiscriminated Unionにし、配布済みの酸素、被ばく量、警報、夜間の失敗と合わせてResultで返す。andThenで失敗後の状態遷移とStore呼び出しを止める。状態遷移はドメイン関数を直接呼び、外部境界のResolver、SpaceWeather、CrewExposureResolver、Storeだけを依存として受け取る。端末側はmatchとswitchでResultに含めた失敗を網羅してnoticeへ変換する。",
   limitation: "どの失敗を業務エラーとして画面のnoticeへ変換するかは、人の判断とレビューが必要になる。呼び出し側に理由別の対応がなく、要求された処理を完了できないシステムエラーはResultへ変換せず、外側の例外境界へ伝える。",
   legacy: "成功値しか現れない関数シグネチャ、複数箇所のthrow、例外メッセージに依存したcatchを読みます。申請済でない許可とフレア警報中の承認だけ500になる処理漏れを、演習テストで再現します。",
   fallback: "2つのguardと approveEva は解答例を反映します。最後にWebルートをmatchとswitchへ置き換え、6種類のnoticeを確認します。",
@@ -430,7 +430,7 @@ export const workspace = ({
     "src/domain/permit/zoneId.ts",
     "src/domain/lockout/segmentId.ts",
     "src/domain/worker/workerId.ts",
-    "src/domain/worker/cumulativeDose.ts",
+    "src/domain/worker/radiationExposure.ts",
     "src/shared/sensitive.ts",
     "src/useCase/errors.ts",
     "src/useCase/approveEva.ts",
@@ -530,7 +530,7 @@ ${session.steps.map((step) => `- ${step.goal}`).join("\n")}
               <p class="case-file__episode-label">日の出基地のひと幕</p>
               {session.episode.map((line) => <p data-episode-line>{line}</p>)}
             </aside>
-            <p>事故報告 第5号が破った条文は、第2条と第5条です。作業許可が見つからない場合と申請済でない場合を、呼び出し側が処理できる業務エラーとして返します。フレア警報中、線量上限超過、酸素不足、夜間の4つは配布済みで、同じ Result の列に並べます。</p>
+            <p>事故報告 第5号が破った条文は、第2条と第5条です。作業許可が見つからない場合と申請済でない場合を、呼び出し側が処理できる業務エラーとして返します。フレア警報中、被ばく量が安全上限を超える、酸素不足、夜間の4つは配布済みで、同じ Result の列に並べます。</p>
             <h3 data-story-stage="use-case">追加したい機能</h3>
             <p>{narrative.requirement}</p>
             <h3 data-story-stage="pitfall">素朴な実装の落とし穴</h3>

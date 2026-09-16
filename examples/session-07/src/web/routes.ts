@@ -16,7 +16,7 @@ import {
 import { EventId } from "../domain/aggregate/eventId.js";
 import { WorkerId } from "../domain/worker/index.js";
 import { approveEvaWithEffects } from "../useCase/approveEva.js";
-import type { CrewDoseResolver, SpaceWeather } from "../useCase/dependencies.js";
+import type { CrewExposureResolver, SpaceWeather } from "../useCase/dependencies.js";
 import type { ApproveEvaWithEffectsError } from "../useCase/errors.js";
 import { toPageProps } from "./permitView.js";
 
@@ -26,7 +26,7 @@ type ApproveEvaNoticeCode =
   | "not-found"
   | "invalid-state"
   | "oxygen"
-  | "dose-limit"
+  | "exposure-limit"
   | "flare-alert"
   | "night";
 
@@ -36,7 +36,7 @@ export const approveEvaNoticeCodes: Readonly<
   PermitNotFound: "not-found",
   InvalidPermitState: "invalid-state",
   InsufficientOxygen: "oxygen",
-  DoseLimitExceeded: "dose-limit",
+  ExposureLimitExceeded: "exposure-limit",
   FlareAlertActive: "flare-alert",
   NightTime: "night",
 };
@@ -53,8 +53,8 @@ const toApproveEvaNoticeCode = (error: ApproveEvaError): ApproveEvaNoticeCode =>
       return approveEvaNoticeCodes.InvalidPermitState;
     case "InsufficientOxygen":
       return approveEvaNoticeCodes.InsufficientOxygen;
-    case "DoseLimitExceeded":
-      return approveEvaNoticeCodes.DoseLimitExceeded;
+    case "ExposureLimitExceeded":
+      return approveEvaNoticeCodes.ExposureLimitExceeded;
     case "FlareAlertActive":
       return approveEvaNoticeCodes.FlareAlertActive;
     case "NightTime":
@@ -72,7 +72,7 @@ const toApproveEvaWithEffectsNoticeCode = (
   error.kind === "PermitConflict" ? "conflict" : toApproveEvaNoticeCode(error);
 
 export type Environment = Readonly<{
-  doses: CrewDoseResolver;
+  exposures: CrewExposureResolver;
   spaceWeather: SpaceWeather;
 }>;
 
@@ -128,7 +128,7 @@ export const registerMoonbaseRoutes = (
     })._unsafeUnwrap();
     const dependencies = {
       resolver: store,
-      doses: environment.doses,
+      exposures: environment.exposures,
       spaceWeather: environment.spaceWeather,
       stateStore: store.stateStore,
       workLog: store.workLog,

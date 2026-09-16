@@ -7,7 +7,7 @@ import { SegmentId } from "../../src/domain/lockout/index.js";
 import type { EvaApproved, EvaPermit, Requested } from "../../src/domain/permit/index.js";
 import { PermitId, ZoneId } from "../../src/domain/permit/index.js";
 import { FlareAlert } from "../../src/domain/spaceWeather/index.js";
-import { CumulativeDose, WorkerId } from "../../src/domain/worker/index.js";
+import { RadiationExposure, WorkerId } from "../../src/domain/worker/index.js";
 import type { EffectsDependencies } from "../../src/useCase/dependencies.js";
 import { approveEvaWithEffects } from "../../src/useCase/approveEva.js";
 import { moonbaseFixture } from "../../../fixtures/moonbase.js";
@@ -166,9 +166,9 @@ const createHarness = (
         return requested;
       },
     },
-    doses: {
+    exposures: {
       resolve: (workerId) =>
-        CumulativeDose.of(moonbaseFixture.crewDoseMicroSv[workerId] ?? 0),
+        RadiationExposure.of(moonbaseFixture.crewExposureMicroSv[workerId] ?? 0),
     },
     spaceWeather: { currentAlert: () => FlareAlert.clear },
     clock: {

@@ -47,7 +47,7 @@ export const segmentsTable = sqliteTable("segments", {
 export const workersTable = sqliteTable("workers", {
   workerId: text("worker_id").primaryKey(),
   qualification: text("qualification", { enum: ["Electrician", "General"] }).notNull(),
-  cumulativeDoseMicroSv: integer("cumulative_dose_micro_sv").notNull(),
+  radiationExposureMicroSv: integer("radiation_exposure_micro_sv").notNull(),
 });
 
 export const permitsTable = sqliteTable("permits", {

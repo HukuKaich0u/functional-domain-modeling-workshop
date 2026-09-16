@@ -27,7 +27,7 @@ const noticeMessages: Readonly<
   InvalidPermitState: "現在の作業許可の状態ではこの操作を実行できません",
   PermitNotFound: "作業許可が見つかりません",
   PermitConflict: "作業許可がほかの操作によって更新されました",
-  DoseLimitExceeded: "累積線量が上限を超えるため承認できません",
+  ExposureLimitExceeded: "作業後の被ばく量が安全上限を超えるため承認できません",
   FlareAlertActive: "フレア警報の発令中は承認できません",
   InsufficientOxygen: "酸素残時間が不足しているため承認できません",
   NightTime: "夜間は船外作業を承認できません",

@@ -200,9 +200,9 @@ describe("MoonBase page SSR", () => {
   test("隊員一覧は医務の値を明示して描き、作業記録は伏せた値をそのまま見せる", async () => {
     const workers = await renderPage(WorkersIndex, {
       ...shared("GroundControl"),
-      workers: [{ workerId: ids.workerA, qualification: "Electrician", cumulativeDoseMicroSv: 12_000 }],
+      workers: [{ workerId: ids.workerA, qualification: "Electrician", radiationExposureMicroSv: 12_000 }],
     });
-    expect(workers).toContain("累積線量（µSv）");
+    expect(workers).toContain("被ばく量（µSv）");
     expect(workers).toContain("規程第8条");
     expect(workers).toContain("12,000");
 
@@ -217,7 +217,7 @@ describe("MoonBase page SSR", () => {
           occurredAt: at("2026-09-15T00:01:00.000Z"),
           lunarDay: 7 as never,
           actorUserId: ids.admin,
-          aggregateState: { workerId: "W-01", qualification: "General", cumulativeDoseMicroSv: "[REDACTED]" },
+          aggregateState: { workerId: "W-01", qualification: "General", radiationExposureMicroSv: "[REDACTED]" },
           eventPayload: { workerId: "W-01" },
         },
       ],

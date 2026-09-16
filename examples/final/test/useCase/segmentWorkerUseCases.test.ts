@@ -14,7 +14,7 @@ import type {
 import { SegmentLabel } from "../../src/domain/segment/index.js";
 import type { User } from "../../src/domain/user/user.js";
 import type { UserByIdResolver } from "../../src/domain/user/userResolver.js";
-import { CumulativeDose } from "../../src/domain/worker/index.js";
+import { RadiationExposure } from "../../src/domain/worker/index.js";
 import type { Worker, WorkerByIdResolver, WorkerDeleted, WorkerRegistered, WorkerUpdated } from "../../src/domain/worker/index.js";
 import { DeleteSegmentUseCase } from "../../src/useCase/deleteSegmentUseCase.js";
 import { DeleteWorkerUseCase } from "../../src/useCase/deleteWorkerUseCase.js";
@@ -164,7 +164,7 @@ describe("系統区間と隊員の登録", () => {
     ).toEqual({ kind: "SegmentInUse", segmentId: ids.segment });
   });
 
-  test("隊員の登録と更新は累積線量を Sensitive のまま扱い、結果にも平文を出さない", async () => {
+  test("隊員の登録と更新は被ばく量を Sensitive のまま扱い、結果にも平文を出さない", async () => {
     const registered: WorkerRegistered[] = [];
     const registerResult = await RegisterWorkerUseCase.create({
       userResolver: userResolverFor(groundControl),
@@ -175,7 +175,7 @@ describe("系統区間と隊員の登録", () => {
       actorUserId: ids.groundControl,
       workerId: ids.workerC,
       qualification: "Electrician",
-      cumulativeDoseMicroSv: CumulativeDose.schema.parse(31_415),
+      radiationExposureMicroSv: RadiationExposure.schema.parse(31_415),
     });
     expect(registerResult._unsafeUnwrap().worker.workerId).toBe(ids.workerC);
     expect(JSON.stringify(registerResult._unsafeUnwrap())).not.toContain("31415");
@@ -192,9 +192,9 @@ describe("系統区間と隊員の登録", () => {
       actorUserId: ids.groundControl,
       workerId: ids.workerA,
       qualification: "General",
-      cumulativeDoseMicroSv: CumulativeDose.schema.parse(27_182),
+      radiationExposureMicroSv: RadiationExposure.schema.parse(27_182),
     });
-    expect(updateResult._unsafeUnwrap().worker.cumulativeDoseMicroSv.unwrap()).toBe(27_182);
+    expect(updateResult._unsafeUnwrap().worker.radiationExposureMicroSv.unwrap()).toBe(27_182);
     expect(updated).toHaveLength(1);
   });
 

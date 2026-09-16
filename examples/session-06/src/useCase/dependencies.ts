@@ -5,13 +5,13 @@ import type {
   Requested,
 } from "../domain/permit/index.js";
 import type { FlareAlert } from "../domain/spaceWeather/index.js";
-import type { CrewDoseResolver } from "../domain/worker/index.js";
+import type { CrewExposureResolver } from "../domain/worker/index.js";
 
 export type PermitResolver = Readonly<{
   resolveById: (permitId: PermitId) => EvaPermit | undefined;
 }>;
 
-export type { CrewDoseResolver };
+export type { CrewExposureResolver };
 
 export type SpaceWeather = Readonly<{
   currentAlert: () => FlareAlert;
@@ -30,7 +30,7 @@ export type PermitStore = PermitResolver &
 
 export type Dependencies = Readonly<{
   resolver: PermitResolver;
-  doses: CrewDoseResolver;
+  exposures: CrewExposureResolver;
   spaceWeather: SpaceWeather;
   store: ApprovedStore;
 }>;

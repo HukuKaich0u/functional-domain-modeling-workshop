@@ -39,7 +39,7 @@ export const session03InitialPermit: Requested = {
 };
 
 export const session03PersistenceContext: PersistenceContext = {
-  crewDoseMicroSv: moonbaseFixture.crewDoseMicroSv,
+  crewExposureMicroSv: moonbaseFixture.crewExposureMicroSv,
 };
 
 const fixtureEquipmentChecks = [

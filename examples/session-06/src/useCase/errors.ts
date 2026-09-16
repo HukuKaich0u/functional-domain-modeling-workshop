@@ -9,8 +9,8 @@ import type {
 import type { FlareAlert } from "../domain/spaceWeather/index.js";
 import {
   hasEnoughOxygen,
-  isWithinDoseLimit,
-  type CrewDoseResolver,
+  isExposureWithinLimit,
+  type CrewExposureResolver,
   type WorkerId,
 } from "../domain/worker/index.js";
 
@@ -43,8 +43,8 @@ export type InsufficientOxygen = Readonly<{
   workerId: WorkerId;
 }>;
 
-export type DoseLimitExceeded = Readonly<{
-  kind: "DoseLimitExceeded";
+export type ExposureLimitExceeded = Readonly<{
+  kind: "ExposureLimitExceeded";
   workerId: WorkerId;
 }>;
 
@@ -83,15 +83,15 @@ export const ensureOxygen = (
     : err({ kind: "InsufficientOxygen", workerId: short.workerId });
 };
 
-export const ensureDoseWithinLimit = (
+export const ensureExposureWithinLimit = (
   permit: Requested,
-  doses: CrewDoseResolver,
-): Result<Requested, DoseLimitExceeded> => {
+  exposures: CrewExposureResolver,
+): Result<Requested, ExposureLimitExceeded> => {
   const exceeded = permit.crew.find(
     (workerId) =>
-      !isWithinDoseLimit(doses.resolve(workerId), permit.plannedMinutes),
+      !isExposureWithinLimit(exposures.resolve(workerId), permit.plannedMinutes),
   );
   return exceeded === undefined
     ? ok(permit)
-    : err({ kind: "DoseLimitExceeded", workerId: exceeded });
+    : err({ kind: "ExposureLimitExceeded", workerId: exceeded });
 };

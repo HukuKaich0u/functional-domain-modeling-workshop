@@ -1,4 +1,4 @@
-export * from "./cumulativeDose.js";
+export * from "./radiationExposure.js";
 export * from "./worker.js";
 export * from "./workerEvent.js";
 export * from "./workerId.js";

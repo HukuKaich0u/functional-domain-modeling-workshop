@@ -21,7 +21,7 @@ export type SanitizedAuditRecord = Readonly<{
   eventPayload: Readonly<Record<string, SanitizedAuditValue>>;
 }>;
 
-/** 作業記録の閲覧。累積線量などの機微情報は読み出し時に必ず伏せる */
+/** 作業記録の閲覧。被ばく量などの機微情報は読み出し時に必ず伏せる */
 export type EventHistoryReader = Readonly<{
   list: (
     admin: Admin,

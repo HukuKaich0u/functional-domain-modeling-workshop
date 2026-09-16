@@ -1,6 +1,6 @@
 # Final: MoonBase 日の出基地の作業管理アプリ
 
-`examples/final` は、作業許可を不正な状態へ戻す、作業区画と系統区間を取り違える、状態だけ更新されて作業記録が残らない、累積線量が表示やログへ混じるといった業務事故を防ぐ完成アプリです。Hono、Inertia、React、Drizzle、file SQLite を一つの package で動かします。
+`examples/final` は、作業許可を不正な状態へ戻す、作業区画と系統区間を取り違える、状態だけ更新されて作業記録が残らない、被ばく量が表示やログへ混じるといった業務事故を防ぐ完成アプリです。Hono、Inertia、React、Drizzle、file SQLite を一つの package で動かします。
 
 ## セットアップと実行
 
@@ -40,11 +40,11 @@ pnpm --filter @moonbase/final exec node dist/index.js
 - `BaseCommander`: 基地長。装備点検の記録、開始承認、エアロックの出発と帰還の記録を担当します。
 - `Electrician`: 電気主任。系統区間の遮断札を掛け、帰還後に札を外して作業許可を完了にします。
 
-作業許可は `Requested → Approved → Outside → Returned → Closed` と進みます。開始承認は、装備点検2名分、酸素残時間、累積線量、フレア警報、相方、遮断札、月面日の7条件を確認し、失敗理由を `kind` を持つ値で返します。完了は、遮断札の取り外しと作業許可の完了を1つの transaction で保存します。中止は出発前だけ可能で、理由を必須にします。
+作業許可は `Requested → Approved → Outside → Returned → Closed` と進みます。開始承認は、装備点検2名分、酸素残時間、被ばく量、フレア警報、相方、遮断札、月面日の7条件を確認し、失敗理由を `kind` を持つ値で返します。完了は、遮断札の取り外しと作業許可の完了を1つの transaction で保存します。中止は出発前だけ可能で、理由を必須にします。
 
 ## コードの責務
 
-- `src/domain`: 判別共用体の状態、branded ID、`Sensitive`（累積線量）、純粋な遷移、typed domain event
+- `src/domain`: 判別共用体の状態、branded ID、`Sensitive`（被ばく量）、純粋な遷移、typed domain event
 - `src/useCase`: one-method resolver/read port と event store を `ResultAsync` で合成する業務処理
 - `src/adaptor/primary`: Hono route、認証 cookie、Inertia props、React page
 - `src/adaptor/secondary`: Drizzle/SQLite resolver、query reader、event store、パスワードハッシュ

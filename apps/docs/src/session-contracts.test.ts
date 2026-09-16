@@ -124,8 +124,8 @@ const expectedCurriculum = [
 const expectedEpisodes = [
   [
     "補給便で着任した初日、前任者は同じ便で帰る支度をしながら、事故報告 第1号のプリントを手渡してきました。",
-    "帰還済みの作業許可は「作業中」へ戻り、点呼は40分の捜索に。共有ログには2名の累積線量まで律儀にそろっています。",
-    "引き継ぎ資料を開く前に、記録の逆戻りと線量流出の再現条件だけは確認できました。",
+    "帰還済みの作業許可は「作業中」へ戻り、点呼は40分の捜索に。共有ログには2名の被ばく量まで律儀にそろっています。",
+    "引き継ぎ資料を開く前に、記録の逆戻りと被ばく量の流出の再現条件だけは確認できました。",
   ],
   [
     "引き継ぎの次の検討で、開始承認の条件は、地上管制の端末、基地の端末、医務の表計算に、3通りの書き方で散らばっていました。",
@@ -417,7 +417,7 @@ describe("page-owned session contracts", () => {
     expect(source).toContain("SQLite");
     expect(source).toContain("現在の作業許可");
     expect(source).toContain("作業記録");
-    expect(source).toContain("累積線量");
+    expect(source).toContain("被ばく量");
     expect(source).not.toContain("src/legacy");
   });
 

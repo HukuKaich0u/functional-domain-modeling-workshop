@@ -16,7 +16,7 @@ import { domainEventsTable, permitsTable, workersTable } from "../schema.js";
 
 const activeStatuses = ["Requested", "Approved", "Outside", "Returned"] as const;
 
-/** 作業記録に残す状態。累積線量は含めない（規程第8条） */
+/** 作業記録に残す状態。被ばく量は含めない（規程第8条） */
 export const safeWorkerState = (worker: Worker): Readonly<Record<string, unknown>> => ({
   workerId: worker.workerId,
   qualification: worker.qualification,
@@ -26,7 +26,7 @@ export const safeWorkerState = (worker: Worker): Readonly<Record<string, unknown
 export const workerRowValues = (worker: Worker) => ({
   workerId: worker.workerId,
   qualification: worker.qualification,
-  cumulativeDoseMicroSv: worker.cumulativeDoseMicroSv.unwrap(),
+  radiationExposureMicroSv: worker.radiationExposureMicroSv.unwrap(),
 });
 
 const appendEvent = (

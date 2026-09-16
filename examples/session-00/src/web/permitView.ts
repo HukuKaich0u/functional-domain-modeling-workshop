@@ -89,8 +89,8 @@ const inspectionWarnings = (
   if (latestLog === undefined || !isDeepStrictEqual(latestLog.payload, permit)) {
     warnings.push("現在の作業許可に対応する作業記録がありません");
   }
-  if (workLogs.some(({ payload }) => payload.crewDose !== undefined)) {
-    warnings.push("作業記録に作業員の累積線量が含まれています");
+  if (workLogs.some(({ payload }) => payload.crewExposure !== undefined)) {
+    warnings.push("作業記録に作業員の被ばく量が含まれています");
   }
 
   return warnings;

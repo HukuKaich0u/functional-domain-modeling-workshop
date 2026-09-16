@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { moonbaseFixture } from "../../../fixtures/moonbase.js";
-import { createFixtureCrewDoseResolver } from "../../src/adaptor/fixtureCrewDoseResolver.js";
+import { createFixtureCrewExposureResolver } from "../../src/adaptor/fixtureCrewExposureResolver.js";
 import { createStaticSpaceWeather } from "../../src/adaptor/staticSpaceWeather.js";
 import { createApp } from "../../src/app.js";
 
@@ -74,9 +74,9 @@ describe("Session 07 Web application", () => {
     expect(response.headers.get("location")).toBe("/?notice=not-found");
   });
 
-  it("線量上限とフレア警報をそれぞれ専用noticeへ変換する", async () => {
-    const doseApp = createApp({
-      doses: createFixtureCrewDoseResolver({ "W-03": 31_500, "W-04": 49_900 }),
+  it("被ばく量が安全上限を超えた場合とフレア警報をそれぞれ専用noticeへ変換する", async () => {
+    const exposureApp = createApp({
+      exposures: createFixtureCrewExposureResolver({ "W-03": 31_500, "W-04": 49_900 }),
     });
     const flareApp = createApp({
       spaceWeather: createStaticSpaceWeather({
@@ -87,13 +87,13 @@ describe("Session 07 Web application", () => {
     });
     try {
       expect(
-        (await post(doseApp, `${permitUrl}/approve`)).headers.get("location"),
-      ).toBe("/?notice=dose-limit");
+        (await post(exposureApp, `${permitUrl}/approve`)).headers.get("location"),
+      ).toBe("/?notice=exposure-limit");
       expect(
         (await post(flareApp, `${permitUrl}/approve`)).headers.get("location"),
       ).toBe("/?notice=flare-alert");
     } finally {
-      doseApp.close();
+      exposureApp.close();
       flareApp.close();
     }
   });

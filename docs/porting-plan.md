@@ -1,5 +1,6 @@
 ---
 created: 2026-09-15
+updated: 2026-09-15
 author: Koki Aoyagi
 type: runbook
 ---
@@ -70,7 +71,7 @@ type: runbook
 | `ExaminationStarted` | `EvaApproved` |
 | `AppointmentId` `VeterinarianId` | `ZoneId` `SegmentId`（用途の対応。`PermitId` は集約の識別子） |
 | `PetId` `OwnerId` `ExamId` | `PermitId` `WorkerId`（配布済みの手本） |
-| `ownerContact`（`Sensitive`） | `CumulativeDose`（`Sensitive<number>`） |
+| `ownerContact`（`Sensitive`） | `RadiationExposure`（`Sensitive<number>`） |
 | `ExamResult`（外部JSONの検証例） | `SpaceWeatherReport` |
 | `AppointmentNotFound` `InvalidAppointmentState` `AppointmentConflict` | `PermitNotFound` `InvalidPermitState` `PermitConflict` |
 | `AppointmentResolver` `ExaminationStartedStore` | `PermitResolver` `EvaApprovedStore` |

@@ -13,7 +13,7 @@ import { approve } from "../domain/permit/index.js";
 import type { Dependencies, EffectsDependencies } from "./dependencies.js";
 import {
   ensureDaytime,
-  ensureDoseWithinLimit,
+  ensureExposureWithinLimit,
   ensureNoFlareAlert,
   ensureOxygen,
   ensurePermitFound,
@@ -41,7 +41,7 @@ export const approveEva =
         ensureNoFlareAlert(permit, deps.spaceWeather.currentAlert()),
       )
       .andThen((permit) => ensureOxygen(permit, input.equipmentChecks))
-      .andThen((permit) => ensureDoseWithinLimit(permit, deps.doses))
+      .andThen((permit) => ensureExposureWithinLimit(permit, deps.exposures))
       .map((permit) =>
         approve(
           permit,
@@ -73,7 +73,7 @@ export const approveEvaWithEffects =
     const lunarDay = 1;
     const result = approveEva({
       resolver: deps.resolver,
-      doses: deps.doses,
+      exposures: deps.exposures,
       spaceWeather: deps.spaceWeather,
       store: { save: () => undefined },
     })({ ...input, approvedAt: occurredAt, lunarDay });

@@ -231,7 +231,7 @@ test("invalid approve identifiers return 500 without changing file SQLite", asyn
   expect(observe(options.databasePath)).toEqual(before);
 });
 
-test("SQLite work log failures preserve the saved state and expose a dose-free persistence error", () => {
+test("SQLite work log failures preserve the saved state and expose a exposure-free persistence error", () => {
   const options = createOptions();
   const migrationDatabase = createSqliteDatabase(options.databasePath);
   try {
@@ -247,7 +247,7 @@ test("SQLite work log failures preserve the saved state and expose a dose-free p
       BEFORE INSERT ON work_logs
       WHEN NEW.event_name = 'EvaApproved'
       BEGIN
-        SELECT RAISE(FAIL, 'W-04 cumulative dose 44000 microSv');
+        SELECT RAISE(FAIL, 'W-04 radiation exposure 44000 microSv');
       END;
     `);
   } finally {

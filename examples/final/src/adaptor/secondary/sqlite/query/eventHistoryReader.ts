@@ -14,7 +14,7 @@ import {
 } from "./persistedEventRow.js";
 
 const redacted = "[REDACTED]";
-/** 作業記録の閲覧画面に出してよい項目。累積線量、作業内容、理由、点検所見は含めない */
+/** 作業記録の閲覧画面に出してよい項目。被ばく量、作業内容、理由、点検所見は含めない */
 const safeKeys = new Set([
   "kind",
   "role",

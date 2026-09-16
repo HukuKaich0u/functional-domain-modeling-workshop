@@ -30,7 +30,7 @@ import {
 import { EquipmentCheck } from "../../src/domain/equipmentCheck/index.js";
 import { AbortReason, EmergencyReason, EvaPermit } from "../../src/domain/permit/index.js";
 import { Segment } from "../../src/domain/segment/index.js";
-import { CumulativeDose, Worker } from "../../src/domain/worker/index.js";
+import { RadiationExposure, Worker } from "../../src/domain/worker/index.js";
 import {
   admin,
   approved,
@@ -244,19 +244,19 @@ describe("segment stores", () => {
 });
 
 describe("worker and equipment check stores", () => {
-  test("累積線量は projection にだけ置き、作業記録には出さない（規程第8条）", async () => {
+  test("被ばく量は projection にだけ置き、作業記録には出さない（規程第8条）", async () => {
     const db = freshDatabase();
     unwrap(await createWorkerRegisteredStore(db).store(Worker.register(eventContext(1))(worker(ids.workerA, 12_345))));
     unwrap(
       await createWorkerUpdatedStore(db).store(
         Worker.update(eventContext(2))(worker(ids.workerA, 12_345), {
           qualification: "Electrician",
-          cumulativeDoseMicroSv: CumulativeDose.schema.parse(23_456),
+          radiationExposureMicroSv: RadiationExposure.schema.parse(23_456),
         }),
       ),
     );
-    expect(db.select().from(workersTable).get()).toMatchObject({ qualification: "Electrician", cumulativeDoseMicroSv: 23_456 });
-    expect(unwrap(await createWorkerByIdResolver(db).resolveById(ids.workerA))?.cumulativeDoseMicroSv.unwrap()).toBe(23_456);
+    expect(db.select().from(workersTable).get()).toMatchObject({ qualification: "Electrician", radiationExposureMicroSv: 23_456 });
+    expect(unwrap(await createWorkerByIdResolver(db).resolveById(ids.workerA))?.radiationExposureMicroSv.unwrap()).toBe(23_456);
     const serialized = JSON.stringify(db.select().from(domainEventsTable).all());
     expect(serialized).not.toContain("12345");
     expect(serialized).not.toContain("23456");
@@ -308,14 +308,14 @@ describe("event history reader", () => {
     expect(records[1]?.eventPayload).toEqual({ permitId: "EVA-0412", zoneId: "PV-07" });
   });
 
-  test("累積線量が混入した記録は伏せて見せるのではなく、読み出しを拒む", async () => {
+  test("被ばく量が混入した記録は伏せて見せるのではなく、読み出しを拒む", async () => {
     const db = freshDatabase();
     db.insert(domainEventsTable)
       .values({
         eventId: "50000000-0000-4000-8000-000000000001",
         aggregateId: "W-09",
         aggregateName: "Worker",
-        aggregateState: { workerId: "W-09", qualification: "General", cumulativeDoseMicroSv: 99_999 },
+        aggregateState: { workerId: "W-09", qualification: "General", radiationExposureMicroSv: 99_999 },
         eventName: "worker.registered",
         eventPayload: { workerId: "W-09" },
         occurredAt: "2026-09-15T00:09:00.000Z",
@@ -324,6 +324,6 @@ describe("event history reader", () => {
       })
       .run();
 
-    await expect(createEventHistoryReader(db).list(admin)).rejects.toThrow("cumulativeDoseMicroSv");
+    await expect(createEventHistoryReader(db).list(admin)).rejects.toThrow("radiationExposureMicroSv");
   });
 });

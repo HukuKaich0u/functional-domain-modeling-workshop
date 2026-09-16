@@ -17,10 +17,10 @@ export const singleViolations: readonly (readonly [RejectionReason, ApprovalRequ
     { ...sampleRequest, equipmentChecks: [checkA, { ...checkB, oxygenMinutes: 200 }] },
   ],
   [
-    "DoseLimitExceeded",
+    "ExposureLimitExceeded",
     {
       ...sampleRequest,
-      crewDoseMicroSv: { ...sampleRequest.crewDoseMicroSv, [workerB]: 49_900 },
+      crewExposureMicroSv: { ...sampleRequest.crewExposureMicroSv, [workerB]: 49_900 },
     },
   ],
   ["FlareAlertActive", { ...sampleRequest, flareAlert: "Warning" }],

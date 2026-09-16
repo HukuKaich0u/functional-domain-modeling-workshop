@@ -1,9 +1,9 @@
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   requiredOxygenMinutes,
   segmentFor,
   verdictFrom,
@@ -55,16 +55,16 @@ export const regulations: readonly Rule[] = [
       ),
   },
   {
-    id: "dose-limit",
+    id: "exposure-limit",
     article: "第2条・第8条",
-    statement: "各作業員の累積線量と予測線量の合計が上限以内である",
-    reason: "DoseLimitExceeded",
+    statement: "今回の作業後も各作業員の被ばく量が安全上限以内である",
+    reason: "ExposureLimitExceeded",
     holds: (request) =>
       request.crew.every((workerId) => {
-        const dose = request.crewDoseMicroSv[workerId];
+        const exposure = request.crewExposureMicroSv[workerId];
         return (
-          dose !== undefined &&
-          dose + predictedDoseMicroSv(request.plannedMinutes) <= DOSE_LIMIT_MICRO_SV
+          exposure !== undefined &&
+          exposure + expectedExposureIncreaseMicroSv(request.plannedMinutes) <= EXPOSURE_LIMIT_MICRO_SV
         );
       }),
   },

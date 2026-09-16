@@ -5,7 +5,7 @@ export const permitsTable = sqliteTable("permits", {
   zoneId: text("zone_id").notNull(),
   status: text("status").notNull(),
   state: text("state", { mode: "json" }).notNull(),
-  crewDose: text("crew_dose", { mode: "json" }).notNull(),
+  crewExposure: text("crew_exposure", { mode: "json" }).notNull(),
 });
 
 export const workLogsTable = sqliteTable("work_logs", {

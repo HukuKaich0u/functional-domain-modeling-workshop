@@ -1,9 +1,9 @@
 import type { Approach } from "../approach.js";
 import {
   CREW_SIZE,
-  DOSE_LIMIT_MICRO_SV,
+  EXPOSURE_LIMIT_MICRO_SV,
   LAST_DAYLIGHT_LUNAR_DAY,
-  predictedDoseMicroSv,
+  expectedExposureIncreaseMicroSv,
   requiredOxygenMinutes,
   segmentFor,
   verdictFrom,
@@ -22,7 +22,7 @@ import {
  * 医務、地上管制、電気主任の知識は協力者オブジェクトとして注入する。
  */
 export interface MedicalOfficer {
-  cumulativeDoseOf(workerId: WorkerId): number | undefined;
+  radiationExposureOf(workerId: WorkerId): number | undefined;
 }
 
 export interface SpaceWeatherDesk {
@@ -95,16 +95,16 @@ export class OxygenReserveRule extends ApprovalRule {
   }
 }
 
-export class DoseLimitRule extends ApprovalRule {
+export class ExposureLimitRule extends ApprovalRule {
   constructor(private readonly medicalOfficer: MedicalOfficer) {
-    super("DoseLimitExceeded");
+    super("ExposureLimitExceeded");
   }
 
   isSatisfiedBy(candidate: PermitCandidate): boolean {
-    const predicted = predictedDoseMicroSv(candidate.plannedMinutes);
+    const expectedIncrease = expectedExposureIncreaseMicroSv(candidate.plannedMinutes);
     return candidate.crewMembers().every((workerId) => {
-      const dose = this.medicalOfficer.cumulativeDoseOf(workerId);
-      return dose !== undefined && dose + predicted <= DOSE_LIMIT_MICRO_SV;
+      const exposure = this.medicalOfficer.radiationExposureOf(workerId);
+      return exposure !== undefined && exposure + expectedIncrease <= EXPOSURE_LIMIT_MICRO_SV;
     });
   }
 }
@@ -174,7 +174,7 @@ export const policyFor = (request: ApprovalRequest): ApprovalPolicy =>
   new ApprovalPolicy([
     new EquipmentCheckedRule(),
     new OxygenReserveRule(),
-    new DoseLimitRule({ cumulativeDoseOf: (workerId) => request.crewDoseMicroSv[workerId] }),
+    new ExposureLimitRule({ radiationExposureOf: (workerId) => request.crewExposureMicroSv[workerId] }),
     new FlareAlertRule({ currentAlert: () => request.flareAlert }),
     new BuddyRule(),
     new LockoutRule({

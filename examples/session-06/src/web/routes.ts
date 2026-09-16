@@ -15,14 +15,14 @@ import {
 import { WorkerId } from "../domain/worker/index.js";
 import { approveEva } from "../useCase/approveEva.js";
 import type {
-  CrewDoseResolver,
+  CrewExposureResolver,
   PermitStore,
   SpaceWeather,
 } from "../useCase/dependencies.js";
 import { toPageProps } from "./permitView.js";
 
 export type Environment = Readonly<{
-  doses: CrewDoseResolver;
+  exposures: CrewExposureResolver;
   spaceWeather: SpaceWeather;
 }>;
 
@@ -80,7 +80,7 @@ export const registerMoonbaseRoutes = (
       approveEva({
         resolver: store,
         store,
-        doses: environment.doses,
+        exposures: environment.exposures,
         spaceWeather: environment.spaceWeather,
       })({
         ...input,

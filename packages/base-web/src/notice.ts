@@ -16,7 +16,7 @@ const moonbaseNoticesByCode: Readonly<
   "invalid-state": { kind: "InvalidPermitState" },
   "not-found": { kind: "PermitNotFound" },
   conflict: { kind: "PermitConflict" },
-  "dose-limit": { kind: "DoseLimitExceeded" },
+  "exposure-limit": { kind: "ExposureLimitExceeded" },
   "flare-alert": { kind: "FlareAlertActive" },
   oxygen: { kind: "InsufficientOxygen" },
   night: { kind: "NightTime" },

@@ -9,7 +9,7 @@ import { approve } from "../domain/permit/index.js";
 import type { Dependencies } from "./dependencies.js";
 import {
   ensureDaytime,
-  ensureDoseWithinLimit,
+  ensureExposureWithinLimit,
   ensureNoFlareAlert,
   ensureOxygen,
   ensurePermitFound,
@@ -46,9 +46,9 @@ export const approveEva =
     if (oxygen.isErr()) {
       throw new Error(`Approval blocked: oxygen too low for ${oxygen.error.workerId}`);
     }
-    const dose = ensureDoseWithinLimit(requested, deps.doses);
-    if (dose.isErr()) {
-      throw new Error(`Approval blocked: dose limit exceeded for ${dose.error.workerId}`);
+    const exposure = ensureExposureWithinLimit(requested, deps.exposures);
+    if (exposure.isErr()) {
+      throw new Error(`Approval blocked: exposure limit exceeded for ${exposure.error.workerId}`);
     }
 
     const next = approve(

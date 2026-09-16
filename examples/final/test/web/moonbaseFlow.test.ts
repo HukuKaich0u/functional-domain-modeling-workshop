@@ -170,9 +170,9 @@ describe("船外作業許可の業務フロー", () => {
     expect((await page(harness, "/events", groundControlCookie)).status).toBe(403);
   });
 
-  test("フレア警報、累積線量、酸素残時間の条件はそれぞれの理由で承認を止める", async () => {
+  test("フレア警報、被ばく量、酸素残時間の条件はそれぞれの理由で承認を止める", async () => {
     const { harness, groundControlCookie, baseCommanderCookie, electricianCookie } = await createStaffedHarness();
-    await registerOperations(harness, groundControlCookie, { doseB: 49_900, alertLevel: "S2" });
+    await registerOperations(harness, groundControlCookie, { exposureB: 49_900, alertLevel: "S2" });
     await requestPermit(harness, groundControlCookie);
     await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0412", 179);
     expect((await post(harness, "/segments/PV-07/lockout", { permitId: "EVA-0412" }, electricianCookie)).status).toBe(303);
@@ -188,14 +188,14 @@ describe("船外作業許可の業務フロー", () => {
     expect((await post(harness, "/segments/PV-07/lockout", { permitId: "EVA-0413" }, electricianCookie)).status).toBe(303);
     await recordEquipmentChecks(harness, baseCommanderCookie, "EVA-0413", 200);
 
-    const dose = await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie);
-    expect(dose.headers.get("location")).toBe("/permits/EVA-0413?error=dose-limit-exceeded");
-    await expect((await page(harness, "/permits/EVA-0413?error=dose-limit-exceeded", baseCommanderCookie)).json()).resolves.toMatchObject({
+    const exposure = await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie);
+    expect(exposure.headers.get("location")).toBe("/permits/EVA-0413?error=exposure-limit-exceeded");
+    await expect((await page(harness, "/permits/EVA-0413?error=exposure-limit-exceeded", baseCommanderCookie)).json()).resolves.toMatchObject({
       props: { errors: { form: expect.stringContaining("規程第8条") } },
     });
 
     expect(
-      (await post(harness, "/workers/W-02", { qualification: "General", cumulativeDoseMicroSv: "8000" }, groundControlCookie)).status,
+      (await post(harness, "/workers/W-02", { qualification: "General", radiationExposureMicroSv: "8000" }, groundControlCookie)).status,
     ).toBe(303);
     const flare = await post(harness, "/permits/EVA-0413/approve", {}, baseCommanderCookie);
     expect(flare.headers.get("location")).toBe("/permits/EVA-0413?error=flare-alert-active");

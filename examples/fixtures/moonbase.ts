@@ -6,8 +6,8 @@ export const moonbaseFixture = {
   crew: ["W-03", "W-04"],
   plannedMinutes: 180,
   oxygenMinutes: 300,
-  doseLimitMicroSv: 50_000,
-  crewDoseMicroSv: { "W-03": 31_500, "W-04": 44_000 } as Readonly<
+  exposureLimitMicroSv: 50_000,
+  crewExposureMicroSv: { "W-03": 31_500, "W-04": 44_000 } as Readonly<
     Record<string, number>
   >,
   requestedAt: "2026-09-15T00:00:00.000Z",

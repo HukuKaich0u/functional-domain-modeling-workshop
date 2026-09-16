@@ -122,7 +122,7 @@ export const navigation = ({
       </li>
       <li>
         <strong>業務上の失敗</strong><br />
-        <code>examples/final/src/useCase/approveEvaUseCase.ts</code> で、許可なし・状態不正・7条件の不成立・保存競合が型付きの <code>Err</code> として残ることを確認します。累積線量の判定は値を返さず、<code>DoseLimitExceeded</code> という事実だけを返します。
+        <code>examples/final/src/useCase/approveEvaUseCase.ts</code> で、許可なし・状態不正・7条件の不成立・保存競合が型付きの <code>Err</code> として残ることを確認します。被ばく量の判定は値を返さず、<code>ExposureLimitExceeded</code> という事実だけを返します。
       </li>
       <li>
         <strong>出力イベント</strong><br />
@@ -134,7 +134,7 @@ export const navigation = ({
       </li>
       <li>
         <strong>例外境界</strong><br />
-        SQLite障害や破損データが業務 <code>Result</code> に入らず、<code>examples/final/src/app.ts</code> の共通境界で安全に記録され、詳細を含まない500応答になることを確認します。累積線量が混入した作業記録は、読み出し側の <code>persistedEventRow.ts</code> が伏せて見せるのではなく拒みます。
+        SQLite障害や破損データが業務 <code>Result</code> に入らず、<code>examples/final/src/app.ts</code> の共通境界で安全に記録され、詳細を含まない500応答になることを確認します。被ばく量が混入した作業記録は、読み出し側の <code>persistedEventRow.ts</code> が伏せて見せるのではなく拒みます。
       </li>
     </ol>
     <p>

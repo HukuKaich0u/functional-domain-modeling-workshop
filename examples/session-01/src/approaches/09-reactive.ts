@@ -59,7 +59,7 @@ export const derive = <Out>(
 export type ApprovalBoard = Readonly<{
   crew$: Cell<readonly string[]>;
   equipmentChecks$: Cell<readonly EquipmentCheck[]>;
-  crewDose$: Cell<Readonly<Record<string, number>>>;
+  crewExposure$: Cell<Readonly<Record<string, number>>>;
   flareAlert$: Cell<FlareAlert>;
   lockedOutSegments$: Cell<readonly string[]>;
   lunarDay$: Cell<number>;
@@ -69,13 +69,13 @@ export type ApprovalBoard = Readonly<{
 export const createBoard = (request: ApprovalRequest): ApprovalBoard => {
   const crew$ = new Cell(request.crew);
   const equipmentChecks$ = new Cell(request.equipmentChecks);
-  const crewDose$ = new Cell(request.crewDoseMicroSv);
+  const crewExposure$ = new Cell(request.crewExposureMicroSv);
   const flareAlert$ = new Cell(request.flareAlert);
   const lockedOutSegments$ = new Cell(request.lockedOutSegmentIds);
   const lunarDay$ = new Cell(request.lunarDay);
 
   const verdict$ = derive(
-    [crew$, equipmentChecks$, crewDose$, flareAlert$, lockedOutSegments$, lunarDay$],
+    [crew$, equipmentChecks$, crewExposure$, flareAlert$, lockedOutSegments$, lunarDay$],
     () =>
       verdictFrom(
         violatedConditions({
@@ -84,7 +84,7 @@ export const createBoard = (request: ApprovalRequest): ApprovalBoard => {
           plannedMinutes: request.plannedMinutes,
           crew: crew$.value,
           equipmentChecks: equipmentChecks$.value,
-          crewDoseMicroSv: crewDose$.value,
+          crewExposureMicroSv: crewExposure$.value,
           flareAlert: flareAlert$.value,
           lockedOutSegmentIds: lockedOutSegments$.value,
           lunarDay: lunarDay$.value,
@@ -92,7 +92,7 @@ export const createBoard = (request: ApprovalRequest): ApprovalBoard => {
       ),
   );
 
-  return { crew$, equipmentChecks$, crewDose$, flareAlert$, lockedOutSegments$, lunarDay$, verdict$ };
+  return { crew$, equipmentChecks$, crewExposure$, flareAlert$, lockedOutSegments$, lunarDay$, verdict$ };
 };
 
 export const reactive: Approach = {

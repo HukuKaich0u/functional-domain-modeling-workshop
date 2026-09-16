@@ -128,9 +128,9 @@ test("Session 06 rejects invalid permit and segment identifiers without changing
   expect(observePermit(databasePath, moonbaseFixture.permitId)).toEqual(beforeInvalidSegment);
 });
 
-test("Session 06 stores an approval work log payload without crew dose", async () => {
+test("Session 06 stores an approval work log payload without crew exposure", async () => {
   const scenario = scenarioFor("Session 06");
-  const databasePath = databases.createDatabasePath("session-06-dose");
+  const databasePath = databases.createDatabasePath("session-06-exposure");
   const app = scenario.createApp(databasePath);
 
   try {
@@ -151,7 +151,7 @@ test("Session 06 stores an approval work log payload without crew dose", async (
   if (serializedPayload === undefined) throw new Error("Missing approval work log payload");
   for (const workerId of moonbaseFixture.crew) {
     expect(serializedPayload).not.toContain(
-      String(moonbaseFixture.crewDoseMicroSv[workerId]),
+      String(moonbaseFixture.crewExposureMicroSv[workerId]),
     );
   }
 });
