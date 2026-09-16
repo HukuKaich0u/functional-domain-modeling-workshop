@@ -63,7 +63,7 @@
 }
 
 .case-file__episode {
-  max-width: 70ch;
+  max-width: 100ch;
   margin-top: 2rem;
   padding: 1rem 1.25rem;
   border: 2px solid var(--case-line);
@@ -236,12 +236,12 @@
   border: 2px solid var(--case-line);
   border-spacing: 0;
   background: var(--case-paper);
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .case-file__content :is(th, td) {
-  padding: 0.7rem 0.8rem;
+  padding: 0.5rem 0.65rem;
   border-block-end: 1px solid var(--case-line);
   overflow-wrap: anywhere;
   text-align: left;
@@ -277,11 +277,11 @@
   margin-block: 1.5rem;
   border: 2px solid var(--case-line);
   background: var(--case-paper);
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .case-file__content :is(dt, dd) {
-  padding: 0.7rem 0.8rem;
+  padding: 0.5rem 0.65rem;
   border-block-end: 1px solid var(--case-line);
 }
 
@@ -996,7 +996,7 @@
 .case-file .case-file__site-header {
   width: 100%;
   margin: 0;
-  padding: 0.8rem max(1rem, calc((100% - 88rem) / 2));
+  padding: 0.5rem max(1.5rem, calc((100% - 120rem) / 2));
   border-bottom: 1px solid #294454;
   background: rgb(7 16 25 / 92%);
   color: #e9efeb;
@@ -1006,9 +1006,9 @@
 .case-file .case-file__site-header a {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   color: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 650;
   text-decoration: none;
 }
@@ -1016,8 +1016,8 @@
 .case-file .case-file__brand-mark {
   position: relative;
   display: block;
-  width: 2rem;
-  height: 2rem;
+  width: 1.6rem;
+  height: 1.6rem;
   flex: 0 0 auto;
   overflow: hidden;
   border: 1px solid #6f8792;
@@ -1029,10 +1029,10 @@
 
 .case-file .case-file__brand-mark::after {
   position: absolute;
-  top: -0.16rem;
-  right: -0.12rem;
-  width: 1.9rem;
-  height: 1.9rem;
+  top: -0.13rem;
+  right: -0.1rem;
+  width: 1.52rem;
+  height: 1.52rem;
   border-radius: 50%;
   background: var(--case-space);
   content: "";

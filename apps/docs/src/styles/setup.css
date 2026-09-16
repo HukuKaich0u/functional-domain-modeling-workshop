@@ -323,22 +323,65 @@
 
 /* Calm setup page. */
 .setup-page__main {
-  width: min(100% - 2rem, 52rem);
-  padding-block: clamp(3rem, 7vw, 5rem);
+  width: min(100% - 3rem, 80rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .setup-page__hero {
-  margin-bottom: 3rem;
+  max-width: none;
+  margin-bottom: 1.5rem;
   border-left-color: #aeb9b7;
 }
 
 .setup-page__hero h1 {
   color: var(--case-ink);
-  font-size: clamp(2.75rem, 8vw, 5rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
+  line-height: 1.25;
 }
 
 .setup-page__hero > p:last-child {
+  max-width: 72rem;
+  margin-top: 0.75rem;
   color: var(--case-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+#environment {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+#environment > h2,
+.setup-page__main > section > h2 {
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+}
+
+.setup-step h3 {
+  font-size: 1.15rem;
+}
+
+.setup-step h3 + p {
+  margin-top: 0.5rem;
+}
+
+.setup-page__steps {
+  margin-top: 1.25rem;
+}
+
+.setup-step,
+.setup-step--repository,
+.setup-step--verification {
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.setup-step__number,
+.setup-step--repository .setup-step__number,
+.setup-step--verification .setup-step__number {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 #environment {

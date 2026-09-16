@@ -367,13 +367,13 @@
 
 /* Calm curriculum: ordinary reading first, MoonBase accents second. */
 .session-directory__main {
-  width: min(100% - 2rem, 74rem);
-  padding-block: clamp(3rem, 7vw, 5rem);
+  width: min(100% - 3rem, 120rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .session-directory__hero {
-  max-width: 52rem;
-  margin-bottom: 3rem;
+  max-width: 64rem;
+  margin-bottom: 1.5rem;
   border-left-color: #aeb9b7;
 }
 
@@ -382,17 +382,24 @@
 }
 
 .session-directory__hero h1 {
+  max-width: none;
   color: var(--case-ink);
-  font-size: clamp(2.75rem, 7vw, 5rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
+  line-height: 1.25;
 }
 
 .session-directory__hero > h1 + p {
+  max-width: 72rem;
+  margin-top: 0.75rem;
   color: var(--case-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .session-directory__setup {
-  width: min(100%, 48rem);
-  margin-bottom: 3rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
   border-color: #c9b892;
   border-left-color: var(--case-sunrise);
   background: #fbf3e4;
@@ -408,7 +415,21 @@
 }
 
 .session-directory__setup h2 {
+  margin-top: 0.4rem;
   color: var(--case-ink);
+  font-size: 1.15rem;
+}
+
+.session-directory__setup h2 + p {
+  margin-top: 0.4rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.session-directory__setup-link {
+  margin-top: 0.75rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
 }
 
 .session-directory__setup h2 + p {
@@ -416,10 +437,23 @@
 }
 
 .session-directory__list {
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
   overflow: visible;
   border: 0;
   background: transparent;
+}
+
+@media (max-width: 64rem) {
+  .session-directory__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 44rem) {
+  .session-directory__list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .session-directory__list > li {
@@ -427,7 +461,8 @@
 }
 
 .session-directory__card {
-  min-height: 21rem;
+  min-height: 0;
+  padding: 1.1rem 1.2rem;
   border: 1px solid #b9c3c0;
   background: #faf9f5;
   color: var(--case-ink);
@@ -435,6 +470,7 @@
 
 .session-directory__card::after {
   color: rgb(34 98 112 / 8%);
+  font-size: 2.5rem;
 }
 
 .session-directory__card:hover,
@@ -456,12 +492,22 @@
   color: #9a621f;
 }
 
+.session-directory__scene {
+  margin-top: 0.9rem;
+}
+
 .session-directory__card h2 {
+  margin-top: 0.5rem;
   color: var(--case-ink);
+  font-size: 1.1rem;
+  line-height: 1.4;
 }
 
 .session-directory__card p {
+  margin: 0.5rem 0 1rem;
   color: var(--case-muted);
+  font-size: 0.85rem;
+  line-height: 1.65;
 }
 
 .session-directory__open {
