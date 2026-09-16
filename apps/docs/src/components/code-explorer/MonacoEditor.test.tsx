@@ -71,7 +71,10 @@ const monacoState = vi.hoisted(() => {
   };
 });
 
-vi.mock("./monaco-client", () => ({ monaco: monacoState.monaco }));
+vi.mock("./monaco-client", () => ({
+  monaco: monacoState.monaco,
+  moonbaseEditorTheme: "moonbase-dark",
+}));
 
 const projectFiles = {
   "src/first.ts": "const first = true;",

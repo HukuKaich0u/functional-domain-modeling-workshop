@@ -188,7 +188,7 @@ export const MonacoEditor = (props: EditorProps) => {
     let cancelled = false;
 
     const initialize = async () => {
-      const { monaco } = await import("./monaco-client");
+      const { monaco, moonbaseEditorTheme } = await import("./monaco-client");
       if (cancelled || editorHost.current === null) return;
 
       configureTypeScript(monaco);
@@ -204,6 +204,9 @@ export const MonacoEditor = (props: EditorProps) => {
       registerExtraLibs(resources, current.typeFiles);
       const editor = monaco.editor.create(editorHost.current, {
         automaticLayout: true,
+        bracketPairColorization: { enabled: false },
+        fontSize: 13,
+        lineHeight: 20,
         minimap: { enabled: false },
         model: resources.models.get(current.path) ?? null,
         readOnly: current.disabled || current.readOnly,
@@ -215,6 +218,7 @@ export const MonacoEditor = (props: EditorProps) => {
           horizontalScrollbarSize: 16,
           horizontalSliderSize: 16,
         },
+        theme: moonbaseEditorTheme,
         wordWrap: "off",
       });
       const nextRuntime: EditorRuntime = { ...resources, editor };

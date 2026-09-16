@@ -213,8 +213,9 @@
   margin: 0;
   padding: 1rem;
   overflow: auto;
-  background: var(--playground-code);
-  color: var(--playground-surface);
+  background: #24292e;
+  color: #e1e4e8;
+  font-size: 0.8125rem;
   line-height: 1.55;
   overscroll-behavior: contain;
 }
