@@ -1,24 +1,51 @@
 ---
 import PreworkLayout from "../../layouts/PreworkLayout.astro";
+import CodeBlock from "../../components/CodeBlock.astro";
 const chapters = [{ id: "choose", label: "読むページを選ぶ" }, { id: "practice", label: "コードの試し方" }];
 ---
-<PreworkLayout title="事前学習" description="業務をモデルにする考え方から、プログラミングのパラダイムとTypeScriptの型へ。本編の前でも、途中で立ち戻っても読める補助教材です。" chapters={chapters}>
+<PreworkLayout title="事前学習" description="業務をモデルにする考え方から、プログラミングのパラダイムと型へ。TypeScript・Python・Rustの例で、本編の前提を一つずつ確かめる補助教材です。" chapters={chapters}>
   <section id="choose">
     <h2>読むページを選ぶ</h2>
-    <p>DDDや関数型の経験は不要です。最初のページはコードを使わず、業務の具体例から読み進められます。続くコードのページでは、JavaScriptの変数、関数、配列、オブジェクト、if文を読めることを前提にしています。すでに説明できる内容は飛ばして構いません。本編のセッション番号と所要時間には含めません。</p>
+    <p>DDDや関数型の経験は不要です。最初のページはコードを使わず、業務の具体例から読み進められます。続くコードのページでは、いずれかの言語で変数、関数、配列、条件分岐を読めることを前提にしています。本編のセッション番号と所要時間には含めません。</p>
+    <p>初めてなら01から順に進んでください。用語を一度に覚える必要はありません。「何の間違いを防ぎたいのか」をつかみ、例の入力から結果を予想して、確認問題で自分の言葉にする、という順番で学びます。</p>
     <h3><a href="/prework/domain-modeling/">01 · ドメインモデリングの入口</a></h3>
-    <p>目安15〜20分。「何をモデルにするのか」がまだ曖昧なら、ここから。日の出基地の作業中止を例に、業務の言葉、ルール、状態、依頼と出来事を整理し、型と関数へつなぐ考え方を学びます。時間が限られる方は、このページの3つの確認問題までを目安にしてください。</p>
+    <p>目安25〜35分。「何をモデルにするのか」がまだ曖昧なら、ここから。管制担当との会話から中止と帰還の違いを見つけ、業務の言葉、ルール、状態、依頼と出来事を整理します。読み終わったら「誰が、いつ、何をできるか」を説明してみてください。</p>
     <h3><a href="/prework/programming-paradigms/">02 · プログラミングのパラダイムを読み比べる</a></h3>
-    <p>目安30〜40分。同じ承認条件を手続き型、オブジェクト指向、関数型、宣言型・データ指向で表し、変更する場所の違いを確かめます。Session 01の10通りの比較を読む準備です。</p>
+    <p>目安40〜55分。同じ承認条件を手続き型、オブジェクト指向、関数型、宣言型・データ指向で表します。入力と結果を固定してコードを追い、規則を1つ増やすときに変更する場所を比べます。Session 01の10通りの比較を読む準備です。</p>
     <h3><a href="/prework/type-system/">03 · 型システムと型駆動プログラミングの基礎</a></h3>
-    <p>目安40〜50分。構造的型付け、積と和、絞り込み、Generics、型レベルの操作、実行時検証を学びます。Session 03〜06で扱う状態、識別子、境界、失敗の表現につながります。</p>
+    <p>目安50〜65分。型を値の集合として捉え、識別子の区別、状態ごとの必須項目、成功と失敗、外部入力の検証へ進みます。コードを書くときに分かる誤りと、実行時に調べる値の違いを説明できることが目標です。最後の型レベルの操作は補足として後から読んでも構いません。</p>
+    <p>所要時間は一つの言語で読む目安です。時間が限られる場合は01の確認問題まで、コードの設計を比較したい場合は02、型に不慣れな場合は03を中心に進めてください。本編の途中で戻って読むこともできます。</p>
   </section>
   <section id="practice">
     <h2>コードの試し方</h2>
-    <p>ドメインモデリングの入口は、具体例と確認問題で理解を確かめます。続く2ページは「背景と要求 → コードを読む → 手を動かす → 確認と気づき」の順で進みます。読むだけなら環境構築は不要です。実行・編集する場合は<a href="/setup/">事前準備</a>を済ませてください。</p>
-    <p>掲載コードはリポジトリの <code>apps/docs/src/prework/examples/</code> にあります。パラダイムの例は同じフォルダの型をimportするので、ファイルをまとめて開きます。コードブロックはそのファイル全体を表示しています。</p>
-    <p><code>pnpm --filter @moonbase/docs test -- src/prework/examples.test.ts</code> で例の実行結果を、<code>pnpm --filter @moonbase/docs typecheck</code> で型を確認できます。編集した後も同じコマンドで確かめます。</p>
+    <p>読むだけなら環境構築は不要です。各例にはTypeScript版と、開閉できるPython版・Rust版を掲載しています。読み慣れた言語を一つ選び、同じ入力で同じ結果になるかを追ってください。本編の演習はTypeScriptです。Python・Rustの比較サンプルは事前学習の範囲に用意しています。</p>
+    <p>コードブロックは <code>apps/docs/src/prework/examples/</code> 以下の実ファイルを表示しています。TypeScriptは直下、Pythonは <code>python/</code>、Rustは <code>rust/</code> にあります。ファイル間で型や関数を共有するため、リポジトリを取得し、以下のコマンドを<strong>リポジトリのルート</strong>で実行してください。各ファイルは関数の定義が中心なので、単に開くだけでは結果は表示されません。テストが具体的な入力を渡して結果を確認します。</p>
+    <h3>TypeScript</h3>
+    <p><a href="/setup/">事前準備</a>に従いNode.js・pnpmと依存関係を用意します。実行時のテストと静的な型検査は別々に行います。</p>
+    <CodeBlock language="shell" label="実行結果と型の両方を確認" code={`pnpm --filter @moonbase/docs exec vitest run src/prework/examples.test.ts
+pnpm --filter @moonbase/docs typecheck`} />
     <p><code>@ts-expect-error</code> は「次の行で型エラーが起きるはず」という検証です。該当行が通るようになると、指示が不要になったこと自体が型エラーになります。エディタで診断を見たいときは、一時的にこの行を外してください。</p>
+    <h3>Python 3.11以降</h3>
+    <p>サンプルの実行は標準ライブラリだけでできます。Node.jsやpnpmは不要です。まず実行結果を確認します。</p>
+    <CodeBlock language="shell" label="unittestで入力と結果を確認" code={`python3 -m unittest discover -s apps/docs/src/prework/examples/python -v`} />
+    <p>成功すると最後に <code>OK</code> が表示されます。ただしunittestは型注釈を検査しません。型の章の練習には、別途mypyを用意します。次は一時ディレクトリの専用環境にインストールするmacOS・Linuxの例です。</p>
+    <CodeBlock language="shell" label="初回のみ：静的型検査の準備" code={`python3 -m venv /tmp/moonbase-prework-venv
+/tmp/moonbase-prework-venv/bin/python -m pip install mypy`} />
+    <CodeBlock language="shell" label="編集後の静的型検査" code={`/tmp/moonbase-prework-venv/bin/python -m mypy --strict apps/docs/src/prework/examples/python`} />
+    <p><code>type_checks.py</code> では、識別子の取り違えなどを型エラーとして検出できることも確認します。意図した誤りの行だけに <code>type: ignore</code> を付け、strict設定で「その指示が不要になったらエラー」にしています。診断そのものを見たい場合は、その行のignoreを一時的に外します。</p>
+    <p>型検査が通ることと、外部から来る値が正しいことは別です。型注釈を付けても、文字列の「30」が数値に変わったり、負数が拒否されたりはしません。</p>
+    <h3>Rust（Cargoを使用）</h3>
+    <p>rustcとCargoを用意します。この教材のcrateに外部依存はありません。cargo testがコンパイルによる型検査と実行時テストを行います。</p>
+    <CodeBlock language="shell" label="Rustの型と動作を確認" code={`cargo test --manifest-path apps/docs/src/prework/examples/rust/Cargo.toml`} />
+    <p>実行時テストに加えて、識別子の取り違え・承認者の欠落・状態の取り違えを拒否する <code>compile_fail</code> のdoc testも実行します。期待どおりコンパイルに失敗した場合に、そのテストは成功します。</p>
+    <h3>何が確かめられればよいか</h3>
+    <ol>
+      <li>変更前のテストを実行し、サンプルが動くことを確認する。</li>
+      <li>装備未点検・警報ありなら、どの実装も未点検と警報の2件の理由を返すと予想する。</li>
+      <li>テストコードを開き、予想した入力と結果が比較されていることを読む。</li>
+      <li>各章の練習で条件や状態を追加し、静的型検査と実行時テストの両方で変更を確かめる。</li>
+    </ol>
+    <p>テストが成功しても、それだけで業務の全条件を満たしたわけではありません。サンプルが扱う2つの条件や入力の範囲について、期待した結果が出たことを確認しています。</p>
   </section>
   <Fragment slot="next"><a href="/prework/domain-modeling/">ドメインモデリングの入口から読む →</a><a href="/sessions/00-system-handover/">本編を始める →</a></Fragment>
 </PreworkLayout>

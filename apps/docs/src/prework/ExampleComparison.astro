@@ -1,0 +1,21 @@
+---
+import CodeBlock from "../components/CodeBlock.astro";
+interface Props {
+  typescript: string;
+  python: string;
+  rust: string;
+  name: string;
+  description: string;
+}
+const { typescript, python, rust, name, description } = Astro.props;
+const otherName = name.replaceAll("-", "_");
+---
+<CodeBlock code={typescript} language="typescript" label={`${name}.ts · ${description}`} />
+<details>
+  <summary>Pythonで読む：{description}</summary>
+  <CodeBlock code={python} language="python" label={`python/${otherName}.py`} />
+</details>
+<details>
+  <summary>Rustで読む：{description}</summary>
+  <CodeBlock code={rust} language="rust" label={`rust/${otherName}.rs`} />
+</details>

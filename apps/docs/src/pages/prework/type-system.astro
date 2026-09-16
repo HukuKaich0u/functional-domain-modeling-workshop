@@ -1,10 +1,18 @@
 ---
 import PreworkLayout from "../../layouts/PreworkLayout.astro";
-import CodeBlock from "../../components/CodeBlock.astro";
+import ExampleComparison from "../../prework/ExampleComparison.astro";
 import structural from "../../prework/examples/structural.ts?raw";
 import states from "../../prework/examples/states.ts?raw";
 import boundary from "../../prework/examples/boundary.ts?raw";
 import operators from "../../prework/examples/type-operators.ts?raw";
+import structuralPython from "../../prework/examples/python/structural.py?raw";
+import structuralRust from "../../prework/examples/rust/structural.rs?raw";
+import statesPython from "../../prework/examples/python/states.py?raw";
+import statesRust from "../../prework/examples/rust/states.rs?raw";
+import boundaryPython from "../../prework/examples/python/boundary.py?raw";
+import boundaryRust from "../../prework/examples/rust/boundary.rs?raw";
+import operatorsPython from "../../prework/examples/python/type_operators.py?raw";
+import operatorsRust from "../../prework/examples/rust/type_operators.rs?raw";
 const chapters = [
   { id: "roles", label: "型システム・型駆動・型レベルの違い" },
   { id: "structure", label: "型の名前と値の構造" },
@@ -15,7 +23,7 @@ const chapters = [
   { id: "references", label: "本編と公式ドキュメントへ" },
 ];
 ---
-<PreworkLayout title="型システムと型駆動プログラミングの基礎" description="型を変数の注釈として使うところから、許される状態と操作を表すところへ進みます。コンパイル時に分かることと、実行時に確かめることを分けて学びます。" duration="40〜50分" chapters={chapters}>
+<PreworkLayout title="型システムと型駆動プログラミングの基礎" description="型を変数の注釈として使うところから、許される状態と操作を表すところへ進みます。コンパイル時に分かることと、実行時に確かめることを分けて学びます。" duration="50〜65分" chapters={chapters}>
   <section id="roles">
     <h2>型システム・型駆動・型レベルの違い</h2>
     <p>管制担当から「承認済みなら必ず承認者が分かるようにしたい。申請中の許可を受け取る処理に、承認済みの許可を渡す間違いも防ぎたい」と頼まれました。一方、外部端末は作業時間を文字列や負の数で送るかもしれません。どこまでを型で守り、どこからを実行時に検査するかが今回の問いです。</p>
@@ -25,37 +33,75 @@ const chapters = [
       <li><strong>型レベルプログラミング：</strong>GenericsやMapped Typesなどで型から型を組み立てること。最後に小さな例を扱います。高度な型の技巧は本編の前提ではありません。</li>
     </ul>
     <p>静的・動的は「いつ検査するか」、構造的・公称的は「何をもって型を区別するか」という別の軸です。「強い型／弱い型」は意味が揺れやすいため、ここでは具体的に、どの代入や値を拒否できるかを確認します。</p>
-    <p>完了条件は、承認者の欠落を型エラーにし、外部の不正な作業時間を実行時に拒否し、その違いを説明できることです。サンプルはstrict設定で確認します。</p>
+    <p>完了条件は、承認者の欠落を型エラーにし、外部の不正な作業時間を実行時に拒否し、その違いを説明できることです。TypeScriptはstrict設定で確認します。Pythonの静的型検査は別コマンド、Rustの型検査はコンパイル時に行います。実行手順は<a href="/prework/#practice">事前学習の案内</a>を参照してください。</p>
+    <h3>型は「扱ってよい値の集合」と考える</h3>
+    <p><code>boolean</code> が許す値はtrueとfalseの2つ。<code>string</code> は「管制担当」だけでなく空文字も許します。<code>"Approved"</code> というリテラル型は、その一つの文字列だけを許します。型を絞るとは、受け入れる値の範囲を狭くすることです。</p>
+    <p>関数の引数の型は「呼ぶ前に満たす条件」、戻り値の型は「呼んだ後に受け取れる形」を示します。ただし <code>approvedBy: string</code> が保証するのは文字列があることまでで、実在する担当者か、承認権限があるかは別の検査です。</p>
+    <h3>実行前の検査と、実行中の検査</h3>
+    <ol>
+      <li><strong>コードを書く：</strong>承認者を持たないApprovedを作ろうとする。静的型検査で、必要な項目が欠けていると分かる。</li>
+      <li><strong>プログラムを動かす：</strong>外部端末から「-10分」が届く。コードの型検査は済んでいても、この値が正しいかはまだ分からない。</li>
+      <li><strong>入口で値を調べる：</strong>正の有限な数かを判定し、通った値だけを後続の処理へ渡す。</li>
+    </ol>
+    <p>Pythonの型注釈は通常の実行では検査されません。mypyなどの静的型検査を実行して初めて、注釈に反するコードを検出できます。Rustはビルドに型検査が含まれますが、数値が業務の範囲内かは同じく実行時に調べます。</p>
   </section>
   <section id="structure">
     <h2>型の名前と値の構造</h2>
-    <CodeBlock code={structural} language="typescript" label="structural.ts · 別名だけでは区別されない" />
+    <ExampleComparison typescript={structural} python={structuralPython} rust={structuralRust} name="structural" description="別名だけでは区別されない" />
     <p><code>ZoneId</code> と <code>SegmentId</code> はどちらもstringの別名です。名前が違っても代入できます。TypeScriptは基本的に構造的型付けで、必要なプロパティがあるかなど、型の構造で互換性を判断します。同じ公開プロパティを持つクラスも、クラス名だけで必ず区別されるわけではありません。</p>
     <p>後半は、実行時にも存在する <code>kind</code> を使って形を分けました。<code>"ZoneId"</code> は任意のstringではなく、その文字列だけを許すリテラル型です。<code>Segment</code> のkindは違うため <code>readZone</code> に渡せません。本編のSession 04では、識別子の取り違えを防ぐ別の手段としてBranded Typeを扱います。</p>
+    <h3>別名と、別の型を使い分ける</h3>
+    <p>別名は意味を説明するラベルにはなりますが、「違う用途の値が混ざらない」という壁にはなりません。TypeScriptでは異なるkindを必須にして形を分けました。Pythonの例は別々のdataclass、Rustの例は別々のstructで包みます。Python・Rustでも、単にstrやStringの別名を二つ作っただけでは区別されません。</p>
+    <p>Pythonの通常のクラスは静的型検査では別の型として扱えますが、注釈だけで実行時の受け渡しを拒否するわけではありません。Protocolによる構造的な契約も使えるため、「Pythonは常に公称的」とひとまとめにはしません。</p>
     <p>このタグはIDの書式や実在を証明しません。「区画のIDとして扱う」と「その区画が存在する」は別の検証です。</p>
   </section>
   <section id="states">
     <h2>積と和で状態を表す</h2>
     <p>オブジェクトで「idもstatusも持つ」と組み合わせるのが積の型の考え方です。Unionの <code>A | B</code> は「AまたはB」を表す和の型です。例えば2通りの値を持つ項目が2つなら積は4通り。異なるタグで区別した2状態と3状態をまとめる和なら5通りになります。</p>
     <p><code>status: "Draft" | "Approved"</code> と <code>approvedBy?: string</code> を別々に持つと、「Approvedなのに承認者なし」も表せます。状態ごとに必要な項目をまとめてからUnionにします。</p>
-    <CodeBlock code={states} language="typescript" label="states.ts · 状態ごとのデータと操作" />
+    <h3>「あってもなくてもよい」を見直す</h3>
+    <p>承認者を任意項目にすると、状態2通り × 承認者の有無2通りで、4種類の組み合わせを作れます。この単純なモデルで表したいのは「申請中で承認者なし」と「承認済みで承認者あり」の2種類です。</p>
+    <ul>
+      <li><strong>申請中：</strong>idを持つ。この状態に承認者は要求しない。</li>
+      <li><strong>承認済み：</strong>idと承認者を一緒に持つ。承認者を省略できない。</li>
+    </ul>
+    <p>まずそれぞれの状態を積で作り、そのどちらかを和で表します。不要な組み合わせを作りにくくすると、承認済みの処理で毎回「承認者は存在するか」を調べずに済みます。ただしTypeScriptの構造的型付けは余分なプロパティを常に禁止するわけではありません。ここで確実に要求するのは、Approvedに承認者があることです。</p>
+    <ExampleComparison typescript={states} python={statesPython} rust={statesRust} name="states" description="状態ごとのデータと操作" />
     <p><code>status</code> で分岐すると、コンパイラはその枝で扱う型を絞り込みます。Approvedの枝では <code>approvedBy</code> が必ずあります。<code>never</code> はあり得る値がない型で、すべての状態を処理したかの確認に使えます。</p>
     <p>関数の型 <code>Draft → Approved</code> には遷移前と遷移後が現れます。新しい値を返すので、元のDraftは変更しません。ただし元のDraftをもう一度渡すことまでは防げません。現実の許可の二重承認や同時更新は、保存側での整合性の仕組みも必要です。</p>
+    <h3>分岐すると、なぜ安全に項目を読める？</h3>
+    <p>関数の入口ではDraftかApprovedか分かりません。TypeScriptでstatusがApprovedだと確かめた枝では、候補からDraftが消え、approvedByを安全に読めます。Python版は <code>isinstance</code> でクラスを調べ、Rust版は <code>match</code> でenumのvariantを分けます。</p>
+    <p>TypeScriptのnever、Pythonのassert_never、Rustのすべてのvariantを列挙したmatchは、「新しい状態を追加したのに分岐を忘れた」を見つける助けになります。Pythonでは静的型検査が必要です。assert_neverだけを実行した場合は、そこに到達したときに例外になります。</p>
+    <p>Rust版のapproveも比較のため <code>&amp;Draft</code> を借用し、新しいApprovedを返します。Draftの所有権を消費する設計も可能ですが、この例では元の値を残します。どの言語でも、別のプロセスによる更新やDBにある同じ許可の再読み込みまでは、この関数だけで防げません。</p>
+    <p>Pythonの <code>frozen=True</code> は属性への通常の代入を禁止しますが、内部にリストがあればその要素まで凍結するわけではありません。Rustの共有参照も、この例の入力を読み取り専用で使うためのものです。「新しい値を返す」という設計と、言語がどこまで変更を制限するかを分けて読みます。</p>
     <p><code>readonly</code> はその型を通じた書き換えを静的に制限します。自動で深い不変性を保証したり、実行時にObject.freezeを呼んだりする機能ではありません。この例では各状態のプロパティがプリミティブなので、浅いReadonlyで形を示しています。</p>
   </section>
   <section id="boundary">
     <h2>unknownから検証済みの値へ</h2>
-    <CodeBlock code={boundary} language="typescript" label="boundary.ts · 検査の結果も型で返す" />
+    <ExampleComparison typescript={boundary} python={boundaryPython} rust={boundaryRust} name="boundary" description="検査の結果も型で返す" />
     <p><code>unknown</code> は、値が何であるかまだ分からないことを表します。<code>typeof</code> でnumberへ絞り込み、有限か、正かを実行時に調べます。number型だけではNaN、Infinity、負の値を除けません。</p>
     <p><code>Result&lt;T, E&gt;</code> のTとEは型の引数です。ここでは成功値にMinutes、失敗値にInvalidMinutesを入れます。Genericsは、具体的な型を差し替えながら同じ関係を保つための仕組みです。呼び出し側もokで分岐してからvalueを使います。</p>
+    <h3>30と「30」を、同じ入口に通してみる</h3>
+    <ol>
+      <li><strong>数値の30：</strong>数値であり、有限で、0より大きい。Minutesを包んだ成功の値が返る。</li>
+      <li><strong>文字列の「30」：</strong>数値ではないので失敗を返す。この例では自動変換しない。</li>
+      <li><strong>数値の0やInfinity：</strong>数値の型でも、業務で扱う時間として不正なので失敗する。</li>
+      <li><strong>呼び出し側：</strong>成功か失敗かを先に分け、成功の枝だけで時間の値を使う。</li>
+    </ol>
+    <p><code>Result&lt;T, E&gt;</code> は、成功の箱にT、失敗の箱にEを入れる型のひな型です。今回なら <code>Result&lt;Minutes, InvalidMinutes&gt;</code>。TやEは実行時の値ではなく、「箱に何の型を入れるか」という指定です。成功と失敗で別の項目を持たせるので、失敗なのに成功値を読む間違いを静的に検出できます。</p>
+    <p>PythonではOkとErrをGenericなdataclassで作り、isinstanceで分岐します。boolはintの一種なので、Trueを1分として受け入れないよう明示的に拒否しています。Rustには標準のResultがあり、OkとErrをmatchします。Rust版のInputは外部入力の一部を表す教材用のenumで、JSON文字列を解析する機能はありません。</p>
     <p><code>as Minutes</code> は検証ではありません。コンパイラへ型を主張するだけで、不正な値を変換も拒否もしません。anyは多くの検査を回避できるため、外部入力の安全性の根拠にはできません。</p>
-    <p>この小さな例のMinutesは、同じ構造の値を別の場所で直接作れてしまいます。すべてのMinutesが必ず検証を通ることまで保証するには、生成経路を制限する設計が必要です。本編では境界でのスキーマ検証とBranded Typeを組み合わせます。型にできる前提と、その前提を成立させる検査の両方を考えます。</p>
+    <p>この小さな例のMinutesは、各言語ともコンストラクタや公開フィールドを使って別の場所で直接作れてしまいます。すべてのMinutesが必ず検証を通ることまで保証するには、生成経路を制限する設計が必要です。本編では境界でのスキーマ検証とBranded Typeを組み合わせます。型にできる前提と、その前提を成立させる検査の両方を考えます。</p>
   </section>
   <section id="operators">
     <h2>型から別の型を作る</h2>
-    <CodeBlock code={operators} language="typescript" label="type-operators.ts · keyof、Mapped Types、Indexed Access Types" />
+    <ExampleComparison typescript={operators} python={operatorsPython} rust={operatorsRust} name="type-operators" description="項目名とエラーの型を対応させる" />
     <p><code>keyof T</code> はキーの型、<code>T[K]</code> はそのキーに対応する値の型です。<code>K extends keyof T</code> はキーの指定を制限します。readFieldの呼び出しでは、入力オブジェクトとキーから戻り値の型が決まります。</p>
     <p><code>FieldErrors&lt;T&gt;</code> は元の型の項目に対応したエラー表示の型を作ります。入力の項目が変わったとき、存在しない項目名のエラーを静的に見つけられます。ただしこの型は、実行時にエラーのオブジェクトを生成しません。値を作るコードは別に必要です。</p>
+    <h3>具体的な呼び出しに、型を当てはめる</h3>
+    <p><code>readField(input, "flareAlert")</code> を読むとき、Tは入力の型、Kは <code>"flareAlert"</code> に当たります。<code>keyof T</code> は入力のキーの候補、<code>T[K]</code> はそのキーの値の型なので、この呼び出しの戻り値はbooleanです。存在しない <code>"workerName"</code> はキーの候補に入らず、型エラーになります。</p>
+    <p><code>[K in keyof T]</code> は「入力の各キーについて項目を作る」、<code>?</code> は「その項目は省略できる」と読みます。エラーが出た項目だけ文字列を持たせられます。実行時のループではなく、型の項目を組み立てる記法です。</p>
+    <p>Python・Rust版ではこの型操作をそのまま再現せず、項目名とエラーの形を明示します。PythonはLiteralとTypedDict、Rustはenumとstructを使います。Rustの <code>Option&lt;String&gt;</code> は、エラー文字列があるSomeと、ないNoneのどちらかです。TypeScript版の自動的なキー追従はないため、項目追加時には関連する宣言も更新してください。</p>
     <p>型レベルの処理は、値を扱う処理との対応を保つために使えます。複雑な条件型や再帰型を導入する前に、単純なUnionとGenericsで意図を表せないか考えてください。</p>
   </section>
   <section id="exercise">
@@ -65,6 +111,7 @@ const chapters = [
       <li>typecheckを実行し、labelのneverへの代入が失敗することを確認します。switchにCancelledの枝を追加して、中止理由を表示します。</li>
       <li>テストに「中止済みの表示」と、<code>parseMinutes</code> が0、負数、文字列を拒否し、30を受け入れるケースがあることを確認します。Cancelledの表示のケースは自分で追加します。</li>
     </ol>
+    <p>Pythonで取り組む場合は、idとreasonを持つCancelledのdataclassを作り、PermitのUnionに足します。mypyを実行すると、labelのassert_neverに未処理のCancelledが届くことを検出できます。RustではCancelledのstructとPermitのvariantを足し、cargo testでmatchの分岐不足を確認します。いずれも理由を表示する分岐と、そのテストを加えて完了です。</p>
     <details><summary>確認する結果と振り返り</summary>
       <p>未処理のCancelledがある間、defaultのpermitはneverになりません。枝を足すと型検査が通り、実行時テストでは指定した中止理由が表示されます。</p>
       <p>「必須項目の欠落」「未対応の状態」は静的検査で分かります。一方、外部端末から届く値が正の数かは実行時に調べます。両方が必要な理由と、型だけではDBの最新状態を保証できない理由を説明できれば、この事前学習は完了です。</p>
@@ -74,6 +121,10 @@ const chapters = [
     <h2>本編と公式ドキュメントへ</h2>
     <p><a href="/sessions/03-state-transitions/">Session 03</a>は状態と遷移、<a href="/sessions/04-semantic-identifiers/">Session 04</a>は識別子、<a href="/sessions/05-boundaries-and-sensitive-data/">Session 05</a>は入力の境界、<a href="/sessions/06-workflow-errors/">Session 06</a>は失敗の表現を扱います。本編を初めて読む場合は、業務背景を紹介するSession 00から進めてください。</p>
     <ul>
+      <li><a href="https://docs.python.org/3.11/library/typing.html">Python typing</a>：型注釈、Generic、Protocol、TypedDict。</li>
+      <li><a href="https://typing.python.org/en/latest/guides/unreachable.html">Pythonの網羅性検査</a>：assert_neverと静的型検査の関係。</li>
+      <li><a href="https://doc.rust-lang.org/book/ch06-00-enums.html">The Rust Programming Language: Enums and Pattern Matching</a>：状態をenumで表し、matchで分岐する。</li>
+      <li><a href="https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html">RustのResult</a>：成功と回復可能な失敗を値で返す。</li>
       <li><a href="https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html">TypeScript for the New Programmer</a>：静的検査と型の消去。</li>
       <li><a href="https://www.typescriptlang.org/docs/handbook/type-compatibility.html">Type Compatibility</a>：構造的型付けと互換性。</li>
       <li><a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">Narrowing</a>：絞り込み、判別可能なUnion、never。</li>
