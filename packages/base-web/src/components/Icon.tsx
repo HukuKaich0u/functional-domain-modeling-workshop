@@ -12,7 +12,6 @@ export type IconName =
   | "menu"
   | "moon"
   | "owners"
-  | "paw"
   | "permit"
   | "plus"
   | "sun"
@@ -30,7 +29,6 @@ const paths: Readonly<Record<IconName, ReactElement>> = {
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   moon: <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />,
   owners: <path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1m6-9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 9v-1a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />,
-  paw: <path d="M12 14c-2.9-3-7-1.4-7 2.1 0 2.5 3.1 3.5 7 4.8 3.9-1.3 7-2.3 7-4.8 0-3.5-4.1-5.1-7-2.1ZM7.2 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3.2-3a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm4.2 3a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm2.3 2.8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />,
   permit: <path d="M8 4h8l2 2v14H6V6l2-2Zm1 6h6m-6 4h6m-6 4h4M9 4v3h6V4" />,
   plus: <path d="M12 5v14m-7-7h14" />,
   sun: <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />,

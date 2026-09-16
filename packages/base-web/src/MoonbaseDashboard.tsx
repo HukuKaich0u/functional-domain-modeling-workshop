@@ -59,15 +59,15 @@ const ActionButton = ({
     <button
       className={
         isNotImplemented
-          ? "button button--secondary clinic-action clinic-action--not-implemented"
-          : "button button--primary clinic-action"
+          ? "button button--secondary demo-action demo-action--not-implemented"
+          : "button button--primary demo-action"
       }
       onClick={() => visit(action)}
       type="button"
     >
       <span>{label}</span>
       {isNotImplemented ? (
-        <span className="clinic-action__status">未実装</span>
+        <span className="demo-action__status">未実装</span>
       ) : null}
     </button>
   );
@@ -96,13 +96,13 @@ const IncidentLabPanel = ({
   incidentLab: MoonbaseIncidentLab;
 }>): ReactElement => (
   <section
-    className="surface-card clinic-incident-lab"
+    className="surface-card incident-lab"
     aria-labelledby="incident-lab-heading"
   >
     <h2 id="incident-lab-heading">事故再現</h2>
-    <div className="clinic-incident-lab__scenarios">
+    <div className="incident-lab__scenarios">
       {incidentLab.scenarios.map((scenario) => (
-        <article className="clinic-incident-scenario" key={scenario.title}>
+        <article className="incident-lab__scenario" key={scenario.title}>
           <div>
             <h3>{scenario.title}</h3>
             <p>{scenario.description}</p>
@@ -111,7 +111,7 @@ const IncidentLabPanel = ({
         </article>
       ))}
     </div>
-    <div className="clinic-database-inspection">
+    <div className="incident-lab__inspection">
       <section aria-labelledby="database-permit-heading">
         <h3 id="database-permit-heading">現在の作業許可</h3>
         <pre>{incidentLab.inspection.permitJson}</pre>
@@ -140,10 +140,10 @@ export const MoonbaseDashboard = ({
   notice,
   sessionLabel,
 }: MoonbasePageProps): ReactElement => (
-  <main className="clinic-demo">
-    <header className="page-header clinic-demo__header">
+  <main className="demo-page">
+    <header className="page-header demo-page__header">
       <div>
-        <p className="clinic-demo__session">{sessionLabel}</p>
+        <p className="demo-page__session">{sessionLabel}</p>
         <h1>MoonBase 作業管理</h1>
         <p className="page-header__description">{learningFocus}</p>
       </div>
@@ -155,19 +155,19 @@ export const MoonbaseDashboard = ({
     </header>
 
     <section
-      className="surface-card clinic-appointment"
+      className="surface-card demo-permit"
       aria-labelledby="permit-heading"
     >
-      <div className="clinic-appointment__heading">
+      <div className="demo-permit__heading">
         <div>
-          <p className="clinic-appointment__eyebrow">本日の船外作業</p>
+          <p className="demo-permit__eyebrow">本日の船外作業</p>
           <h2 id="permit-heading">{permit.zoneId} 接続作業</h2>
         </div>
         <span className="status-badge status-badge--info">
           {permit.statusLabel}
         </span>
       </div>
-      <dl className="clinic-appointment__details">
+      <dl className="demo-permit__details">
         <div>
           <dt>許可番号</dt>
           <dd>{permit.permitId}</dd>
@@ -185,7 +185,7 @@ export const MoonbaseDashboard = ({
           <dd>{permit.kind}</dd>
         </div>
       </dl>
-      <div className="clinic-actions" aria-label="作業許可の操作">
+      <div className="demo-permit__actions" aria-label="作業許可の操作">
         {(Object.keys(actionLabels) as ActionKey[]).map((key) => (
           <ActionButton
             action={actions[key]}

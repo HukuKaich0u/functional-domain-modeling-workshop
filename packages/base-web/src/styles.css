@@ -858,18 +858,18 @@ td {
   }
 }
 
-.clinic-demo {
+.demo-page {
   width: min(1080px, calc(100% - 32px));
   margin: 0 auto;
   padding: 40px 0;
 }
 
-.clinic-demo__header {
+.demo-page__header {
   margin-bottom: 24px;
 }
 
-.clinic-demo__session,
-.clinic-appointment__eyebrow {
+.demo-page__session,
+.demo-permit__eyebrow {
   margin: 0 0 6px;
   color: var(--primary);
   font-size: 0.8rem;
@@ -878,85 +878,85 @@ td {
   text-transform: uppercase;
 }
 
-.clinic-appointment {
+.demo-permit {
   display: grid;
   gap: 24px;
   padding: 24px;
 }
 
-.clinic-appointment__heading {
+.demo-permit__heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
 }
 
-.clinic-appointment__heading h2 {
+.demo-permit__heading h2 {
   margin: 0;
   font-size: 1.75rem;
 }
 
-.clinic-appointment__details {
+.demo-permit__details {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin: 0;
 }
 
-.clinic-appointment__details div {
+.demo-permit__details div {
   padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-subtle);
 }
 
-.clinic-appointment__details dt {
+.demo-permit__details dt {
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 700;
 }
 
-.clinic-appointment__details dd {
+.demo-permit__details dd {
   margin: 4px 0 0;
   overflow-wrap: anywhere;
   font-weight: 600;
 }
 
-.clinic-actions {
+.demo-permit__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.clinic-action {
+.demo-action {
   display: inline-flex;
   gap: 10px;
 }
 
-.clinic-action__status {
+.demo-action__status {
   padding-left: 10px;
   border-left: 1px solid currentColor;
   font-size: 0.75rem;
   opacity: 0.75;
 }
 
-.clinic-incident-lab {
+.incident-lab {
   display: grid;
   gap: 24px;
 }
 
-.clinic-incident-lab h2,
-.clinic-incident-lab h3 {
+.incident-lab h2,
+.incident-lab h3 {
   margin: 0;
 }
 
-.clinic-incident-lab__scenarios,
-.clinic-database-inspection {
+.incident-lab__scenarios,
+.incident-lab__inspection {
   display: grid;
   gap: 16px;
 }
 
-.clinic-incident-scenario {
+.incident-lab__scenario {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -967,17 +967,17 @@ td {
   background: var(--surface-subtle);
 }
 
-.clinic-incident-scenario p {
+.incident-lab__scenario p {
   margin: 6px 0 0;
 }
 
-.clinic-database-inspection section {
+.incident-lab__inspection section {
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
 }
 
-.clinic-database-inspection pre {
+.incident-lab__inspection pre {
   margin: 12px 0 0;
   padding: 12px;
   overflow-x: auto;
@@ -986,7 +986,7 @@ td {
   font-size: 0.875rem;
 }
 
-.clinic-database-inspection ul {
+.incident-lab__inspection ul {
   margin: 12px 0 0;
   padding-left: 20px;
 }
@@ -1008,19 +1008,19 @@ td {
 }
 
 @media (max-width: 640px) {
-  .clinic-demo {
+  .demo-page {
     padding: 24px 0;
   }
 
-  .clinic-appointment {
+  .demo-permit {
     padding: 20px;
   }
 
-  .clinic-appointment__details {
+  .demo-permit__details {
     grid-template-columns: 1fr;
   }
 
-  .clinic-incident-scenario {
+  .incident-lab__scenario {
     align-items: flex-start;
     flex-direction: column;
   }

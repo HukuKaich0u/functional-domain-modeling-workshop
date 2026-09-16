@@ -29,6 +29,7 @@ describe("noticeFromCode", () => {
   });
 });
 
+
 describe("moonbaseNoticeFromCode", () => {
   it("MoonBase の失敗種別だけをnoticeへ変換する", () => {
     expect(moonbaseNoticeFromCode("invalid-state")).toEqual({

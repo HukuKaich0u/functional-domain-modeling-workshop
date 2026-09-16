@@ -28,45 +28,6 @@ type PublicExportRequirement = Readonly<{
   sessions?: ReadonlyArray<string>;
 }>;
 
-// 動物病院の題材が残っているスナップショット。段階4で MoonBase へ書き換えるたびに減る。
-const legacyClinicContract: ConceptContract = {
-  sessions: [],
-  ownedConcepts: ["appointment", "owner", "pet", "examResult"],
-  ownedIdentifierPaths: [
-    "domain/appointment/appointmentId.ts",
-    "domain/appointment/veterinarianId.ts",
-    "domain/owner/ownerId.ts",
-    "domain/pet/petId.ts",
-    "domain/examResult/examId.ts",
-  ],
-  publicApiPaths: [
-    "domain/appointment/index.ts",
-    "domain/owner/index.ts",
-    "domain/pet/index.ts",
-    "domain/examResult/index.ts",
-  ],
-  requiredPublicExports: [
-    {
-      concept: "appointment",
-      module: "appointment",
-      symbol: "Appointment",
-      typeOnly: true,
-      sessions: ["04"],
-    },
-    { concept: "appointment", module: "appointmentId", symbol: "AppointmentId" },
-    { concept: "appointment", module: "veterinarianId", symbol: "VeterinarianId" },
-    { concept: "appointment", module: "statusLabel", symbol: "toStatusLabel" },
-    { concept: "appointment", module: "transitions", symbol: "checkIn" },
-    { concept: "appointment", module: "transitions", symbol: "startExamination" },
-    { concept: "appointment", module: "transitions", symbol: "completeExamination" },
-    { concept: "appointment", module: "transitions", symbol: "recordPayment" },
-    { concept: "appointment", module: "transitions", symbol: "cancel" },
-    { concept: "owner", module: "ownerId", symbol: "OwnerId" },
-    { concept: "pet", module: "petId", symbol: "PetId" },
-    { concept: "examResult", module: "examId", symbol: "ExamId" },
-  ],
-};
-
 // MoonBase の題材へ書き換えたスナップショット。
 const moonbaseContract: ConceptContract = {
   sessions: ["04", "05", "06", "07", "08"],
@@ -105,7 +66,7 @@ const moonbaseContract: ConceptContract = {
   ],
 };
 
-const conceptContracts = [legacyClinicContract, moonbaseContract] as const;
+const conceptContracts = [moonbaseContract] as const;
 const finalPublicApis = ["permit", "segment", "worker", "equipmentCheck", "spaceWeather"] as const;
 
 const collectTypeScriptFiles = async (directoryUrl: URL): Promise<URL[]> => {
@@ -433,12 +394,12 @@ describe("runnable session package contract", () => {
   it("rejects source imports from another session while allowing test-only continuity adapters", async () => {
     const fixtureDirectory = await mkdtemp(join(tmpdir(), "session-source-import-contract-"));
     const sessionUrl = new URL(`${pathToFileURL(join(fixtureDirectory, "session-04")).href}/`);
-    const sourceDirectory = join(fixtureDirectory, "session-04/src/domain/appointment");
+    const sourceDirectory = join(fixtureDirectory, "session-04/src/domain/permit");
     await mkdir(sourceDirectory, { recursive: true });
 
     try {
       const relativeImport = new URL("relativeImport.ts", `${pathToFileURL(sourceDirectory).href}/`);
-      await writeFile(relativeImport, 'import "../../../../session-05/src/domain/appointment/appointment.js";\n');
+      await writeFile(relativeImport, 'import "../../../../session-05/src/domain/permit/permit.js";\n');
       await expect(assertNoCrossSessionSourceImports(sessionUrl)).rejects.toThrow(
         "must not import another session",
       );
@@ -447,7 +408,7 @@ describe("runnable session package contract", () => {
       const packageImport = new URL("packageImport.ts", `${pathToFileURL(sourceDirectory).href}/`);
       await writeFile(
         packageImport,
-        'import "@moonbase/session-05/src/domain/appointment/appointment.js";\n',
+        'import "@moonbase/session-05/src/domain/permit/permit.js";\n',
       );
       await expect(assertNoCrossSessionSourceImports(sessionUrl)).rejects.toThrow(
         "must not import another session",
@@ -457,7 +418,7 @@ describe("runnable session package contract", () => {
       const packageExport = new URL("packageExport.ts", `${pathToFileURL(sourceDirectory).href}/`);
       await writeFile(
         packageExport,
-        'export * from "@moonbase/session-05/src/domain/appointment/appointment.js";\n',
+        'export * from "@moonbase/session-05/src/domain/permit/permit.js";\n',
       );
       await expect(assertNoCrossSessionSourceImports(sessionUrl)).rejects.toThrow(
         "must not import another session",
@@ -470,7 +431,7 @@ describe("runnable session package contract", () => {
       );
       await writeFile(
         packageDynamicImport,
-        'void import("@moonbase/session-05/src/domain/appointment/appointment.js");\n',
+        'void import("@moonbase/session-05/src/domain/permit/permit.js");\n',
       );
       await expect(assertNoCrossSessionSourceImports(sessionUrl)).rejects.toThrow(
         "must not import another session",
@@ -478,7 +439,7 @@ describe("runnable session package contract", () => {
 
       await rm(packageDynamicImport);
       const absoluteImport = new URL("absoluteImport.ts", `${pathToFileURL(sourceDirectory).href}/`);
-      await writeFile(absoluteImport, 'import "/workspace/examples/session-05/src/domain/appointment/appointment.js";\n');
+      await writeFile(absoluteImport, 'import "/workspace/examples/session-05/src/domain/permit/permit.js";\n');
       await expect(assertNoCrossSessionSourceImports(sessionUrl)).rejects.toThrow(
         "must not import another session",
       );
@@ -500,12 +461,12 @@ describe("runnable session package contract", () => {
     const sessionUrl = `${pathToFileURL(join(fixtureDirectory, "session-04")).href}/`;
     const sourcePath = join(
       fixtureDirectory,
-      "session-04/src/domain/appointment/crossSessionImport.ts",
+      "session-04/src/domain/permit/crossSessionImport.ts",
     );
-    await mkdir(join(fixtureDirectory, "session-04/src/domain/appointment"), { recursive: true });
+    await mkdir(join(fixtureDirectory, "session-04/src/domain/permit"), { recursive: true });
     await writeFile(
       sourcePath,
-      'import "../../../../session-05/src/domain/appointment/appointment.js";\n',
+      'import "../../../../session-05/src/domain/permit/permit.js";\n',
     );
 
     try {
@@ -583,15 +544,15 @@ describe("runnable session package contract", () => {
     }
   });
 
-  it("keeps Session 06 source free of the removed in-memory appointment store", async () => {
+  it("keeps Session 06 source free of an in-memory permit store", async () => {
     const sessionUrl = new URL("examples/session-06/", rootUrl);
     await expect(
-      stat(new URL("src/adaptor/inMemoryAppointmentStore.d.ts", sessionUrl)),
+      stat(new URL("src/adaptor/inMemoryPermitStore.d.ts", sessionUrl)),
     ).rejects.toMatchObject({ code: "ENOENT" });
 
     for (const file of await collectTypeScriptFiles(new URL("src/", sessionUrl))) {
       expect(await readFile(file, "utf8"), file.pathname).not.toContain(
-        "inMemoryAppointmentStore",
+        "inMemoryPermitStore",
       );
     }
   });

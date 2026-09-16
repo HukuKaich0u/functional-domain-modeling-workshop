@@ -13,6 +13,17 @@ export type ActionAvailability =
     }>
   | Readonly<{ kind: "Hidden" }>;
 
+export type IncidentScenario = Readonly<{
+  title: string;
+  description: string;
+  action: Exclude<ActionAvailability, { kind: "Hidden" }>;
+}>;
+
+/** MoonBase の役割。Admin はシステム担当、GroundControl は地上管制、BaseCommander は基地長、Electrician は電気主任 */
+export type MoonbaseUserView = Readonly<{
+  role: "Admin" | "GroundControl" | "BaseCommander" | "Electrician";
+}>;
+
 export type AppointmentActions = Readonly<{
   checkIn: ActionAvailability;
   startExamination: ActionAvailability;
@@ -20,12 +31,6 @@ export type AppointmentActions = Readonly<{
   recordPayment: ActionAvailability;
   cancel: ActionAvailability;
   requestFollowUp: ActionAvailability;
-}>;
-
-export type IncidentScenario = Readonly<{
-  title: string;
-  description: string;
-  action: Exclude<ActionAvailability, { kind: "Hidden" }>;
 }>;
 
 export type DatabaseInspection = Readonly<{
@@ -66,11 +71,6 @@ export type ClinicPageProps = Readonly<{
 
 export type ClinicUserView = Readonly<{
   role: "Admin" | "Receptionist" | "Veterinarian";
-}>;
-
-/** MoonBase の役割。Admin はシステム担当、GroundControl は地上管制、BaseCommander は基地長、Electrician は電気主任 */
-export type MoonbaseUserView = Readonly<{
-  role: "Admin" | "GroundControl" | "BaseCommander" | "Electrician";
 }>;
 
 export type PermitActions = Readonly<{
