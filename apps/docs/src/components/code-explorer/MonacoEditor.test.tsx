@@ -59,6 +59,8 @@ const monacoState = vi.hoisted(() => {
         ModuleResolutionKind: { NodeJs: 2 },
         ScriptTarget: { ES2020: 7 },
         typescriptDefaults: {
+          setEagerModelSync: vi.fn(),
+          setDiagnosticsOptions: vi.fn(),
           setCompilerOptions: vi.fn(),
           addExtraLib: vi.fn(() => ({ dispose: vi.fn() })),
         },

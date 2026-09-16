@@ -54,6 +54,13 @@ const languageForPath = (path: string): string => {
 };
 
 const configureTypeScript = (monaco: MonacoApi): void => {
+  monaco.typescript.typescriptDefaults.setEagerModelSync(true);
+  // WebContainer の依存を Monaco に完全には同期できないため、
+  // モジュール解決失敗は editor 上だけで無視する。
+  // 実際の型検査は terminal の pnpm typecheck で行う。
+  monaco.typescript.typescriptDefaults.setDiagnosticsOptions({
+    diagnosticCodesToIgnore: [2307],
+  });
   monaco.typescript.typescriptDefaults.setCompilerOptions({
     allowNonTsExtensions: true,
     module: monaco.typescript.ModuleKind.ESNext,
